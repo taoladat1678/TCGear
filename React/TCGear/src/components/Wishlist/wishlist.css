@@ -1,0 +1,50 @@
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(225,29,72,0.9) 0%, rgba(0,0,0,0.9) 100%);
+}
+
+.product-card {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.3);
+}
+
+.empty-wishlist {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.social-icon {
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.2);
+}
+
+@media (max-width: 760px) {
+  .empty-wishlist {
+    padding: 2rem 1rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+}
+
+/* Additional Tailwind overrides or custom styles */
+.bg-secondary { background-color: #000000; }
+.text-accent { color: #ffffff; }
+.text-primary { color: #e11d48; }
+.border-primary\/20 { border-color: rgba(225, 29, 72, 0.2); }
+.bg-secondary\/50 { background-color: rgba(0, 0, 0, 0.5); }
+.text-accent\/70 { color: rgba(255, 255, 255, 0.7); }
+.bg-primary { background-color: #e11d48; }
+.hover\:bg-primary\/90:hover { background-color: rgba(225, 29, 72, 0.9); }
+.text-white { color: #ffffff; }

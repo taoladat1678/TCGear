@@ -1,0 +1,132 @@
+/* register.css - No changes needed, as it's already layout-focused */
+.register-container {
+  min-height: calc(100vh - 200px);
+}
+
+.register-card {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.input-field {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  height: 48px;
+}
+
+.input-field:focus {
+  border-color: #e11d48;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2);
+  outline: none;
+}
+
+.input-field.invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.social-register-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.social-register-btn:hover {
+  background: rgba(225, 29, 72, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+}
+
+.password-strength {
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  margin-top: 6px;
+}
+
+.password-strength-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.toggle-password {
+  cursor: pointer;
+  color: #e11d48;
+  transition: color 0.2s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  color: #ffffff;
+}
+
+.toggle-password-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  width: 48px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  align-self: center;
+  margin-top: 29px;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e11d48;
+  margin-bottom: 1rem;
+}
+
+.avatar-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 760px) {
+  .register-card {
+    padding: 1.5rem;
+  }
+  .input-field {
+    padding: 0.5rem 0.75rem;
+    height: 40px;
+  }
+  .social-register-btn {
+    font-size: 0.875rem;
+  }
+  .avatar-preview {
+    width: 80px;
+    height: 80px;
+  }
+  .toggle-password-container {
+    height: 40px;
+    width: 40px;
+  }
+  .toggle-password {
+    width: 20px;
+    height: 20px;
+  }
+}

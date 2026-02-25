@@ -1,0 +1,26 @@
+#categories-submenu {
+    margin-top: 5px;
+}
+
+#blogs-submenu {
+    margin-top: 5px;
+}
+
+.sidebar-submenu {
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.sidebar-submenu.show {
+    display: block;
+    max-height: 200px;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+    nav a {
+        padding: 0.75rem 1rem;
+    }
+}

@@ -1,0 +1,16 @@
+/* profile.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-orbitron { font-family: 'Orbitron', sans-serif; }
+.font-open-sans { font-family: 'Open Sans', sans-serif; }
+
+.bg-secondary { background-color: #0a0a0a; }
+.text-accent { color: #ffffff; }
+.text-primary { color: #e11d48; }
+.border-primary\/30 { border-color: rgba(225, 29, 72, 0.3); }
+
+/* Tăng độ nét cho card */
+.backdrop-blur-sm { backdrop-filter: blur(6px); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }

@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý khách hàng TCGear - Quản lý thông tin và hoạt động của tất cả khách hàng">
+    <meta name="keywords" content="quản lý khách hàng, TCGear, khách hàng gaming, quản trị user">
+    <meta name="author" content="TCGear">
+    <title>Quản Lý Khách Hàng - TCGear Admin</title>
+    <link rel="icon" type="image/x-icon"
+        href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#e11d48",
+                        secondary: "#000000",
+                        accent: "#ffffff",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap");
+
+        h1,
+        h2,
+        h3,
+        .font-orbitron {
+            font-family: "Orbitron", sans-serif;
+        }
+
+        p,
+        span,
+        a,
+        input,
+        button,
+        .font-open-sans {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loader {
+            border: 4px solid #e11d48;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+
+        #categories-submenu {
+            margin-top: 5px;
+        }
+
+        #blogs-submenu {
+            margin-top: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #000000;
+            border: 1px solid #e11d48;
+            border-radius: 4px;
+            min-width: 120px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: #ffffff;
+            gap: 8px;
+            flex-wrap: nowrap;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e11d48;
+        }
+
+        #notifications-dropdown {
+            width: 16rem;
+        }
+
+        .sidebar-submenu {
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .sidebar-submenu.show {
+            display: block;
+            max-height: 200px;
+        }
+
+        .counter {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #e11d48;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: "Open Sans", sans-serif;
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .backdrop {
+            display: none;
+        }
+
+        .backdrop.show {
+            display: block;
+        }
+
+        .active {
+            background-color: #e11d48;
+            color: #ffffff;
+        }
+
+        /* Slide-up from bottom animation for main sections */
+        @keyframes slideUpFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slideUpFromBottom {
+            animation: slideUpFromBottom 0.8s ease-out forwards;
+        }
+
+        /* Slide-in from left for sidebar */
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Apply to sidebar items */
+        nav > a,
+        .sidebar-item {
+            opacity: 0;
+            animation: slideInFromLeft 0.8s ease-out forwards;
+        }
+
+        /* Slide-in for sidebar items */
+        .sidebar-item {
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover animation for icons */
+        [data-feather] {
+            transition: transform 0.2s ease;
+        }
+
+        [data-feather]:hover {
+            transform: scale(1.1);
+        }
+
+        /* Chart load animation */
+        .chart-container canvas {
+            animation: slideUpFromBottom 1s ease-out both;
+        }
+
+        /* Table row stagger slide up - remove delays for together */
+        .table-container tbody tr {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.5s ease-out;
+        }
+
+        .table-container tbody tr.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Customer list stagger slide up - remove delays */
+        .divide-y > div {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s ease-out;
+        }
+
+        .divide-y > div.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* System status stagger slide up - remove delays */
+        .grid-cols-3 > div {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s ease-out;
+        }
+
+        .grid-cols-3 > div.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 760px) {
+            .header-search-container {
+                margin-left: auto;
+                margin-right: auto;
+                flex: 1;
+                max-width: calc(100vw - 4rem - 3rem);
+            }
+
+            .mobile-header-right {
+                display: flex;
+                align-items: center;
+                gap: 0rem;
+            }
+
+            #notifications-toggle {
+                margin-right: 0 !important;
+            }
+
+            .mobile-header-right > div:nth-child(2) {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .table-container {
+                font-size: 0.75rem;
+            }
+
+            .table-container th,
+            .table-container td {
+                padding: 0.5rem;
+                min-width: 80px;
+            }
+
+            .table-container th:first-child,
+            .table-container td:first-child,
+            .table-container th:nth-child(2),
+            .table-container td:nth-child(2) {
+                min-width: 60px;
+            }
+
+            .table-container th:nth-child(3),
+            .table-container td:nth-child(3) {
+                min-width: 120px;
+            }
+
+            .chart-container {
+                height: 200px;
+            }
+
+            /* Additional mobile adjustments for better usability */
+            header {
+                padding: 0.75rem 1rem;
+            }
+
+            .header-search-container input {
+                font-size: 0.875rem;
+                padding: 0.5rem;
+            }
+
+            /* Keep icons position and size unchanged on mobile */
+            [data-feather] {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+            }
+
+            /* Ensure icon positions in flex items remain stable */
+            .flex.items-center > [data-feather] {
+                flex-shrink: 0;
+                margin-right: 0.5rem;
+            }
+
+            button, .sidebar-toggle {
+                min-height: 2.75rem;
+                min-width: 2.75rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Stabilize header right icons and counter on mobile */
+            .mobile-header-right > div {
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            #notifications-toggle,
+            #profile-toggle {
+                min-width: 2.5rem;
+                min-height: 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                position: relative;
+                padding: 0.5rem;
+                margin: 0 !important;
+            }
+
+            #profile-toggle img {
+                width: 2rem !important;
+                height: 2rem !important;
+            }
+
+            #profile-toggle [data-feather] {
+                width: 1rem !important;
+                height: 1rem !important;
+                margin-left: 0.25rem;
+            }
+
+            .counter {
+                top: -2px !important;
+                right: -2px !important;
+                left: auto !important;
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 11px !important;
+            }
+
+            /* Adjust overview cards padding */
+            .grid-cols-1 > div {
+                padding: 1rem;
+            }
+
+            /* Reduce gaps in grids on mobile */
+            .grid {
+                gap: 1rem;
+            }
+
+            /* Table improvements: make status badges smaller */
+            .px-2.py-1.text-xs {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            /* Customer list images smaller */
+            .h-10.w-10 {
+                height: 2rem;
+                width: 2rem;
+            }
+
+            /* System status cards padding */
+            .bg-primary\/10.p-4 {
+                padding: 0.75rem;
+            }
+
+            /* Footer padding */
+            footer {
+                padding: 1rem;
+            }
+
+            /* Ensure dropdowns don't overflow */
+            .dropdown-content {
+                right: auto;
+                left: 0;
+            }
+
+            /* Sidebar width adjustment for very small screens */
+            .w-64 {
+                width: 80vw;
+                max-width: 280px;
+            }
+
+            /* Improve table responsiveness: add horizontal scroll indicator if needed */
+            .table-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Stack header elements vertically if needed for very small screens */
+            .header-search-container {
+                margin-top: 0.5rem;
+            }
+
+            /* Reduce sidebar item padding for better fit */
+            nav a {
+                padding: 0.75rem 1rem;
+            }
+
+            /* Ensure charts are fully responsive and touch-friendly */
+            .chart-container {
+                touch-action: pan-x pan-y;
+            }
+
+            /* Giữ nguyên width của dropdown thông báo và dropdown user trên màn hình <=760px */
+            #notifications-dropdown {
+                min-width: unset !important;
+                width: 16rem !important;
+            }
+
+            #profile-dropdown {
+                min-width: unset !important;
+                width: 12rem !important;
+            }
+
+            /* Improve customer list touch targets */
+            .divide-y > div {
+                min-height: 3rem;
+                padding: 0.75rem;
+            }
+
+            /* System status grid stacks to single column */
+            .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            /* Overview cards stack and reduce font sizes slightly */
+            .grid-cols-1 > div h3 {
+                font-size: 1.25rem;
+            }
+
+            /* Ensure main content padding is minimal but usable */
+            main {
+                padding: 1rem;
+            }
+
+            /* Modal adjustments for mobile */
+            .sm:max-w-3xl {
+                max-width: 95vw;
+                margin: 1rem;
+            }
+
+            .px-6.py-4 {
+                padding: 1rem;
+            }
+
+            .grid-cols-1.md\\:grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .space-y-6 {
+                space-y: 1rem;
+            }
+        }
+
+        /* Initial opacity for animations */
+        .animate-slideUpFromBottom,
+        .table-container tbody tr,
+        .divide-y > div,
+        .grid-cols-3 > div {
+            opacity: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1.5rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-secondary text-accent">
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-secondary border-r border-primary/20 lg:static lg:inset-0 transition-transform duration-500 ease-out -translate-x-full lg:translate-x-0 animate-slideInFromLeft">
+            <div class="flex items-center justify-center h-16 bg-secondary border-b border-primary/20">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+                    class="h-8 w-auto transition-transform duration-200 hover:scale-110" alt="TCGear Logo">
+                <span class="ml-2 text-lg font-bold text-primary font-orbitron">TCGear Admin</span>
+            </div>
+            <nav class="mt-5">
+                <a href="admin-dashboard.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="home" class="w-5 h-5"></i>
+                    <span class="mx-4">Bảng Điều Khiển</span>
+                </a>
+                <a href="admin-product.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="package" class="w-5 h-5"></i>
+                    <span class="mx-4">Sản Phẩm</span>
+                </a>
+                <div class="sidebar-item">
+                    <a href="#" onclick="toggleSubmenu('categories')" class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans cursor-pointer transition-all duration-200">
+                        <i data-feather="layers" class="w-5 h-5"></i>
+                        <span class="mx-4">Danh Mục</span>
+                        <i id="categories-chevron" data-feather="chevron-down" class="w-4 h-4 ml-auto transition-transform duration-200"></i>
+                    </a>
+                    <div id="categories-submenu" class="sidebar-submenu bg-secondary/50">
+                        <a href="admin-categories.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="layers" class="w-4 h-4 mr-2"></i>
+                            <span>Danh mục chính</span>
+                        </a>
+                        <a href="admin_sub-categories.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="list" class="w-4 h-4 mr-2"></i>
+                            <span>Danh mục phụ</span>
+                        </a>
+                    </div>
+                </div>
+                <a href="admin-orders.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="shopping-cart" class="w-5 h-5"></i>
+                    <span class="mx-4">Đơn Hàng</span>
+                </a>
+                <a href="admin-users.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 active">
+                    <i data-feather="users" class="w-5 h-5"></i>
+                    <span class="mx-4">Người dùng</span>
+                </a>
+                <a href="admin-teams.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="grid" class="w-5 h-5"></i>
+                    <span class="mx-4">Đội tuyển</span>
+                </a>
+                <div class="sidebar-item">
+                    <a href="#" onclick="toggleSubmenu('blogs')" class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans cursor-pointer transition-all duration-200">
+                        <i data-feather="file-text" class="w-5 h-5"></i>
+                        <span class="mx-4">Bài Viết Blog</span>
+                        <i id="blogs-chevron" data-feather="chevron-down" class="w-4 h-4 ml-auto transition-transform duration-200"></i>
+                    </a>
+                    <div id="blogs-submenu" class="sidebar-submenu bg-secondary/50">
+                        <a href="admin-blogs.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="file-text" class="w-4 h-4 mr-2"></i>
+                            <span>Blog</span>
+                        </a>
+                        <a href="admin_blogs-categories.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="folder" class="w-4 h-4 mr-2"></i>
+                            <span>Danh mục blog</span>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="admin-messages.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="message-circle" class="w-5 h-5"></i>
+                    <span class="mx-4">Tin Nhắn</span>
+                </a>
+                <a href="admin-comments.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="message-square" class="w-5 h-5"></i>
+                    <span class="mx-4">Bình luận</span>
+                </a>
+                <a href="admin-settings.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="settings" class="w-5 h-5"></i>
+                    <span class="mx-4">Cài Đặt</span>
+                </a>
+                <a href="logout.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="log-out" class="w-5 h-5"></i>
+                    <span class="mx-4">Đăng Xuất</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="flex items-center justify-between px-4 py-4 bg-secondary border-b border-primary/20 md:px-6 transition-all duration-300 animate-slideUpFromBottom z-60">
+                <div class="flex items-center flex-1">
+                    <button id="sidebar-toggle"
+                        class="text-accent hover:text-primary focus:outline-none lg:hidden mr-2 transition-transform duration-200 hover:scale-110">
+                        <i data-feather="menu" class="w-6 h-6"></i>
+                    </button>
+                    <div class="header-search-container relative mx-2 lg:mx-0 max-w-md">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <i data-feather="search" class="w-5 h-5 text-accent transition-transform duration-200 hover:scale-110"></i>
+                        </span>
+                        <input
+                            class="w-full pl-4 pr-10 py-2 rounded-md border-2 border-primary/30 bg-secondary text-accent focus:outline-none focus:border-primary font-open-sans"
+                            type="text" placeholder="Tìm kiếm">
+                    </div>
+                </div>
+                <div class="mobile-header-right flex items-center">
+                    <div class="relative">
+                        <button id="notifications-toggle"
+                            class="flex items-center text-accent hover:text-primary mx-2 lg:mx-4 relative transition-all duration-200 hover:scale-110">
+                            <i data-feather="bell" class="w-5 h-5"></i>
+                            <span class="counter">3</span>
+                        </button>
+                        <div id="notifications-dropdown" class="dropdown-content w-64">
+                            <div class="p-4 border-b border-primary/20 animate-slideUpFromBottom">
+                                <h3 class="text-accent font-semibold font-orbitron">Thông Báo</h3>
+                            </div>
+                            <div class="p-4 max-h-64 overflow-y-auto">
+                                <div class="flex items-center mb-4 animate-slideUpFromBottom">
+                                    <div class="bg-primary/10 p-2 rounded-full">
+                                        <i data-feather="shopping-cart" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-accent font-open-sans">Đã nhận đơn hàng mới</p>
+                                        <p class="text-xs text-accent/70 font-open-sans">2 phút trước</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center mb-4 animate-slideUpFromBottom">
+                                    <div class="bg-primary/10 p-2 rounded-full">
+                                        <i data-feather="user-plus" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-accent font-open-sans">Khách hàng mới đăng ký</p>
+                                        <p class="text-xs text-accent/70 font-open-sans">5 phút trước</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center animate-slideUpFromBottom">
+                                    <div class="bg-primary/10 p-2 rounded-full">
+                                        <i data-feather="alert-triangle" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-accent font-open-sans">Tải máy chủ cao</p>
+                                        <p class="text-xs text-accent/70 font-open-sans">10 phút trước</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-t border-primary/20 bg-primary/10">
+                                <a href="#" class="text-primary text-sm font-semibold font-open-sans text-center block transition-colors duration-200 hover:text-primary/80">Xem tất cả thông báo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative mx-2 lg:mx-4">
+                        <button id="profile-toggle"
+                            class="flex items-center text-accent hover:text-primary transition-all duration-200 hover:scale-105">
+                            <img class="h-8 w-8 rounded-full object-cover transition-transform duration-200 hover:scale-110" src="http://static.photos/people/200x200/1"
+                                alt="Người dùng quản trị">
+                            <i id="profile-chevron" data-feather="chevron-down" class="h-4 w-8 ml-1 transition-transform duration-200"></i>
+                        </button>
+                        <div id="profile-dropdown" class="dropdown-content w-48">
+                            <a href="profile.html" class="font-open-sans transition-all duration-200 hover:bg-primary/10"><i data-feather="user" class="h-5 w-5"></i>
+                                Hồ Sơ</a>
+                            <a href="settings.html" class="font-open-sans transition-all duration-200 hover:bg-primary/10"><i data-feather="settings"
+                                    class="h-5 w-5"></i> Cài Đặt</a>
+                            <a href="logout.html" class="font-open-sans transition-all duration-200 hover:bg-primary/10"><i data-feather="log-out" class="h-5 w-5"></i>
+                                Đăng Xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 max-w-7xl md:p-6">
+                <!-- Page Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 animate-slideUpFromBottom">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-accent font-orbitron">Quản Lý Khách Hàng</h1>
+                        <p class="text-accent/70 font-open-sans mt-1">Quản lý thông tin và hoạt động của tất cả khách hàng</p>
+                    </div>
+                    <div class="flex space-x-2 mt-4 sm:mt-0">
+                        <button id="add-user-btn" class="px-4 py-2 bg-primary text-accent rounded-md font-open-sans hover:bg-primary/90 transition flex items-center">
+                            <i data-feather="plus" class="w-4 h-4 mr-2"></i> Thêm Người Dùng
+                        </button>
+                        <button class="px-4 py-2 border border-primary/20 text-accent rounded-md font-open-sans hover:bg-primary/10 transition flex items-center">
+                            <i data-feather="download" class="w-4 h-4 mr-2"></i> Xuất CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customer Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 md:gap-8 md:mb-12">
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-slideUpFromBottom">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-primary/10 transition-transform duration-300 hover:scale-110">
+                                <i data-feather="users" class="w-6 h-6 text-primary"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Tổng Khách Hàng</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">5,372</h3>
+                            </div>
+                        </div>
+                        <p class="text-sm text-accent/70 mt-2 font-open-sans"><i data-feather="trending-up"
+                                class="w-4 h-4 inline transition-transform duration-200 hover:scale-110"></i> 5.7% so với tuần trước</p>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-slideUpFromBottom">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-500/20 transition-transform duration-300 hover:scale-110">
+                                <i data-feather="user-plus" class="w-6 h-6 text-green-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Khách Hàng Mới</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">128</h3>
+                            </div>
+                        </div>
+                        <p class="text-sm text-accent/70 mt-2 font-open-sans"><i data-feather="trending-up"
+                                class="w-4 h-4 inline transition-transform duration-200 hover:scale-110"></i> 15.2% so với tuần trước</p>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-slideUpFromBottom">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-500/20 transition-transform duration-300 hover:scale-110">
+                                <i data-feather="activity" class="w-6 h-6 text-blue-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Khách Hàng Active</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">3,845</h3>
+                            </div>
+                        </div>
+                        <p class="text-sm text-accent/70 mt-2 font-open-sans"><i data-feather="trending-up"
+                                class="w-4 h-4 inline transition-transform duration-200 hover:scale-110"></i> 4.1% so với tuần trước</p>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-slideUpFromBottom">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-500/20 transition-transform duration-300 hover:scale-110">
+                                <i data-feather="trending-up" class="w-6 h-6 text-purple-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Tỷ Lệ Giữ Chân</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">87%</h3>
+                            </div>
+                        </div>
+                        <p class="text-sm text-accent/70 mt-2 font-open-sans"><i data-feather="trending-up"
+                                class="w-4 h-4 inline transition-transform duration-200 hover:scale-110"></i> 2.3% so với tuần trước</p>
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 mb-8 md:mb-12 animate-slideUpFromBottom">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm text-accent/70 font-open-sans mb-2">Trạng Thái</label>
+                            <select class="w-full px-3 py-2 border border-primary/20 bg-secondary text-accent rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                                <option value="">Tất cả</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="new">Mới</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-accent/70 font-open-sans mb-2">Ngày Đăng Ký</label>
+                            <input type="date" class="w-full px-3 py-2 border border-primary/20 bg-secondary text-accent rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-accent/70 font-open-sans mb-2">Số Đơn Hàng</label>
+                            <select class="w-full px-3 py-2 border border-primary/20 bg-secondary text-accent rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                                <option value="">Tất cả</option>
+                                <option value="1">1+</option>
+                                <option value="3">3+</option>
+                                <option value="5">5+</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-accent/70 font-open-sans mb-2">Loại Khách Hàng</label>
+                            <select class="w-full px-3 py-2 border border-primary/20 bg-secondary text-accent rounded-md focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                                <option value="">Tất cả</option>
+                                <option value="regular">Thường</option>
+                                <option value="vip">VIP</option>
+                                <option value="premium">Premium</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button class="px-4 py-2 bg-primary text-accent rounded-md font-open-sans hover:bg-primary/90 transition mr-2">
+                            Áp Dụng Bộ Lọc
+                        </button>
+                        <button class="px-4 py-2 border border-primary/20 text-accent rounded-md font-open-sans hover:bg-primary/10 transition">
+                            Đặt Lại
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customers Table -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 md:gap-8 md:mb-12">
+                    <!-- Customers Table -->
+                    <div class="lg:col-span-2 bg-secondary/50 rounded-lg shadow overflow-hidden border border-primary/20 animate-slideUpFromBottom">
+                        <div class="px-4 py-4 md:px-6 border-b border-primary/20 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-accent font-orbitron">Danh Sách Khách Hàng</h3>
+                            <div class="flex items-center space-x-2">
+                                <button class="text-primary text-sm flex items-center font-open-sans hover:text-primary/80 transition-all duration-200 hover:scale-110">
+                                    <i data-feather="refresh-cw" class="w-4 h-4 mr-1"></i> Làm Mới
+                                </button>
+                                <button class="text-primary text-sm flex items-center font-open-sans hover:text-primary/80 transition-all duration-200 hover:scale-110">
+                                    <i data-feather="download" class="w-4 h-4 mr-1"></i> Xuất
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto table-container">
+                            <table class="min-w-full divide-y divide-primary/20">
+                                <thead class="bg-secondary/30">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-3 md:px-6 text-left text-xs font-medium text-accent/70 font-open-sans uppercase tracking-wider">
+                                            ID</th>
+                                        <th
+                                            class="px-4 py-3 md:px-6 text-left text-xs font-medium text-accent/70 font-open-sans uppercase tracking-wider">
+                                            Ảnh</th>
+                                        <th
+                                            class="px-4 py-3 md:px-6 text-left text-xs font-medium text-accent/70 font-open-sans uppercase tracking-wider">
+                                            Họ Tên</th>
+                                        <th
+                                            class="px-4 py-3 md:px-6 text-left text-xs font-medium text-accent/70 font-open-sans uppercase tracking-wider">
+                                            Email</th>
+                                        <th
+                                            class="px-4 py-3 md:px-6 text-left text-xs font-medium text-accent/70 font-open-sans uppercase tracking-wider">
+                                            Trạng Thái</th>
+                                        <th
+                                            class="px-4 py-3 md:px-6 text-left text-xs font-medium text-accent/70 font-open-sans uppercase tracking-wider">
+                                            Hành Động</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-primary/20">
+                                    <tr class="animate-in" data-phone="+84 123 456 789" data-address="123 Đường ABC, Quận 1, TP.HCM" data-register="2023-09-15" data-orders="8" data-total="$1,249.50" data-role="Regular" data-status="active">
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">#CUS-001</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="http://static.photos/people/200x200/2" alt="Emma Wilson">
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm font-semibold text-accent font-open-sans">Emma
+                                            Wilson</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">emma.wilson@email.com</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-500 font-open-sans">Active</span>
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">
+                                            <div class="flex space-x-2">
+                                                <button class="view-user-btn text-primary hover:text-primary/80">
+                                                    <i data-feather="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="edit-user-btn text-blue-500 hover:text-blue-400">
+                                                    <i data-feather="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-red-500 hover:text-red-400">
+                                                    <i data-feather="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="animate-in" data-phone="+84 987 654 321" data-address="456 Đường XYZ, Quận 3, TP.HCM" data-register="2023-10-02" data-orders="3" data-total="$589.99" data-role="Regular" data-status="active">
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">#CUS-002</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="http://static.photos/people/200x200/3" alt="David Miller">
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm font-semibold text-accent font-open-sans">David
+                                            Miller</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">david.miller@email.com</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-500 font-open-sans">Active</span>
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">
+                                            <div class="flex space-x-2">
+                                                <button class="view-user-btn text-primary hover:text-primary/80">
+                                                    <i data-feather="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="edit-user-btn text-blue-500 hover:text-blue-400">
+                                                    <i data-feather="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-red-500 hover:text-red-400">
+                                                    <i data-feather="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="animate-in" data-phone="+84 456 789 123" data-address="789 Đường DEF, Quận 7, TP.HCM" data-register="2023-08-20" data-orders="12" data-total="$2,499.00" data-role="VIP" data-status="active">
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">#CUS-003</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="http://static.photos/people/200x200/4" alt="Sophia Garcia">
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm font-semibold text-accent font-open-sans">Sophia
+                                            Garcia</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">sophia.garcia@email.com</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-500 font-open-sans">VIP</span>
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">
+                                            <div class="flex space-x-2">
+                                                <button class="view-user-btn text-primary hover:text-primary/80">
+                                                    <i data-feather="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="edit-user-btn text-blue-500 hover:text-blue-400">
+                                                    <i data-feather="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-red-500 hover:text-red-400">
+                                                    <i data-feather="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="animate-in" data-phone="+84 321 654 987" data-address="321 Đường GHI, Quận 10, TP.HCM" data-register="2023-11-05" data-orders="1" data-total="$149.99" data-role="Regular" data-status="new">
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">#CUS-004</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="http://static.photos/people/200x200/5" alt="James Taylor">
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm font-semibold text-accent font-open-sans">James
+                                            Taylor</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">james.taylor@email.com</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-yellow-500/20 text-yellow-500 font-open-sans">Mới</span>
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">
+                                            <div class="flex space-x-2">
+                                                <button class="view-user-btn text-primary hover:text-primary/80">
+                                                    <i data-feather="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="edit-user-btn text-blue-500 hover:text-blue-400">
+                                                    <i data-feather="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-red-500 hover:text-red-400">
+                                                    <i data-feather="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="animate-in" data-phone="+84 789 123 456" data-address="654 Đường JKL, Quận 2, TP.HCM" data-register="2023-07-12" data-orders="0" data-total="$0.00" data-role="Regular" data-status="inactive">
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">#CUS-005</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <img class="h-10 w-10 rounded-full object-cover"
+                                                src="http://static.photos/people/200x200/6" alt="Olivia Martinez">
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm font-semibold text-accent font-open-sans">Olivia
+                                            Martinez</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">olivia.martinez@email.com</td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap">
+                                            <span
+                                                class="px-2 py-1 text-xs rounded-full bg-gray-500/20 text-gray-500 font-open-sans">Inactive</span>
+                                        </td>
+                                        <td class="px-4 py-4 md:px-6 whitespace-nowrap text-sm text-accent font-open-sans">
+                                            <div class="flex space-x-2">
+                                                <button class="view-user-btn text-primary hover:text-primary/80">
+                                                    <i data-feather="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="edit-user-btn text-blue-500 hover:text-blue-400">
+                                                    <i data-feather="edit" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-red-500 hover:text-red-400">
+                                                    <i data-feather="trash" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-4 py-4 md:px-6 border-t border-primary/20 flex justify-end items-center">
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-primary/20 text-accent rounded-md font-open-sans hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    <i data-feather="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                <button class="px-3 py-1 bg-primary text-accent rounded-md font-open-sans">1</button>
+                                <button class="px-3 py-1 border border-primary/20 text-accent rounded-md font-open-sans hover:bg-primary/10">2</button>
+                                <button class="px-3 py-1 border border-primary/20 text-accent rounded-md font-open-sans hover:bg-primary/10">3</button>
+                                <button class="px-3 py-1 border border-primary/20 text-accent rounded-md font-open-sans hover:bg-primary/10">
+                                    <i data-feather="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-slideUpFromBottom">
+                    <h3 class="text-lg font-semibold text-accent font-orbitron mb-4">Trạng Thái Hệ Thống</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-primary/10 p-4 rounded-lg animate-in">
+                            <div class="flex items-center">
+                                <i data-feather="server" class="w-6 h-6 text-primary transition-transform duration-200 hover:scale-110"></i>
+                                <span class="ml-2 text-sm font-semibold text-accent font-open-sans">Máy Chủ</span>
+                            </div>
+                            <p class="text-xs text-accent/70 mt-2 font-open-sans">Tất cả hệ thống hoạt động bình thường</p>
+                        </div>
+                        <div class="bg-primary/10 p-4 rounded-lg animate-in">
+                            <div class="flex items-center">
+                                <i data-feather="database" class="w-6 h-6 text-primary transition-transform duration-200 hover:scale-110"></i>
+                                <span class="ml-2 text-sm font-semibold text-accent font-open-sans">Cơ Sở Dữ Liệu</span>
+                            </div>
+                            <p class="text-xs text-accent/70 mt-2 font-open-sans">Thời gian phản hồi: 42ms</p>
+                        </div>
+                        <div class="bg-primary/10 p-4 rounded-lg animate-in">
+                            <div class="flex items-center">
+                                <i data-feather="hard-drive" class="w-6 h-6 text-primary transition-transform duration-200 hover:scale-110"></i>
+                                <span class="ml-2 text-sm font-semibold text-accent font-open-sans">Lưu Trữ</span>
+                            </div>
+                            <p class="text-xs text-accent/70 mt-2 font-open-sans">78% đã sử dụng - 12.4GB trống</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-secondary border-t border-primary/20 p-4 md:p-6 transition-all duration-300 animate-slideUpFromBottom">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-sm text-accent/50 font-open-sans">© 2025 TCGear. Tất cả quyền được bảo lưu.</p>
+                    <div class="flex space-x-4 mt-4 md:mt-0">
+                        <a href="https://facebook.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://twitter.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://instagram.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://youtube.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-secondary/90"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-secondary rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative">
+                <div class="px-6 py-4 border-b border-primary/20 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-accent font-orbitron">Thêm Người Dùng Mới</h3>
+                    <button id="close-add-modal" class="modal-close">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="px-6 py-4">
+                    <form id="add-user-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="user_id" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">User ID <span class="text-primary">*</span></label>
+                                <input type="text" id="user_id" name="user_id" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập User ID">
+                            </div>
+                            <div>
+                                <label for="user_fullname" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Họ và Tên <span class="text-primary">*</span></label>
+                                <input type="text" id="user_fullname" name="user_fullname" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập họ và tên">
+                            </div>
+                            <div>
+                                <label for="user_username" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tên Đăng Nhập <span class="text-primary">*</span></label>
+                                <input type="text" id="user_username" name="user_username" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập tên đăng nhập">
+                            </div>
+                            <div>
+                                <label for="user_password" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Mật Khẩu <span class="text-primary">*</span></label>
+                                <input type="password" id="user_password" name="user_password" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập mật khẩu">
+                            </div>
+                            <div>
+                                <label for="user_email" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Email <span class="text-primary">*</span></label>
+                                <input type="email" id="user_email" name="user_email" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập email">
+                            </div>
+                            <div>
+                                <label for="user_phone_number" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Số Điện Thoại <span class="text-primary">*</span></label>
+                                <input type="tel" id="user_phone_number" name="user_phone_number" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập số điện thoại">
+                            </div>
+                            <div>
+                                <label for="user_status" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Trạng Thái <span class="text-primary">*</span></label>
+                                <select id="user_status" name="user_status" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                                    <option value="">Chọn trạng thái</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="user_address" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Địa Chỉ</label>
+                                <textarea id="user_address" name="user_address" rows="3" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập địa chỉ"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="px-6 py-4 border-t border-primary/20 flex justify-end space-x-3">
+                    <button id="cancel-btn" type="button" class="px-4 py-2 border border-primary/20 rounded-md text-accent hover:bg-secondary/70 font-open-sans">
+                        Hủy
+                    </button>
+                    <button type="submit" form="add-user-form" class="px-4 py-2 bg-primary text-accent rounded-md hover:bg-primary/90 font-open-sans">
+                        Thêm Người Dùng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-secondary/90"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-secondary rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative">
+                <div class="px-6 py-4 border-b border-primary/20 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-accent font-orbitron">Chỉnh Sửa Người Dùng</h3>
+                    <button id="close-edit-modal" class="modal-close">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="px-6 py-4">
+                    <form id="edit-user-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="edit-user_id" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">User ID <span class="text-primary">*</span></label>
+                                <input type="text" id="edit-user_id" name="user_id" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập User ID">
+                            </div>
+                            <div>
+                                <label for="edit-user_fullname" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Họ và Tên <span class="text-primary">*</span></label>
+                                <input type="text" id="edit-user_fullname" name="user_fullname" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập họ và tên">
+                            </div>
+                            <div>
+                                <label for="edit-user_username" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tên Đăng Nhập <span class="text-primary">*</span></label>
+                                <input type="text" id="edit-user_username" name="user_username" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập tên đăng nhập">
+                            </div>
+                            <div>
+                                <label for="edit-user_password" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Mật Khẩu (để trống nếu không thay đổi)</label>
+                                <input type="password" id="edit-user_password" name="user_password" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập mật khẩu mới">
+                            </div>
+                            <div>
+                                <label for="edit-user_email" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Email <span class="text-primary">*</span></label>
+                                <input type="email" id="edit-user_email" name="user_email" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập email">
+                            </div>
+                            <div>
+                                <label for="edit-user_phone_number" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Số Điện Thoại <span class="text-primary">*</span></label>
+                                <input type="tel" id="edit-user_phone_number" name="user_phone_number" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập số điện thoại">
+                            </div>
+                            <div>
+                                <label for="edit-user_status" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Trạng Thái <span class="text-primary">*</span></label>
+                                <select id="edit-user_status" name="user_status" required class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                                    <option value="">Chọn trạng thái</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="edit-user_address" class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Địa Chỉ</label>
+                                <textarea id="edit-user_address" name="user_address" rows="3" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập địa chỉ"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="px-6 py-4 border-t border-primary/20 flex justify-end space-x-3">
+                    <button id="cancel-edit-btn" type="button" class="px-4 py-2 border border-primary/20 rounded-md text-accent hover:bg-secondary/70 font-open-sans">
+                        Hủy
+                    </button>
+                    <button type="submit" form="edit-user-form" class="px-4 py-2 bg-primary text-accent rounded-md hover:bg-primary/90 font-open-sans">
+                        Cập Nhật Người Dùng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View User Detail Modal -->
+    <div id="view-user-modal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-secondary/90"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-secondary rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative">
+                <div class="px-6 py-4 border-b border-primary/20 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-accent font-orbitron">Chi Tiết Người Dùng</h3>
+                    <button id="close-view-modal" class="modal-close">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                <div class="px-6 py-4">
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">User ID</label>
+                                <input type="text" id="view-user_id" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Họ và Tên</label>
+                                <input type="text" id="view-user_fullname" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tên Đăng Nhập</label>
+                                <input type="text" id="view-user_username" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Email</label>
+                                <input type="email" id="view-user_email" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Số Điện Thoại</label>
+                                <input type="tel" id="view-user_phone_number" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Vai Trò</label>
+                                <input type="text" id="view-user_role" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Ngày Đăng Ký</label>
+                                <input type="date" id="view-user_register" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Số Đơn Hàng</label>
+                                <input type="number" id="view-user_orders" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Địa Chỉ</label>
+                                <textarea id="view-user_address" rows="3" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tổng Chi Tiêu</label>
+                                <input type="text" id="view-user_total" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Trạng Thái</label>
+                                <input type="text" id="view-user_status" readonly class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent font-open-sans">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-primary/20 flex justify-end space-x-3">
+                    <button id="close-view-btn" type="button" class="px-4 py-2 border border-primary/20 rounded-md text-accent hover:bg-secondary/70 font-open-sans">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backdrop for mobile sidebar -->
+    <div id="sidebar-backdrop" class="fixed inset-0 z-40 bg-secondary/50 lg:hidden backdrop transition-opacity duration-300"></div>
+
+    <script>
+        // Pure JS for interactivity
+        document.addEventListener('DOMContentLoaded', function () {
+            let sidebarOpen = false;
+            let notificationsOpen = false;
+            let profileOpen = false;
+
+            const sidebar = document.querySelector('.fixed.inset-y-0.left-0');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            const notificationsToggle = document.getElementById('notifications-toggle');
+            const notificationsDropdown = document.getElementById('notifications-dropdown');
+            const profileToggle = document.getElementById('profile-toggle');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            const profileChevron = document.getElementById('profile-chevron');
+            const notificationsContainer = notificationsDropdown.parentNode;
+            const profileContainer = profileDropdown.parentNode;
+            const addUserBtn = document.getElementById('add-user-btn');
+            const addUserModal = document.getElementById('add-user-modal');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const closeAddModal = document.getElementById('close-add-modal');
+            const addUserForm = document.getElementById('add-user-form');
+            const viewUserModal = document.getElementById('view-user-modal');
+            const closeViewModal = document.getElementById('close-view-modal');
+            const closeViewBtn = document.getElementById('close-view-btn');
+            const editUserModal = document.getElementById('edit-user-modal');
+            const closeEditModal = document.getElementById('close-edit-modal');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            const editUserForm = document.getElementById('edit-user-form');
+
+            // Trigger animations after load - all together
+            setTimeout(() => {
+                document.querySelectorAll('.animate-slideUpFromBottom').forEach(el => {
+                    el.style.opacity = '1';
+                });
+                document.querySelectorAll('.table-container tbody tr, .divide-y > div, .grid-cols-3 > div').forEach(el => {
+                    el.classList.add('animate-in');
+                });
+                document.querySelectorAll('nav > a, .sidebar-item').forEach(el => {
+                    el.style.opacity = '1';
+                });
+            }, 200);
+
+            // Function to close a specific dropdown
+            function closeDropdown(name) {
+                if (name === 'notifications') {
+                    notificationsOpen = false;
+                    notificationsDropdown.classList.remove('show');
+                    setTimeout(() => {
+                        if (!notificationsOpen) {
+                            notificationsContainer.appendChild(notificationsDropdown);
+                            notificationsDropdown.style.position = 'absolute';
+                            notificationsDropdown.style.top = '100%';
+                            notificationsDropdown.style.right = '0';
+                            notificationsDropdown.style.left = 'auto';
+                        }
+                    }, 300);
+                } else if (name === 'profile') {
+                    profileOpen = false;
+                    profileDropdown.classList.remove('show');
+                    profileChevron.classList.remove('rotate-180');
+                    setTimeout(() => {
+                        if (!profileOpen) {
+                            profileContainer.appendChild(profileDropdown);
+                            profileDropdown.style.position = 'absolute';
+                            profileDropdown.style.top = '100%';
+                            profileDropdown.style.right = '0';
+                            profileDropdown.style.left = 'auto';
+                        }
+                    }, 300);
+                }
+            }
+
+            // Function to close all dropdowns
+            function closeAllDropdowns() {
+                closeDropdown('notifications');
+                closeDropdown('profile');
+            }
+
+            // Sidebar toggle
+            function updateSidebar() {
+                if (sidebarOpen) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                    sidebarBackdrop.classList.add('show');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebar.classList.remove('translate-x-0');
+                    sidebarBackdrop.classList.remove('show');
+                }
+            }
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebarOpen = !sidebarOpen;
+                updateSidebar();
+            });
+
+            sidebarBackdrop.addEventListener('click', () => {
+                sidebarOpen = false;
+                updateSidebar();
+            });
+
+            // Notifications dropdown
+            notificationsToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!notificationsOpen) {
+                    closeAllDropdowns();
+                    const rect = notificationsToggle.getBoundingClientRect();
+                    notificationsDropdown.style.position = 'fixed';
+                    notificationsDropdown.style.top = `${rect.bottom}px`;
+                    notificationsDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                    notificationsDropdown.style.left = 'auto';
+                    document.body.appendChild(notificationsDropdown);
+                    notificationsOpen = true;
+                    notificationsDropdown.classList.add('show');
+                } else {
+                    closeDropdown('notifications');
+                }
+            });
+
+            // Profile dropdown
+            profileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!profileOpen) {
+                    closeAllDropdowns();
+                    const rect = profileToggle.getBoundingClientRect();
+                    profileDropdown.style.position = 'fixed';
+                    profileDropdown.style.top = `${rect.bottom}px`;
+                    profileDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                    profileDropdown.style.left = 'auto';
+                    document.body.appendChild(profileDropdown);
+                    profileOpen = true;
+                    profileDropdown.classList.add('show');
+                    profileChevron.classList.add('rotate-180');
+                } else {
+                    closeDropdown('profile');
+                }
+            });
+
+            // Click away handlers
+            document.addEventListener('click', (e) => {
+                if (notificationsOpen && !notificationsToggle.contains(e.target) && !notificationsDropdown.contains(e.target)) {
+                    closeDropdown('notifications');
+                }
+
+                if (profileOpen && !profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    closeDropdown('profile');
+                }
+            });
+
+            // Add User Modal handlers
+            function openAddModal() {
+                addUserModal.classList.remove('hidden');
+            }
+
+            function closeAddModalFunc() {
+                addUserModal.classList.add('hidden');
+                addUserForm.reset();
+            }
+
+            addUserBtn.addEventListener('click', openAddModal);
+            cancelBtn.addEventListener('click', closeAddModalFunc);
+            closeAddModal.addEventListener('click', closeAddModalFunc);
+
+            // Close add modal on backdrop click
+            const addModalBackdrop = addUserModal.querySelector('.fixed.inset-0');
+            addModalBackdrop.addEventListener('click', (e) => {
+                if (e.target === addModalBackdrop) {
+                    closeAddModalFunc();
+                }
+            });
+
+            // Add User Form submit handler (placeholder)
+            addUserForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Here you would typically send the form data to the server
+                console.log('Form submitted:', Object.fromEntries(new FormData(addUserForm)));
+                alert('Người dùng đã được thêm thành công!'); // Placeholder alert
+                closeAddModalFunc();
+            });
+
+            // Edit User Modal handlers
+            function openEditModal(row) {
+                const nameCell = row.querySelector('td:nth-child(3)');
+                const id = row.querySelector('td:first-child').textContent;
+                const email = row.querySelector('td:nth-child(4)').textContent;
+                const status = row.querySelector('td:nth-child(5) span').textContent;
+
+                document.getElementById('edit-user_id').value = id;
+                document.getElementById('edit-user_fullname').value = nameCell.textContent;
+                document.getElementById('edit-user_username').value = id; // Assuming username is ID for sample
+                document.getElementById('edit-user_email').value = email;
+                document.getElementById('edit-user_phone_number').value = row.dataset.phone || '';
+                document.getElementById('edit-user_address').value = row.dataset.address || '';
+                document.getElementById('edit-user_status').value = row.dataset.status || status.toLowerCase();
+                editUserModal.classList.remove('hidden');
+            }
+
+            function closeEditModalFunc() {
+                editUserModal.classList.add('hidden');
+                editUserForm.reset();
+            }
+
+            cancelEditBtn.addEventListener('click', closeEditModalFunc);
+            closeEditModal.addEventListener('click', closeEditModalFunc);
+
+            // Close edit modal on backdrop click
+            const editModalBackdrop = editUserModal.querySelector('.fixed.inset-0');
+            editModalBackdrop.addEventListener('click', (e) => {
+                if (e.target === editModalBackdrop) {
+                    closeEditModalFunc();
+                }
+            });
+
+            // Edit User Form submit handler (placeholder)
+            editUserForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Here you would typically send the form data to the server
+                console.log('Edit form submitted:', Object.fromEntries(new FormData(editUserForm)));
+                alert('Người dùng đã được cập nhật thành công!'); // Placeholder alert
+                closeEditModalFunc();
+            });
+
+            // View User Modal handlers
+            function openViewModal(row) {
+                const nameCell = row.querySelector('td:nth-child(3)');
+                const id = row.querySelector('td:first-child').textContent;
+                const email = row.querySelector('td:nth-child(4)').textContent;
+                const status = row.querySelector('td:nth-child(5) span').textContent;
+
+                document.getElementById('view-user_id').value = id;
+                document.getElementById('view-user_fullname').value = nameCell.textContent;
+                document.getElementById('view-user_username').value = id; // Assuming username is ID for sample
+                document.getElementById('view-user_email').value = email;
+                document.getElementById('view-user_phone_number').value = row.dataset.phone || '';
+                document.getElementById('view-user_address').value = row.dataset.address || '';
+                document.getElementById('view-user_register').value = row.dataset.register || '';
+                document.getElementById('view-user_orders').value = row.dataset.orders || '';
+                document.getElementById('view-user_total').value = row.dataset.total || '';
+                document.getElementById('view-user_role').value = row.dataset.role || '';
+                document.getElementById('view-user_status').value = status;
+
+                viewUserModal.classList.remove('hidden');
+            }
+
+            function closeViewModalFunc() {
+                viewUserModal.classList.add('hidden');
+            }
+
+            closeViewModal.addEventListener('click', closeViewModalFunc);
+            closeViewBtn.addEventListener('click', closeViewModalFunc);
+
+            // Close view modal on backdrop click
+            const viewModalBackdrop = viewUserModal.querySelector('.fixed.inset-0');
+            viewModalBackdrop.addEventListener('click', (e) => {
+                if (e.target === viewModalBackdrop) {
+                    closeViewModalFunc();
+                }
+            });
+
+            // View and Edit button event delegation
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.view-user-btn')) {
+                    e.stopPropagation();
+                    const button = e.target.closest('.view-user-btn');
+                    const row = button.closest('tr');
+                    openViewModal(row);
+                }
+                if (e.target.closest('.edit-user-btn')) {
+                    e.stopPropagation();
+                    const button = e.target.closest('.edit-user-btn');
+                    const row = button.closest('tr');
+                    openEditModal(row);
+                }
+            });
+        });
+
+        // Toggle submenu function
+        window.toggleSubmenu = function(id) {
+            const submenu = document.getElementById(id + '-submenu');
+            const chevron = document.getElementById(id + '-chevron');
+            const isOpen = submenu.classList.contains('show');
+
+            // Close all submenus
+            document.querySelectorAll('.sidebar-submenu').forEach(s => s.classList.remove('show'));
+            document.querySelectorAll('[id$="-chevron"]').forEach(c => c.classList.remove('rotate-180'));
+
+            // Toggle current
+            if (!isOpen) {
+                submenu.classList.add('show');
+                chevron.classList.add('rotate-180');
+            }
+        };
+
+        // Initialize Feather Icons
+        feather.replace();
+
+        // Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            preloader.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        });
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function () {
+            // No charts in this page, but keeping the structure for consistency
+        });
+    </script>
+</body>
+
+</html>

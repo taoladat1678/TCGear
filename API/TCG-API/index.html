@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fearless Draft</title>
+
+<style>
+body {
+  margin: 0;
+  background: radial-gradient(circle at center, #2b0000, #0d0000);
+  font-family: Arial;
+  color: white;
+}
+
+.header {
+  text-align: center;
+  padding: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ff4d4d;
+}
+
+.container {
+  display: flex;
+  height: 90vh;
+}
+
+.left {
+  width: 28%;
+  padding: 15px;
+}
+
+.center {
+  width: 72%;
+  padding: 15px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #ff4d4d;
+}
+
+.banBox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 110px;
+  border: 2px solid #aa0000;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.banItem {
+  position: relative;
+}
+
+.banItem img {
+  width: 70px;
+  border-radius: 8px;
+  border: 2px solid red;
+  cursor: pointer;
+}
+
+.slash {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: red;
+  top: 50%;
+  left: 0;
+  transform: rotate(-45deg);
+}
+
+.switchBox {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.switchBox button {
+  padding: 6px 14px;
+  margin: 5px;
+  background: #600000;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.activeMode {
+  background: red !important;
+}
+
+/* Search & Filter */
+.filterBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filterBar input, .filterBar select {
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* Champion Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 70px);
+  gap: 8px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.champItem {
+  position: relative;
+}
+
+.champItem img {
+  width: 65px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.champItem img:hover {
+  transform: scale(1.1);
+}
+
+.champSlash {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: red;
+  top: 50%;
+  left: 0;
+  transform: rotate(-45deg);
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Fearless Draft</div>
+
+<div class="container">
+
+  <div class="left">
+
+    <div class="sectionTitle">🔥 Game Ban</div>
+    <div id="gameBan" class="banBox"></div>
+
+    <div class="switchBox">
+      <button id="gameBtn" class="activeMode">Ban vào Game</button>
+      <button id="seriesBtn">Ban vào Series</button>
+    </div>
+
+    <div class="sectionTitle">💀 Series Ban</div>
+    <div id="seriesBan" class="banBox"></div>
+
+  </div>
+
+  <div class="center">
+
+    <div class="filterBar">
+      <input type="text" id="searchInput" placeholder="Search champion...">
+      <select id="roleFilter">
+        <option value="ALL">All</option>
+        <option value="Top">Top</option>
+        <option value="Jungle">Jungle</option>
+        <option value="Mid">Mid</option>
+        <option value="ADC">ADC</option>
+        <option value="Support">Support</option>
+      </select>
+    </div>
+
+    <div id="championGrid" class="grid"></div>
+
+  </div>
+
+</div>
+
+<script>
+const version = "16.3.1";
+const grid = document.getElementById("championGrid");
+const gameBanBox = document.getElementById("gameBan");
+const seriesBanBox = document.getElementById("seriesBan");
+const searchInput = document.getElementById("searchInput");
+const roleFilter = document.getElementById("roleFilter");
+
+let mode = "game";
+let champions = [];
+let gameBan = [];
+let seriesBan = JSON.parse(localStorage.getItem("seriesBan")) || [];
+
+const roleMap = {
+  Top: ["Fighter","Tank"],
+  Jungle: ["Assassin","Fighter"],
+  Mid: ["Mage","Assassin"],
+  ADC: ["Marksman"],
+  Support: ["Support"]
+};
+
+document.getElementById("gameBtn").onclick = () => {
+  mode = "game";
+  updateModeUI();
+};
+
+document.getElementById("seriesBtn").onclick = () => {
+  mode = "series";
+  updateModeUI();
+};
+
+function updateModeUI(){
+  gameBtn.classList.toggle("activeMode", mode==="game");
+  seriesBtn.classList.toggle("activeMode", mode==="series");
+}
+
+fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`)
+.then(res=>res.json())
+.then(data=>{
+  champions = Object.values(data.data);
+  renderGrid();
+  renderSavedSeries();
+});
+
+function renderGrid(){
+  grid.innerHTML="";
+  const search = searchInput.value.toLowerCase();
+  const role = roleFilter.value;
+
+  champions.forEach(champ=>{
+
+    if(seriesBan.includes(champ.id)) return;
+
+    if(!champ.name.toLowerCase().includes(search)) return;
+
+    if(role!=="ALL"){
+      if(!champ.tags.some(t=>roleMap[role].includes(t))) return;
+    }
+
+    const div = document.createElement("div");
+    div.className="champItem";
+
+    const img = document.createElement("img");
+    img.src=`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${champ.id}.png`;
+    img.onclick=()=>banChampion(champ.id);
+
+    div.appendChild(img);
+
+    if(gameBan.includes(champ.id)){
+      const slash=document.createElement("div");
+      slash.className="champSlash";
+      div.appendChild(slash);
+    }
+
+    grid.appendChild(div);
+  });
+}
+
+function banChampion(id){
+  if(mode==="game"){
+    if(gameBan.includes(id)) return;
+    gameBan.push(id);
+    addBanImage(id,gameBanBox,false);
+  }else{
+    if(seriesBan.includes(id)) return;
+    seriesBan.push(id);
+    localStorage.setItem("seriesBan",JSON.stringify(seriesBan));
+    addBanImage(id,seriesBanBox,true);
+  }
+  renderGrid();
+}
+
+function addBanImage(id,box,isSeries){
+  const div=document.createElement("div");
+  div.className="banItem";
+
+  const img=document.createElement("img");
+  img.src=`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${id}.png`;
+
+  div.appendChild(img);
+
+  if(!isSeries){
+    const slash=document.createElement("div");
+    slash.className="slash";
+    div.appendChild(slash);
+  }
+
+  img.onclick=()=>{
+    if(isSeries){
+      seriesBan=seriesBan.filter(c=>c!==id);
+      localStorage.setItem("seriesBan",JSON.stringify(seriesBan));
+    }else{
+      gameBan=gameBan.filter(c=>c!==id);
+    }
+    div.remove();
+    renderGrid();
+  };
+
+  box.appendChild(div);
+}
+
+function renderSavedSeries(){
+  seriesBan.forEach(id=>{
+    addBanImage(id,seriesBanBox,true);
+  });
+}
+
+searchInput.addEventListener("input",renderGrid);
+roleFilter.addEventListener("change",renderGrid);
+</script>
+
+</body>
+</html>

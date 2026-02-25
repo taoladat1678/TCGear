@@ -1,0 +1,10 @@
+/* Mobile */
+@media (max-width: 760px) {
+  #notifications-dropdown {
+    left: -200px !important;
+  }
+
+  #profile-dropdown {
+    left: -140px !important;
+  }
+}

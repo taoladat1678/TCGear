@@ -1,0 +1,145 @@
+.order-card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(225, 29, 72, 0.2);
+  background: rgba(26, 26, 26, 0.9);
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.3);
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: "Open Sans", sans-serif;
+}
+
+.status-delivered {
+  background-color: #10b981;
+  color: white;
+}
+
+.status-processing {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.status-shipped {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.status-cancelled {
+  background-color: #ef4444;
+  color: white;
+}
+
+.order-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+.order-details.open {
+  max-height: 1000px;
+}
+
+.filter-btn {
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background-color: #e11d48;
+  color: white;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.tracking-progress {
+  position: relative;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tracking-progress-bar {
+  height: 100%;
+  background: #10b981;
+  transition: width 0.5s ease;
+}
+
+.tracking-steps {
+  position: relative;
+  margin-top: 20px;
+}
+
+.tracking-step {
+  position: relative;
+  flex: 1;
+  text-align: center;
+}
+
+.tracking-step::before {
+  content: "";
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+  width: 26px;
+  height: 26px;
+  background: #e5e7eb;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  z-index: 2;
+}
+
+.tracking-step.completed::before {
+  content: "✓";
+  background: #10b981;
+}
+
+.tracking-step.active::before {
+  background: #f59e0b;
+  border-color: #fff;
+}
+
+.empty-orders {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+/* Tailwind overrides for custom colors (assuming Tailwind is used) */
+.bg-secondary { background-color: #000000; }
+.text-accent { color: #ffffff; }
+.text-primary { color: #e11d48; }
+.text-accent\/70 { color: rgba(255, 255, 255, 0.7); }
+.border-primary\/20 { border-color: rgba(225, 29, 72, 0.2); }
+.bg-secondary\/50 { background-color: rgba(0, 0, 0, 0.5); }
+.bg-black { background-color: #000000; }
+.bg-primary { background-color: #e11d48; }
+.bg-primary\/90 { background-color: rgba(225, 29, 72, 0.9); }
+.border-primary { border-color: #e11d48; }
+.hover\:bg-primary\/90:hover { background-color: rgba(225, 29, 72, 0.9); }
+.font-open-sans { font-family: "Open Sans", sans-serif; }
+.font-orbitron { font-family: "Orbitron", sans-serif; }
+
+@media (max-width: 640px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}

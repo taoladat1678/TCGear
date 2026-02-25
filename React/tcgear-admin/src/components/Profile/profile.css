@@ -1,0 +1,75 @@
+/* profile.css */
+/* Extracted and relevant styles for the profile component */
+/* Includes fonts, general utilities, and profile-specific styles */
+/* Assumes Tailwind is available globally or imported elsewhere */
+
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap");
+
+h1,
+h2,
+h3,
+.font-orbitron {
+  font-family: "Orbitron", sans-serif;
+}
+
+p,
+span,
+a,
+input,
+button,
+.font-open-sans {
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Hover animation for icons */
+[data-feather] {
+  transition: transform 0.2s ease;
+}
+
+[data-feather]:hover {
+  transform: scale(1.1);
+}
+
+/* Form input focus styles */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #e11d48;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
+}
+
+/* Mobile adjustments for profile */
+@media (max-width: 760px) {
+  /* Footer padding */
+  footer {
+    padding: 1rem;
+  }
+
+  /* Ensure main content padding is minimal but usable */
+  main {
+    padding: 1rem;
+  }
+
+  /* Profile form adjustments on mobile */
+  .profile-section {
+    padding: 1rem;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  /* Keep icons position and size unchanged on mobile */
+  [data-feather] {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+
+  /* Ensure icon positions in flex items remain stable */
+  .flex.items-center > [data-feather] {
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+}

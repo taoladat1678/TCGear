@@ -1,0 +1,130 @@
+.blog-card {
+    transition: all 0.3s ease;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid rgba(225, 29, 72, 0.2);
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px -5px rgba(225, 29, 72, 0.4);
+}
+
+.prose {
+    max-width: none;
+}
+
+.prose h2 {
+    font-size: 1.75em;
+    font-weight: 700;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: #ffffff;
+    font-family: "Orbitron", sans-serif;
+}
+
+.prose p {
+    margin-bottom: 1.5em;
+    line-height: 1.7;
+    font-size: 0.875rem;
+    color: #ffffff;
+    font-family: "Open Sans", sans-serif;
+}
+
+.prose ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+    margin-bottom: 1.5em;
+    font-size: 0.875rem;
+    color: #ffffff;
+    font-family: "Open Sans", sans-serif;
+}
+
+.prose blockquote {
+    border-left: 4px solid #e11d48;
+    padding-left: 1.5em;
+    margin: 2em 0;
+    font-style: italic;
+    color: #ffffff;
+    font-family: "Open Sans", sans-serif;
+}
+
+.prose img {
+    border-radius: 12px;
+    margin: 2em 0;
+    box-shadow: 0 4px 15px rgba(225, 29, 72, 0.2);
+}
+
+.sidebar-link:hover {
+    color: #e11d48;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 3rem;
+}
+
+.page-item {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e11d48;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Open Sans", sans-serif;
+}
+
+.page-item:hover, .page-item.active {
+    background: #e11d48;
+    color: white;
+}
+
+/* Media Queries relevant to blog-detail */
+@media (max-width: 760px) {
+    .blog-card img {
+        height: 40vh;
+    }
+
+    .blog-card h2 {
+        font-size: 1.75rem;
+    }
+
+    .blog-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .sidebar-section {
+        width: 100%;
+    }
+
+    .prose h2 {
+        font-size: 1.5em;
+    }
+
+    .prose p, .prose ul {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .blog-card img {
+        height: 30vh;
+    }
+
+    .blog-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .blog-card h3 {
+        font-size: 1.125rem;
+    }
+
+    .prose h2 {
+        font-size: 1.25em;
+    }
+}

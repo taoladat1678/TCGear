@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hoàn tất đơn hàng của bạn với thiết bị chơi game và áo đấu cao cấp tại TCGear">
+    <meta name="keywords" content="đơn hàng thiết bị chơi game, mua áo đấu esports, thanh toán, TCGear">
+    <meta name="author" content="TCGear">
+    <title>Thông Tin Đơn Hàng | TCGear</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e11d48',
+                        secondary: '#000000',
+                        accent: '#ffffff',
+                        muted: '#a3a3a3'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
+
+        h1, h2, h3, .font-orbitron {
+            font-family: "Orbitron", sans-serif;
+        }
+
+        p, span, a, input, button, .font-open-sans {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .order-steps {
+            counter-reset: step;
+        }
+        
+        .order-step:before {
+            counter-increment: step;
+            content: counter(step);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e11d48;
+            color: white;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .order-step.active:before {
+            background-color: #e11d48;
+        }
+        
+        .order-step.completed:before {
+            background-color: #10b981;
+            content: '✓';
+        }
+        
+        .order-step.inactive:before {
+            background-color: #6b7280;
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 1px solid #374151;
+        }
+        
+        .input-field:focus {
+            border-color: #e11d48;
+            box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.2);
+        }
+        
+        .payment-method {
+            transition: all 0.3s ease;
+            border: 1px solid #374151;
+        }
+        
+        .payment-method:hover, .payment-method.selected {
+            border-color: #e11d48;
+            background-color: rgba(225, 29, 72, 0.05);
+        }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader {
+            border: 4px solid #e11d48;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .account-dropdown,
+        .language-dropdown {
+            position: relative;
+        }
+
+        .account-dropdown-content,
+        .language-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: -45px;
+            background: #000000;
+            border: 1px solid #e11d48;
+            border-radius: 4px;
+            min-width: 140px;
+            z-index: 50;
+        }
+
+        .account-dropdown-content {
+            min-width: 165px;
+        }
+
+        .account-dropdown-content a,
+        .language-dropdown-content a {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: #ffffff;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .account-dropdown-content a:hover,
+        .language-dropdown-content a:hover {
+            background: #e11d48;
+        }
+
+        .account-dropdown.open .account-dropdown-content,
+        .language-dropdown.open .language-dropdown-content {
+            display: block;
+        }
+
+        .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .counter {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #e11d48;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        #orders-counter,
+        #mobile-orders-counter {
+            position: static;
+            margin-left: 6px;
+            vertical-align: middle;
+            background: #e11d48;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown-content a {
+            position: relative;
+        }
+
+        #mobile-menu {
+            max-height: 80vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #e11d48 #000000;
+        }
+
+        #mobile-menu::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #mobile-menu::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        #mobile-menu::-webkit-scrollbar-thumb {
+            background: #e11d48;
+            border-radius: 4px;
+        }
+
+        .nav-links {
+            margin-left: 160px;
+            display: flex;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            white-space: nowrap;
+        }
+
+        .actions-container {
+            margin-left: 35px;
+        }
+
+        @media (max-width: 760px) {
+            .cart-icon,
+            .wishlist-icon,
+            .account-dropdown,
+            .language-dropdown {
+                display: none;
+            }
+
+            .nav-links,
+            .search-bar {
+                display: none;
+            }
+
+            #mobile-menu-toggle {
+                display: block;
+            }
+
+            #mobile-menu .mobile-cart,
+            #mobile-menu .mobile-wishlist {
+                display: flex;
+                align-items: center;
+                position: relative;
+            }
+
+            #mobile-menu .account-dropdown,
+            #mobile-menu .language-dropdown {
+                display: block;
+                align-items: center;
+                position: relative;
+            }
+
+            #mobile-menu .account-dropdown-content,
+            #mobile-menu .language-dropdown-content {
+                position: static;
+                border: none;
+                background: transparent;
+                width: 100%;
+                padding-left: 2rem;
+                margin-top: 0.5rem;
+            }
+
+            #mobile-menu .account-dropdown-content a,
+            #mobile-menu .language-dropdown-content a {
+                padding: 4px 8px;
+                display: flex;
+            }
+        }
+
+        @media (min-width: 761px) and (max-width: 1270px) {
+            .nav-links {
+                display: none;
+            }
+
+            .search-bar,
+            .cart-icon,
+            .wishlist-icon,
+            .account-dropdown,
+            .language-dropdown {
+                display: flex;
+            }
+
+            #mobile-menu-toggle {
+                display: block;
+            }
+
+            #mobile-menu .mobile-cart,
+            #mobile-menu .mobile-wishlist,
+            #mobile-menu .account-dropdown,
+            #mobile-menu .language-dropdown {
+                display: none;
+            }
+        }
+
+        @media (min-width: 1271px) {
+            .nav-links,
+            .search-bar,
+            .cart-icon,
+            .wishlist-icon,
+            .account-dropdown,
+            .language-dropdown {
+                display: flex;
+            }
+
+            #mobile-menu-toggle {
+                display: none;
+            }
+
+            #mobile-menu {
+                display: none !important;
+            }
+
+            #mobile-menu .mobile-cart,
+            #mobile-menu .mobile-wishlist,
+            #mobile-menu .account-dropdown,
+            #mobile-menu .language-dropdown,
+            #mobile-menu .account-dropdown-content,
+            #mobile-menu .language-dropdown-content {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .voucher-section .flex.items-center {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .voucher-section .flex.items-center input {
+                width: 100%;
+            }
+            .voucher-section .flex.items-center button {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 765px) {
+            #mobile-menu .flex.items-center.bg-secondary.border.border-primary\/20.rounded-md.overflow-hidden {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-secondary text-accent">
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-secondary border-b border-primary/20 sticky top-0 z-50" aria-label="Thanh điều hướng chính">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-8">
+                <div class="flex items-center shop-logo">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png" class="h-10 w-auto" alt="Logo TCGear"/>
+                    <span class="ml-2 text-xl font-bold text-primary font-orbitron">TCGEAR</span>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <div class="nav-container flex items-center gap-1">
+                        <div class="nav-links">
+                            <a href="index.html" class="text-primary transition font-open-sans" aria-current="page">Trang chủ</a>
+                            <a href="shop.html" class="text-accent hover:text-primary transition font-open-sans">Cửa hàng</a>
+                            <a href="teams.html" class="text-accent hover:text-primary transition font-open-sans">Đội tuyển</a>
+                            <a href="blog.html" class="text-accent hover:text-primary transition font-open-sans">Blog</a>
+                            <a href="contact.html" class="text-accent hover:text-primary transition font-open-sans">Liên hệ</a>
+                            <a href="about.html" class="text-accent hover:text-primary transition font-open-sans">Giới thiệu</a>
+                        </div>
+                    </div>
+
+                    <div class="actions-container flex items-center gap-1 justify-end">
+                        <div class="search-bar items-center bg-secondary border border-primary/20 rounded-md overflow-hidden">
+                            <input type="text" id="search-input" placeholder="Tìm kiếm..." class="bg-transparent px-3 py-1 text-accent focus:outline-none w-40 lg:w-56 font-open-sans" aria-label="Tìm kiếm sản phẩm"/>
+                            <button class="p-2 text-accent hover:text-primary transition font-orbitron" aria-label="Tìm kiếm">
+                                <i data-feather="search" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                        <a href="cart.html" class="cart-icon p-2 text-accent hover:text-primary transition font-orbitron" aria-label="Giỏ hàng">
+                            <i data-feather="shopping-cart"></i>
+                            <span class="counter" id="cart-counter">3</span>
+                        </a>
+                        <a href="wishlist.html" class="wishlist-icon p-2 text-accent hover:text-primary transition font-orbitron relative" aria-label="Danh sách yêu thích">
+                            <i data-feather="heart"></i>
+                            <span class="counter" id="wishlist-counter">0</span>
+                        </a>
+                        <div class="account-dropdown">
+                            <button id="account-toggle" class="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron" aria-label="Tài khoản người dùng">
+                                <i data-feather="user"></i>
+                                <i data-feather="chevron-down" class="h-4 w-4"></i>
+                            </button>
+                            <div class="account-dropdown-content">
+                                <a href="profile.html" aria-label="Hồ sơ" class="font-open-sans"><i data-feather="user" class="h-5 w-5"></i> Hồ sơ</a>
+                                <a href="orders.html" aria-label="Đơn hàng" class="font-open-sans"><i data-feather="shopping-bag" class="h-5 w-5"></i> Đơn hàng <span class="counter" id="orders-counter">0</span></a>
+                                <a href="vouchers.html" aria-label="Voucher" class="font-open-sans"><i data-feather="gift" class="h-5 w-5"></i> Voucher</a>
+                                <a href="login.html" aria-label="Đăng nhập" class="font-open-sans"><i data-feather="log-in" class="h-5 w-5"></i> Đăng nhập</a>
+                                <a href="register.html" aria-label="Đăng ký" class="font-open-sans"><i data-feather="user-plus" class="h-5 w-5"></i> Đăng ký</a>
+                            </div>
+                        </div>
+                        <div class="language-dropdown">
+                            <button id="language-toggle" class="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron" aria-label="Chọn ngôn ngữ">
+                                <i data-feather="globe"></i>
+                                <i data-feather="chevron-down" class="h-4 w-4"></i>
+                            </button>
+                            <div class="language-dropdown-content">
+                                <a href="?lang=eng" aria-label="Tiếng Anh" class="font-open-sans"><i data-feather="flag" class="h-5 w-5"></i> Tiếng Anh</a>
+                                <a href="?lang=vie" aria-label="Tiếng Việt" class="font-open-sans"><i data-feather="flag" class="h-5 w-5"></i> Tiếng Việt</a>
+                            </div>
+                        </div>
+                        <button id="mobile-menu-toggle" class="p-2 text-accent font-orbitron" aria-label="Bật/tắt menu di động">
+                            <i data-feather="menu"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu hidden bg-secondary border-t border-primary/20">
+                <div class="flex flex-col space-y-4 py-4 px-4">
+                    <div class="flex items-center bg-secondary border border-primary/20 rounded-md overflow-hidden">
+                        <input type="text" id="mobile-search-input" placeholder="Tìm kiếm sản phẩm..." class="bg-transparent px-3 py-1 text-accent focus:outline-none w-full font-open-sans" aria-label="Tìm kiếm sản phẩm"/>
+                        <button class="p-2 text-accent hover:text-primary transition font-orbitron" aria-label="Tìm kiếm">
+                            <i data-feather="search" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+                    <a href="index.html" class="text-accent hover:text-primary transition font-open-sans">Trang chủ</a>
+                    <a href="shop.html" class="text-accent hover:text-primary transition font-open-sans">Cửa hàng</a>
+                    <a href="teams.html" class="text-accent hover:text-primary transition font-open-sans">Đội tuyển</a>
+                    <a href="blog.html" class="text-accent hover:text-primary transition font-open-sans">Blog</a>
+                    <a href="contact.html" class="text-accent hover:text-primary transition font-open-sans">Liên hệ</a>
+                    <a href="about.html" class="text-accent hover:text-primary transition font-open-sans">Giới thiệu</a>
+                    <a href="cart.html" class="mobile-cart text-accent hover:text-primary transition font-open-sans flex items-center gap-2 relative">
+                        <i data-feather="shopping-cart" class="h-5 w-5"></i> Giỏ hàng
+                        <span class="counter" id="mobile-cart-counter">3</span>
+                    </a>
+                    <a href="wishlist.html" class="mobile-wishlist text-accent hover:text-primary transition font-open-sans flex items-center gap-2 relative" aria-label="Danh sách yêu thích" data-product="Danh sách yêu thích">
+                        <i data-feather="heart" class="h-5 w-5"></i> Danh sách yêu thích
+                        <span class="counter" id="mobile-wishlist-counter">0</span>
+                    </a>
+                    <div class="account-dropdown relative">
+                        <button id="mobile-account-toggle" class="text-accent hover:text-primary transition font-open-sans flex items-center gap-2 w-full text-left relative" aria-label="Bật/tắt menu tài khoản">
+                            <i data-feather="user" class="h-5 w-5"></i> Tài khoản
+                            <i data-feather="chevron-down" class="h-5 w-5"></i>
+                        </button>
+                        <div class="account-dropdown-content w-full">
+                            <a href="profile.html" aria-label="Hồ sơ" class="font-open-sans"><i data-feather="user" class="h-5 w-5"></i> Hồ sơ</a>
+                            <a href="orders.html" aria-label="Đơn hàng" class="font-open-sans"><i data-feather="shopping-bag" class="h-5 w-5"></i> Đơn hàng <span class="counter" id="mobile-orders-counter">0</span></a>
+                            <a href="vouchers.html" aria-label="Voucher" class="font-open-sans"><i data-feather="gift" class="h-5 w-5"></i> Voucher</a>
+                            <a href="login.html" aria-label="Đăng nhập" class="font-open-sans"><i data-feather="log-in" class="h-5 w-5"></i> Đăng nhập</a>
+                            <a href="register.html" aria-label="Đăng ký" class="font-open-sans"><i data-feather="user-plus" class="h-5 w-5"></i> Đăng ký</a>
+                        </div>
+                    </div>
+                    <div class="language-dropdown relative">
+                        <button id="mobile-language-toggle" class="text-accent hover:text-primary transition font-open-sans flex items-center gap-2 w-full text-left relative" aria-label="Bật/tắt menu ngôn ngữ">
+                            <i data-feather="globe" class="h-5 w-5"></i> Ngôn ngữ
+                            <i data-feather="chevron-down" class="h-5 w-5"></i>
+                        </button>
+                        <div class="language-dropdown-content w-full">
+                            <a href="?lang=eng" aria-label="Tiếng Anh" class="font-open-sans"><i data-feather="flag" class="h-5 w-5"></i> Tiếng Anh</a>
+                            <a href="?lang=vie" aria-label="Tiếng Việt" class="font-open-sans"><i data-feather="flag" class="h-5 w-5"></i> Tiếng Việt</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Shipping Form -->
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold mb-6 font-orbitron" data-aos="fade-up">Thông Tin Giao Hàng</h2>
+                
+                <form id="shipping-form" class="space-y-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="first-name" class="block text-sm font-medium mb-1 font-open-sans">Tên</label>
+                            <input type="text" id="first-name" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                        </div>
+                        <div>
+                            <label for="last-name" class="block text-sm font-medium mb-1 font-open-sans">Họ</label>
+                            <input type="text" id="last-name" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium mb-1 font-open-sans">Địa Chỉ Email</label>
+                        <input type="email" id="email" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium mb-1 font-open-sans">Số Điện Thoại</label>
+                        <input type="tel" id="phone" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                    </div>
+                    
+                    <div>
+                        <label for="address" class="block text-sm font-medium mb-1 font-open-sans">Địa Chỉ</label>
+                        <input type="text" id="address" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="country" class="block text-sm font-medium mb-1 font-open-sans">Quốc Gia</label>
+                            <select id="country" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                                <option value="">Chọn Quốc Gia</option>
+                                <option value="US">Hoa Kỳ</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">Vương Quốc Anh</option>
+                                <option value="KR">Hàn Quốc</option>
+                                <option value="JP">Nhật Bản</option>
+                                <option value="EU">Liên Minh Châu Âu</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="city" class="block text-sm font-medium mb-1 font-open-sans">Thành Phố</label>
+                            <input type="text" id="city" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                        </div>
+                        <div>
+                            <label for="zip" class="block text-sm font-medium mb-1 font-open-sans">Mã Bưu Điện</label>
+                            <input type="text" id="zip" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans" required>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <h3 class="text-lg font-semibold mb-4 font-orbitron">Phương Thức Giao Hàng</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="shipping" value="standard" class="h-4 w-4 text-primary focus:ring-primary" checked>
+                                <span class="flex-1 font-open-sans">
+                                    <span class="block">Giao Hàng Tiêu Chuẩn</span>
+                                    <span class="block text-sm text-accent/70">3-5 ngày làm việc - $5.99</span>
+                                </span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="shipping" value="express" class="h-4 w-4 text-primary focus:ring-primary">
+                                <span class="flex-1 font-open-sans">
+                                    <span class="block">Giao Hàng Nhanh</span>
+                                    <span class="block text-sm text-accent/70">1-2 ngày làm việc - $12.99</span>
+                                </span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="shipping" value="overnight" class="h-4 w-4 text-primary focus:ring-primary">
+                                <span class="flex-1 font-open-sans">
+                                    <span class="block">Giao Hàng Qua Đêm</span>
+                                    <span class="block text-sm text-accent/70">Ngày làm việc tiếp theo - $24.99</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <h3 class="text-lg font-semibold mb-4 font-orbitron">Phương Thức Thanh Toán</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="payment-method p-4 rounded-md cursor-pointer selected">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="payment" value="credit" class="h-4 w-4 text-primary focus:ring-primary" checked>
+                                    <i data-feather="credit-card" class="h-5 w-5"></i>
+                                    <span class="font-open-sans">Thẻ Tín Dụng</span>
+                                </div>
+                            </div>
+                            <div class="payment-method p-4 rounded-md cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="payment" value="paypal" class="h-4 w-4 text-primary focus:ring-primary">
+                                    <i data-feather="dollar-sign" class="h-5 w-5"></i>
+                                    <span class="font-open-sans">PayPal</span>
+                                </div>
+                            </div>
+                            <div class="payment-method p-4 rounded-md cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="payment" value="crypto" class="h-4 w-4 text-primary focus:ring-primary">
+                                    <i data-feather="bitcoin" class="h-5 w-5"></i>
+                                    <span class="font-open-sans">Tiền Điện Tử</span>
+                                </div>
+                            </div>
+                            <div class="payment-method p-4 rounded-md cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="payment" value="bank" class="h-4 w-4 text-primary focus:ring-primary">
+                                    <i data-feather="bank" class="h-5 w-5"></i>
+                                    <span class="font-open-sans">Chuyển Khoản Ngân Hàng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <label class="flex items-start space-x-3">
+                            <input type="checkbox" class="h-5 w-5 text-primary focus:ring-primary mt-0.5" required>
+                            <span class="text-sm font-open-sans">Tôi đồng ý với <a href="terms.html" class="text-primary hover:underline">Điều khoản Dịch vụ</a> và <a href="privacy.html" class="text-primary hover:underline">Chính sách Bảo mật</a></span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-end pt-6">
+                        <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-md font-semibold transition flex items-center font-orbitron">
+                            Tiếp Tục Thanh Toán
+                            <i data-feather="arrow-right" class="ml-2 h-5 w-5"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="lg:col-span-1" data-aos="fade-up" data-aos-delay="200">
+                <div class="bg-secondary/50 border border-primary/20 rounded-lg p-6 sticky top-6">
+                    <h2 class="text-xl font-bold mb-6 font-orbitron">Tóm Tắt Đơn Hàng</h2>
+                    
+                    <div class="space-y-4 mb-6">
+                        <!-- Cart Item 1 -->
+                        <div class="cart-item flex items-start space-x-4 pb-4 border-b border-primary/10">
+                            <img src="https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                                 alt="Tai Nghe Chơi Game Pro" class="w-16 h-16 object-cover rounded-md" loading="lazy">
+                            <div class="flex-1">
+                                <h3 class="font-medium font-open-sans">Tai Nghe Chơi Game Pro</h3>
+                                <p class="text-sm text-accent/70 font-open-sans">Đen/Đỏ</p>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="text-primary font-bold font-open-sans">$129.99</span>
+                                    <span class="text-sm font-open-sans">Số lượng: 1</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cart Item 2 -->
+                        <div class="cart-item flex items-start space-x-4 pb-4 border-b border-primary/10">
+                            <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                                 alt="Áo Đấu Đội T1" class="w-16 h-16 object-cover rounded-md" loading="lazy">
+                            <div class="flex-1">
+                                <h3 class="font-medium font-open-sans">Áo Đấu Đội T1</h3>
+                                <p class="text-sm text-accent/70 font-open-sans">Kích thước: L</p>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="text-primary font-bold font-open-sans">$64.99</span>
+                                    <span class="text-sm font-open-sans">Số lượng: 2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="voucher-section mb-6">
+                        <h3 class="text-lg font-semibold mb-4 font-orbitron">Mã Voucher</h3>
+                        <div class="flex items-center space-x-3">
+                            <input type="text" id="voucher-code" placeholder="Nhập mã voucher" class="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans">
+                            <button id="apply-voucher" class="bg-primary hover:bg-primary/90 text-white px-4 py-3 rounded-md font-semibold transition font-orbitron whitespace-nowrap">Áp dụng</button>
+                        </div>
+                        <p class="text-center text-accent/70 my-4 font-open-sans">hoặc</p>
+                        <div class="flex justify-center">
+                            <a href="vouchers.html" class="bg-secondary border border-primary/20 hover:bg-primary/90 hover:text-white px-6 py-3 rounded-md font-semibold transition font-orbitron">Chọn voucher ở đây</a>
+                        </div>
+                        <p id="voucher-message" class="text-sm text-accent/70 mt-2 font-open-sans hidden"></p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex justify-between font-open-sans">
+                            <span>Tổng phụ</span>
+                            <span id="subtotal">$259.97</span>
+                        </div>
+                        <div class="flex justify-between font-open-sans">
+                            <span>Phí giao hàng</span>
+                            <span id="shipping-fee">$5.99</span>
+                        </div>
+                        <div class="flex justify-between font-open-sans">
+                            <span>Thuế</span>
+                            <span id="tax">$21.83</span>
+                        </div>
+                        <div class="flex justify-between font-open-sans" id="discount-row" style="display: none;">
+                            <span>Giảm giá</span>
+                            <span id="discount">$0.00</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-lg pt-2 border-t border-primary/10 font-open-sans">
+                            <span>Tổng cộng</span>
+                            <span id="total" class="text-primary">$287.79</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-accent/70 font-open-sans">
+                        <p>Cần trợ giúp? <a href="contact.html" class="text-primary hover:underline">Liên hệ hỗ trợ của chúng tôi</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-secondary border-t border-primary/20 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <div class="flex items-center mb-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png" class="h-8 w-auto" alt="Logo TCGear"/>
+                    <span class="ml-2 text-lg font-bold text-primary font-orbitron">TCGEAR</span>
+                </div>
+                <p class="text-accent/70 mb-4 font-open-sans">
+                    Thiết bị chơi game và áo đấu cao cấp dành cho game thủ chuyên nghiệp và đội esports.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="https://facebook.com/tcgear" class="text-accent/70 hover:text-primary transition font-open-sans" aria-label="Facebook"><i data-feather="facebook"></i></a>
+                    <a href="https://twitter.com/tcgear" class="text-accent/70 hover:text-primary transition font-open-sans" aria-label="Twitter"><i data-feather="twitter"></i></a>
+                    <a href="https://instagram.com/tcgear" class="text-accent/70 hover:text-primary transition font-open-sans" aria-label="Instagram"><i data-feather="instagram"></i></a>
+                    <a href="https://youtube.com/tcgear" class="text-accent/70 hover:text-primary transition font-open-sans" aria-label="YouTube"><i data-feather="youtube"></i></a>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold text-lg mb-4 font-orbitron">Cửa hàng</h3>
+                <ul class="space-y-2">
+                    <li><a href="jerseys.html" class="text-accent/70 hover:text-primary transition font-open-sans">Áo đấu</a></li>
+                    <li><a href="shop.html?category=headsets" class="text-accent/70 hover:text-primary transition font-open-sans">Tai nghe</a></li>
+                    <li><a href="shop.html?category=keyboards" class="text-accent/70 hover:text-primary transition font-open-sans">Bàn phím</a></li>
+                    <li><a href="shop.html?category=mice" class="text-accent/70 hover:text-primary transition font-open-sans">Chuột</a></li>
+                    <li><a href="shop.html?category=accessories" class="text-accent/70 hover:text-primary transition font-open-sans">Phụ kiện</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold text-lg mb-4 font-orbitron">Công ty</h3>
+                <ul class="space-y-2">
+                    <li><a href="about.html" class="text-accent/70 hover:text-primary transition font-open-sans">Về chúng tôi</a></li>
+                    <li><a href="contact.html" class="text-accent/70 hover:text-primary transition font-open-sans">Liên hệ</a></li>
+                    <li><a href="shipping.html" class="text-accent/70 hover:text-primary transition font-open-sans">Vận chuyển</a></li>
+                    <li><a href="returns.html" class="text-accent/70 hover:text-primary transition font-open-sans">Đổi trả</a></li>
+                    <li><a href="faq.html" class="text-accent/70 hover:text-primary transition font-open-sans">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold text-lg mb-4 font-orbitron">Liên hệ</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start">
+                        <i data-feather="map-pin" class="mr-2 h-5 w-5 text-primary mt-0.5"></i>
+                        <span class="text-accent/70 font-open-sans">123 Đường Chơi Game, Thành phố Esports</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i data-feather="mail" class="mr-2 h-5 w-5 text-primary mt-0.5"></i>
+                        <span class="text-accent/70 font-open-sans">support@tcgear.com</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i data-feather="phone" class="mr-2 h-5 w-5 text-primary mt-0.5"></i>
+                        <span class="text-accent/70 font-open-sans">+1 (555) 123-4567</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto border-t border-primary/20 mt-8 pt-8 text-center text-accent/50 text-sm">
+            <p class="font-open-sans">
+                © 2025 <span class="font-orbitron">TCGear</span>. Mọi quyền được bảo lưu.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.display = 'none';
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        function toggleMobileMenu() {
+            if (window.innerWidth <= 1270) {
+                mobileMenu.classList.toggle("hidden");
+                document.body.style.overflow = mobileMenu.classList.contains("hidden") ? "auto" : "hidden";
+            }
+        }
+
+        mobileMenuToggle.addEventListener("click", toggleMobileMenu);
+        mobileMenuToggle.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            toggleMobileMenu();
+        });
+
+        // Dropdown Elements
+        const accountToggle = document.getElementById("account-toggle");
+        const mobileAccountToggle = document.getElementById("mobile-account-toggle");
+        const desktopAccountDropdown = document.querySelector(
+            ".account-dropdown:not(#mobile-menu .account-dropdown)"
+        );
+        const mobileAccountDropdown = document.querySelector(
+            "#mobile-menu .account-dropdown"
+        );
+
+        const languageToggle = document.getElementById("language-toggle");
+        const mobileLanguageToggle = document.getElementById("mobile-language-toggle");
+        const desktopLanguageDropdown = document.querySelector(
+            ".language-dropdown:not(#mobile-menu .language-dropdown)"
+        );
+        const mobileLanguageDropdown = document.querySelector(
+            "#mobile-menu .language-dropdown"
+        );
+
+        // Function to close all dropdowns except the specified one
+        function closeOtherDropdowns(exceptDropdown) {
+            const dropdowns = [
+                desktopAccountDropdown,
+                mobileAccountDropdown,
+                desktopLanguageDropdown,
+                mobileLanguageDropdown,
+            ].filter(Boolean);
+            dropdowns.forEach((dropdown) => {
+                if (dropdown !== exceptDropdown) {
+                    dropdown.classList.remove("open");
+                }
+            });
+        }
+
+        // Function to toggle a dropdown and close others
+        function toggleDropdown(dropdown, isMobile, e) {
+            e.stopPropagation();
+            if (isMobile && window.innerWidth > 1270) {
+                return;
+            }
+            closeOtherDropdowns(dropdown);
+            dropdown.classList.toggle("open");
+        }
+
+        // Event listeners for account dropdown
+        accountToggle.addEventListener("click", (e) => {
+            toggleDropdown(desktopAccountDropdown, false, e);
+        });
+
+        mobileAccountToggle.addEventListener("click", (e) => {
+            toggleDropdown(mobileAccountDropdown, true, e);
+        });
+
+        // Event listeners for language dropdown
+        languageToggle.addEventListener("click", (e) => {
+            toggleDropdown(desktopLanguageDropdown, false, e);
+        });
+
+        mobileLanguageToggle.addEventListener("click", (e) => {
+            toggleDropdown(mobileLanguageDropdown, true, e);
+        });
+
+        // Close dropdowns when clicking outside
+        window.addEventListener("click", (e) => {
+            if (
+                !desktopAccountDropdown.contains(e.target) &&
+                !mobileAccountDropdown.contains(e.target) &&
+                !mobileAccountToggle.contains(e.target) &&
+                !accountToggle.contains(e.target)
+            ) {
+                desktopAccountDropdown.classList.remove("open");
+                mobileAccountDropdown.classList.remove("open");
+            }
+            if (
+                !desktopLanguageDropdown.contains(e.target) &&
+                !mobileLanguageDropdown.contains(e.target) &&
+                !mobileLanguageToggle.contains(e.target) &&
+                !languageToggle.contains(e.target)
+            ) {
+                desktopLanguageDropdown.classList.remove("open");
+                mobileLanguageDropdown.classList.remove("open");
+            }
+        });
+
+        // Handle window resize to close mobile menu and dropdowns on larger screens
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 1270) {
+                mobileMenu.classList.add("hidden");
+                mobileAccountDropdown.classList.remove("open");
+                mobileLanguageDropdown.classList.remove("open");
+                document.body.style.overflow = "auto";
+            }
+        });
+
+        // Search Functionality
+        const searchInput = document.getElementById('search-input');
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+        [searchInput, mobileSearchInput].forEach(input => {
+            input.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                window.location.href = `search.html?query=${encodeURIComponent(query)}`;
+            });
+        });
+
+        // Payment Method Selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                const input = this.querySelector('input[type="radio"]');
+                input.checked = true;
+            });
+        });
+
+        // Form Submission
+        const shippingForm = document.getElementById('shipping-form');
+        shippingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            window.location.href = 'payment.html';
+        });
+
+        // Country Select
+        const countrySelect = document.getElementById('country');
+        countrySelect.addEventListener('change', function() {
+            // Add logic here to update shipping options based on country if needed
+        });
+
+        // Voucher Apply Button
+        const applyVoucherButton = document.getElementById('apply-voucher');
+        const voucherCodeInput = document.getElementById('voucher-code');
+        const voucherMessage = document.getElementById('voucher-message');
+        const subtotalElement = document.getElementById('subtotal');
+        const shippingFeeElement = document.getElementById('shipping-fee');
+        const taxElement = document.getElementById('tax');
+        const discountElement = document.getElementById('discount');
+        const discountRow = document.getElementById('discount-row');
+        const totalElement = document.getElementById('total');
+
+        // Sample voucher codes and their discounts
+        const validVouchers = {
+            'SAVE10': 0.10, // 10% discount
+            'SAVE20': 0.20, // 20% discount
+            'FREESHIP': 'free_shipping' // Free shipping
+        };
+
+        applyVoucherButton.addEventListener('click', function() {
+            const voucherCode = voucherCodeInput.value.trim().toUpperCase();
+            const baseSubtotal = 259.97;
+            let shippingFee = 5.99;
+            const tax = 21.83;
+            let discount = 0;
+
+            if (!voucherCode) {
+                voucherMessage.textContent = 'Vui lòng nhập mã voucher';
+                voucherMessage.classList.remove('hidden', 'text-green-500');
+                voucherMessage.classList.add('text-red-500');
+                discountRow.style.display = 'none';
+                totalElement.textContent = '$' + (baseSubtotal + shippingFee + tax).toFixed(2);
+                return;
+            }
+
+            if (validVouchers[voucherCode]) {
+                if (voucherCode === 'FREESHIP') {
+                    shippingFee = 0;
+                    voucherMessage.textContent = 'Đã áp dụng mã voucher: Miễn phí vận chuyển';
+                    voucherMessage.classList.remove('hidden', 'text-red-500');
+                    voucherMessage.classList.add('text-green-500');
+                } else {
+                    discount = baseSubtotal * validVouchers[voucherCode];
+                    voucherMessage.textContent = `Đã áp dụng mã voucher: Giảm $${discount.toFixed(2)}`;
+                    voucherMessage.classList.remove('hidden', 'text-red-500');
+                    voucherMessage.classList.add('text-green-500');
+                    discountRow.style.display = 'flex';
+                    discountElement.textContent = '-$' + discount.toFixed(2);
+                }
+                shippingFeeElement.textContent = '$' + shippingFee.toFixed(2);
+                totalElement.textContent = '$' + (baseSubtotal + shippingFee + tax - discount).toFixed(2);
+            } else {
+                voucherMessage.textContent = 'Mã voucher không hợp lệ';
+                voucherMessage.classList.remove('hidden', 'text-green-500');
+                voucherMessage.classList.add('text-red-500');
+                discountRow.style.display = 'none';
+                totalElement.textContent = '$' + (baseSubtotal + shippingFee + tax).toFixed(2);
+            }
+
+            setTimeout(() => {
+                voucherMessage.classList.add('hidden');
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý danh mục sản phẩm TCGear - Thiết bị chơi game cao cấp và áo đấu esports">
+    <meta name="keywords" content="quản lý danh mục TCGear, thiết bị chơi game, danh mục esports">
+    <meta name="author" content="TCGear">
+    <title>Quản Lý Danh Mục - TCGear Admin</title>
+    <link rel="icon" type="image/x-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#e11d48",
+                        secondary: "#000000",
+                        accent: "#ffffff",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap");
+
+        h1,
+        h2,
+        h3,
+        .font-orbitron {
+            font-family: "Orbitron", sans-serif;
+        }
+
+        p,
+        span,
+        a,
+        input,
+        button,
+        .font-open-sans {
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loader {
+            border: 4px solid #e11d48;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        
+        #categories-submenu {
+            margin-top: 5px;
+        }
+
+        #blogs-submenu {
+            margin-top: 5px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #000000;
+            border: 1px solid #e11d48;
+            border-radius: 4px;
+            min-width: 120px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dropdown-content a {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: #ffffff;
+            gap: 8px;
+            flex-wrap: nowrap;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: #e11d48;
+        }
+
+        #notifications-dropdown {
+            width: 16rem;
+        }
+
+        .sidebar-submenu {
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .sidebar-submenu.show {
+            display: block;
+            max-height: 200px;
+        }
+
+        .counter {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #e11d48;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: "Open Sans", sans-serif;
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .backdrop {
+            display: none;
+        }
+
+        .backdrop.show {
+            display: block;
+        }
+
+        .active {
+            background-color: #e11d48;
+            color: #ffffff;
+        }
+
+        /* Slide-up from bottom animation for main sections */
+        @keyframes slideUpFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slideUpFromBottom {
+            animation: slideUpFromBottom 0.8s ease-out forwards;
+        }
+
+        /* Slide-in from left for sidebar */
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Apply to sidebar items */
+        nav > a,
+        .sidebar-item {
+            opacity: 0;
+            animation: slideInFromLeft 0.8s ease-out forwards;
+        }
+
+        /* Slide-in for sidebar items */
+        .sidebar-item {
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover animation for icons */
+        [data-feather] {
+            transition: transform 0.2s ease;
+        }
+
+        [data-feather]:hover {
+            transform: scale(1.1);
+        }
+
+        /* Chart load animation */
+        .chart-container canvas {
+            animation: slideUpFromBottom 1s ease-out both;
+        }
+
+        /* Stats cards stagger slide up */
+        .grid-cols-4 > div {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s ease-out;
+        }
+
+        .grid-cols-4 > div.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Category cards stagger slide up */
+        .grid-cols-3 > div {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.5s ease-out;
+        }
+
+        .grid-cols-3 > div.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .category-card {
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.4);
+        }
+
+        .parent-tag {
+            background: #e11d48/20;
+            color: #e11d48;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            border: 1px solid #e11d48/30;
+        }
+
+        /* Ensure subcategories are visible */
+        .subcategory-management {
+            min-height: 100px;
+            opacity: 1;
+            transform: none !important;
+        }
+
+        .subcategory-management * {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #000000;
+            margin: auto;
+            padding: 0;
+            border: 1px solid #e11d48;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e11d48/20;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e11d48/20;
+            text-align: right;
+        }
+
+        .close {
+            color: #ffffff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #e11d48;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 760px) {
+            .header-search-container {
+                margin-left: auto;
+                margin-right: auto;
+                flex: 1;
+                max-width: calc(100vw - 4rem - 3rem);
+            }
+
+            .mobile-header-right {
+                display: flex;
+                align-items: center;
+                gap: 0rem;
+            }
+
+            #notifications-toggle {
+                margin-right: 0 !important;
+            }
+
+            .mobile-header-right > div:nth-child(2) {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .table-container {
+                font-size: 0.75rem;
+            }
+
+            .table-container th,
+            .table-container td {
+                padding: 0.5rem;
+            }
+
+            .chart-container {
+                height: 200px;
+            }
+
+            /* Additional mobile adjustments for better usability */
+            header {
+                padding: 0.75rem 1rem;
+            }
+
+            .header-search-container input {
+                font-size: 0.875rem;
+                padding: 0.5rem;
+            }
+
+            /* Keep icons position and size unchanged on mobile */
+            [data-feather] {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+            }
+
+            /* Ensure icon positions in flex items remain stable */
+            .flex.items-center > [data-feather] {
+                flex-shrink: 0;
+                margin-right: 0.5rem;
+            }
+
+            button, .sidebar-toggle {
+                min-height: 2.75rem;
+                min-width: 2.75rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Stabilize header right icons and counter on mobile */
+            .mobile-header-right > div {
+                position: relative;
+                flex-shrink: 0;
+            }
+
+            #notifications-toggle,
+            #profile-toggle {
+                min-width: 2.5rem;
+                min-height: 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                position: relative;
+                padding: 0.5rem;
+                margin: 0 !important;
+            }
+
+            #profile-toggle img {
+                width: 2rem !important;
+                height: 2rem !important;
+            }
+
+            #profile-toggle [data-feather] {
+                width: 1rem !important;
+                height: 1rem !important;
+                margin-left: 0.25rem;
+            }
+
+            .counter {
+                top: -2px !important;
+                right: -2px !important;
+                left: auto !important;
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 11px !important;
+            }
+
+            /* Adjust overview cards padding */
+            .grid-cols-1 > div {
+                padding: 1rem;
+            }
+
+            /* Reduce gaps in grids on mobile */
+            .grid {
+                gap: 1rem;
+            }
+
+            /* Table improvements: make status badges smaller */
+            .px-2.py-1.text-xs {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            /* Customer list images smaller */
+            .h-10.w-10 {
+                height: 2rem;
+                width: 2rem;
+            }
+
+            /* System status cards padding */
+            .bg-primary\/10.p-4 {
+                padding: 0.75rem;
+            }
+
+            /* Footer padding */
+            footer {
+                padding: 1rem;
+            }
+
+            /* Ensure dropdowns don't overflow */
+            .dropdown-content {
+                right: auto;
+                left: 0;
+            }
+
+            /* Sidebar width adjustment for very small screens */
+            .w-64 {
+                width: 80vw;
+                max-width: 280px;
+            }
+
+            /* Improve table responsiveness: add horizontal scroll indicator if needed */
+            .table-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Stack header elements vertically if needed for very small screens */
+            .header-search-container {
+                margin-top: 0.5rem;
+            }
+
+            /* Reduce sidebar item padding for better fit */
+            nav a {
+                padding: 0.75rem 1rem;
+            }
+
+            /* Ensure charts are fully responsive and touch-friendly */
+            .chart-container {
+                touch-action: pan-x pan-y;
+            }
+
+            /* Giữ nguyên width của dropdown thông báo và dropdown user trên màn hình <=760px */
+            #notifications-dropdown {
+                min-width: unset !important;
+                width: 16rem !important;
+            }
+
+            #profile-dropdown {
+                min-width: unset !important;
+                width: 12rem !important;
+            }
+
+            /* Improve customer list touch targets */
+            .divide-y > div {
+                min-height: 3rem;
+                padding: 0.75rem;
+            }
+
+            /* System status grid stacks to single column */
+            .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            /* Overview cards stack and reduce font sizes slightly */
+            .grid-cols-1 > div h3 {
+                font-size: 1.25rem;
+            }
+
+            /* Ensure main content padding is minimal but usable */
+            main {
+                padding: 1rem;
+            }
+        }
+
+        /* Initial opacity for animations */
+        .animate-slideUpFromBottom,
+        .grid-cols-4 > div,
+        .grid-cols-3 > div {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-secondary text-accent">
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 z-50 w-64 bg-secondary border-r border-primary/20 lg:static lg:inset-0 transition-transform duration-500 ease-out -translate-x-full lg:translate-x-0 animate-slideInFromLeft">
+            <div class="flex items-center justify-center h-16 bg-secondary border-b border-primary/20">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+                    class="h-8 w-auto transition-transform duration-200 hover:scale-110" alt="TCGear Logo">
+                <span class="ml-2 text-lg font-bold text-primary font-orbitron">TCGear Admin</span>
+            </div>
+            <nav class="mt-5">
+                <a href="admin-dashboard.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="home" class="w-5 h-5"></i>
+                    <span class="mx-4">Bảng Điều Khiển</span>
+                </a>
+                <a href="admin-product.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="package" class="w-5 h-5"></i>
+                    <span class="mx-4">Sản Phẩm</span>
+                </a>
+                <div class="sidebar-item">
+                    <a href="#" onclick="toggleSubmenu('categories')" class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans cursor-pointer transition-all duration-200 active">
+                        <i data-feather="layers" class="w-5 h-5"></i>
+                        <span class="mx-4">Danh Mục</span>
+                        <i id="categories-chevron" data-feather="chevron-down" class="w-4 h-4 ml-auto transition-transform duration-200 rotate-180"></i>
+                    </a>
+                    <div id="categories-submenu" class="sidebar-submenu bg-secondary/50 show">
+                        <a href="admin-categories.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 active">
+                            <i data-feather="list" class="w-4 h-4 mr-2"></i>
+                            <span>Danh mục chính</span>
+                        </a>
+                        <a href="admin_sub-categories.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="list-nested" class="w-4 h-4 mr-2"></i>
+                            <span>Danh mục phụ</span>
+                        </a>
+                    </div>
+                </div>
+                <a href="admin-orders.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="shopping-cart" class="w-5 h-5"></i>
+                    <span class="mx-4">Đơn Hàng</span>
+                </a>
+                <a href="admin-users.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="users" class="w-5 h-5"></i>
+                    <span class="mx-4">Người dùng</span>
+                </a>
+                <a href="admin-teams.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="grid" class="w-5 h-5"></i>
+                    <span class="mx-4">Đội tuyển</span>
+                </a>
+                <div class="sidebar-item">
+                    <a href="#" onclick="toggleSubmenu('blogs')" class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans cursor-pointer transition-all duration-200">
+                        <i data-feather="file-text" class="w-5 h-5"></i>
+                        <span class="mx-4">Bài Viết Blog</span>
+                        <i id="blogs-chevron" data-feather="chevron-down" class="w-4 h-4 ml-auto transition-transform duration-200"></i>
+                    </a>
+                    <div id="blogs-submenu" class="sidebar-submenu bg-secondary/50">
+                        <a href="admin-blogs.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="file-text" class="w-4 h-4 mr-2"></i>
+                            <span>Blog</span>
+                        </a>
+                        <a href="admin_blogs-categories.html" class="flex items-center pl-12 pr-4 py-1 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                            <i data-feather="folder" class="w-4 h-4 mr-2"></i>
+                            <span>Danh mục blog</span>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="admin-messages.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="message-circle" class="w-5 h-5"></i>
+                    <span class="mx-4">Tin Nhắn</span>
+                </a>
+                <a href="admin-comments.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="message-square" class="w-5 h-5"></i>
+                    <span class="mx-4">Bình luận</span>
+                </a>
+                <a href="admin-settings.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="settings" class="w-5 h-5"></i>
+                    <span class="mx-4">Cài Đặt</span>
+                </a>
+                <a href="logout.html"
+                    class="flex items-center px-4 py-2 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200">
+                    <i data-feather="log-out" class="w-5 h-5"></i>
+                    <span class="mx-4">Đăng Xuất</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="flex items-center justify-between px-4 py-4 bg-secondary border-b border-primary/20 md:px-6 transition-all duration-300 animate-slideUpFromBottom z-60">
+                <div class="flex items-center flex-1">
+                    <button id="sidebar-toggle"
+                        class="text-accent hover:text-primary focus:outline-none lg:hidden mr-2 transition-transform duration-200 hover:scale-110">
+                        <i data-feather="menu" class="w-6 h-6"></i>
+                    </button>
+                    <div class="header-search-container relative mx-2 lg:mx-0 max-w-md">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <i data-feather="search" class="w-5 h-5 text-accent transition-transform duration-200 hover:scale-110"></i>
+                        </span>
+                        <input
+                            class="w-full pl-4 pr-10 py-2 rounded-md border-2 border-primary/30 bg-secondary text-accent focus:outline-none focus:border-primary font-open-sans"
+                            type="text" placeholder="Tìm kiếm">
+                    </div>
+                </div>
+                <div class="mobile-header-right flex items-center">
+                    <div class="relative">
+                        <button id="notifications-toggle"
+                            class="flex items-center text-accent hover:text-primary mx-2 lg:mx-4 relative transition-all duration-200 hover:scale-110">
+                            <i data-feather="bell" class="w-5 h-5"></i>
+                            <span class="counter">3</span>
+                        </button>
+                        <div id="notifications-dropdown" class="dropdown-content w-64">
+                            <div class="p-4 border-b border-primary/20 animate-slideUpFromBottom">
+                                <h3 class="text-accent font-semibold font-orbitron">Thông Báo</h3>
+                            </div>
+                            <div class="p-4 max-h-64 overflow-y-auto">
+                                <div class="flex items-center mb-4 animate-slideUpFromBottom">
+                                    <div class="bg-primary/10 p-2 rounded-full">
+                                        <i data-feather="shopping-cart" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-accent font-open-sans">Đã nhận đơn hàng mới</p>
+                                        <p class="text-xs text-accent/70 font-open-sans">2 phút trước</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center mb-4 animate-slideUpFromBottom">
+                                    <div class="bg-primary/10 p-2 rounded-full">
+                                        <i data-feather="user-plus" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-accent font-open-sans">Khách hàng mới đăng ký</p>
+                                        <p class="text-xs text-accent/70 font-open-sans">5 phút trước</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center animate-slideUpFromBottom">
+                                    <div class="bg-primary/10 p-2 rounded-full">
+                                        <i data-feather="alert-triangle" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-accent font-open-sans">Tải máy chủ cao</p>
+                                        <p class="text-xs text-accent/70 font-open-sans">10 phút trước</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-t border-primary/20 bg-primary/10">
+                                <a href="#" class="text-primary text-sm font-semibold font-open-sans text-center block transition-colors duration-200 hover:text-primary/80">Xem tất cả thông báo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative mx-2 lg:mx-4">
+                        <button id="profile-toggle"
+                            class="flex items-center text-accent hover:text-primary transition-all duration-200 hover:scale-105">
+                            <img class="h-8 w-8 rounded-full object-cover transition-transform duration-200 hover:scale-110" src="http://static.photos/people/200x200/1"
+                                alt="Người dùng quản trị">
+                            <i id="profile-chevron" data-feather="chevron-down" class="h-4 w-8 ml-1 transition-transform duration-200"></i>
+                        </button>
+                        <div id="profile-dropdown" class="dropdown-content w-48">
+                            <a href="profile.html" class="font-open-sans transition-all duration-200 hover:bg-primary/10"><i data-feather="user" class="h-5 w-5"></i>
+                                Hồ Sơ</a>
+                            <a href="settings.html" class="font-open-sans transition-all duration-200 hover:bg-primary/10"><i data-feather="settings"
+                                    class="h-5 w-5"></i> Cài Đặt</a>
+                            <a href="logout.html" class="font-open-sans transition-all duration-200 hover:bg-primary/10"><i data-feather="log-out" class="h-5 w-5"></i>
+                                Đăng Xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-4 max-w-7xl mx-auto md:p-6">
+                <!-- Page Header -->
+                <div class="flex justify-between items-center mb-8 animate-slideUpFromBottom">
+                    <div>
+                        <h1 class="text-3xl font-bold text-accent font-orbitron">Quản Lý Danh Mục</h1>
+                        <p class="text-accent/70 font-open-sans mt-2">Quản lý danh mục sản phẩm TCGear</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="openAddCategory" class="bg-primary hover:bg-primary/90 text-accent py-2 px-4 rounded-md flex items-center font-open-sans transition-all duration-200 hover:scale-105">
+                            <i data-feather="plus" class="w-5 h-5 mr-2"></i>
+                            Thêm Danh Mục
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Category Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 md:gap-8 md:mb-12 animate-slideUpFromBottom">
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-in">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-primary/10">
+                                <i data-feather="layers" class="w-6 h-6 text-primary"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Tổng Số Danh Mục</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">24</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-in">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-500/10">
+                                <i data-feather="check-circle" class="w-6 h-6 text-green-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Danh Mục Đang Hoạt Động</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">18</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-in">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-500/10">
+                                <i data-feather="alert-circle" class="w-6 h-6 text-yellow-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Danh Mục Chưa Có Sản Phẩm</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">3</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg shadow p-4 md:p-6 border border-primary/20 animate-in">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-500/10">
+                                <i data-feather="layers" class="w-6 h-6 text-blue-500"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-accent/70 font-open-sans">Tổng Số Danh Mục Phụ</p>
+                                <h3 class="text-xl md:text-2xl font-bold text-accent font-orbitron">45</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 md:gap-8 md:mb-12 animate-slideUpFromBottom">
+                    <!-- Category Card 1 -->
+                    <div class="category-card bg-secondary/50 rounded-lg shadow overflow-hidden border border-primary/20 animate-in" data-code="AO_DAU_ESPORTS" data-name="Áo Đấu Esports" data-image="http://static.photos/technology/640x360/1">
+                        <div class="h-48 overflow-hidden">
+                            <img src="http://static.photos/technology/640x360/1" alt="Áo Đấu Esports" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4 md:p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg md:text-xl font-semibold text-accent font-orbitron">Áo Đấu Esports</h3>
+                                <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary font-open-sans">Đang hoạt động</span>
+                            </div>
+                            <p class="text-accent/70 mb-4 font-open-sans">Áo đấu chính thức của các đội tuyển Esports hàng đầu</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-accent/70 font-open-sans">15 sản phẩm</span>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 text-accent/70 hover:text-primary rounded-full hover:bg-primary/10 edit-btn transition-all duration-200 hover:scale-110">
+                                        <i data-feather="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="p-2 text-accent/70 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-all duration-200 hover:scale-110">
+                                        <i data-feather="trash" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Card 2 -->
+                    <div class="category-card bg-secondary/50 rounded-lg shadow overflow-hidden border border-primary/20 animate-in" data-code="TAI_NGHE_GAMING" data-name="Tai Nghe Gaming" data-image="http://static.photos/technology/640x360/2">
+                        <div class="h-48 overflow-hidden">
+                            <img src="http://static.photos/technology/640x360/2" alt="Tai Nghe Gaming" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4 md:p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg md:text-xl font-semibold text-accent font-orbitron">Tai Nghe Gaming</h3>
+                                <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary font-open-sans">Đang hoạt động</span>
+                            </div>
+                            <p class="text-accent/70 mb-4 font-open-sans">Tai nghe chuyên dụng cho game thủ với âm thanh surround 7.1</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-accent/70 font-open-sans">22 sản phẩm</span>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 text-accent/70 hover:text-primary rounded-full hover:bg-primary/10 edit-btn transition-all duration-200 hover:scale-110">
+                                        <i data-feather="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="p-2 text-accent/70 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-all duration-200 hover:scale-110">
+                                        <i data-feather="trash" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Card 3 -->
+                    <div class="category-card bg-secondary/50 rounded-lg shadow overflow-hidden border border-primary/20 animate-in" data-code="BAN_PHIM_CO" data-name="Bàn Phím Cơ" data-image="http://static.photos/technology/640x360/3">
+                        <div class="h-48 overflow-hidden">
+                            <img src="http://static.photos/technology/640x360/3" alt="Bàn Phím Cơ" class="w-full h- full object-cover">
+                        </div>
+                        <div class="p-4 md:p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg md:text-xl font-semibold text-accent font-orbitron">Bàn Phím Cơ</h3>
+                                <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary font-open-sans">Đang hoạt động</span>
+                            </div>
+                            <p class="text-accent/70 mb-4 font-open-sans">Bàn phím cơ chuyên nghiệp với đèn LED RGB</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-accent/70 font-open-sans">18 sản phẩm</span>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 text-accent/70 hover:text-primary rounded-full hover:bg-primary/10 edit-btn transition-all duration-200 hover:scale-110">
+                                        <i data-feather="edit" class="w-4 h-4"></i>
+                                    </button>
+                                    <button class="p-2 text-accent/70 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-all duration-200 hover:scale-110">
+                                        <i data-feather="trash" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Pagination for Main Categories -->
+                <div class="flex justify-center items-center mt-8 mb-8 animate-slideUpFromBottom">
+                    <nav class="flex items-center space-x-2">
+                        <a href="#" class="px-3 py-1 rounded border border-primary/20 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 hover:scale-105">
+                            <i data-feather="chevron-left" class="w-4 h-4"></i>
+                        </a>
+                        <a href="#" class="px-3 py-1 rounded border border-primary bg-primary text-accent font-open-sans">1</a>
+                        <a href="#" class="px-3 py-1 rounded border border-primary/20 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 hover:scale-105">2</a>
+                        <a href="#" class="px-3 py-1 rounded border border-primary/20 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 hover:scale-105">3</a>
+                        <span class="px-2 py-1 text-accent/70 font-open-sans">...</span>
+                        <a href="#" class="px-3 py-1 rounded border border-primary/20 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 hover:scale-105">8</a>
+                        <a href="#" class="px-3 py-1 rounded border border-primary/20 text-accent hover:bg-primary/10 hover:text-primary font-open-sans transition-all duration-200 hover:scale-105">
+                            <i data-feather="chevron-right" class="w-4 h-4"></i>
+                        </a>
+                    </nav>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="bg-secondary border-t border-primary/20 p-4 md:p-6 transition-all duration-300 animate-slideUpFromBottom">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-sm text-accent/50 font-open-sans">© 2025 TCGear. Tất cả quyền được bảo lưu.</p>
+                    <div class="flex space-x-4 mt-4 md:mt-0">
+                        <a href="https://facebook.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://twitter.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://instagram.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://youtube.com/tcgear"
+                            class="text-accent/70 hover:text-primary font-open-sans transition-transform duration-200 hover:scale-110">
+                            <i data-feather="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Backdrop for mobile sidebar -->
+    <div id="sidebar-backdrop" class="fixed inset-0 z-40 bg-secondary/50 lg:hidden backdrop transition-opacity duration-300"></div>
+
+    <!-- Add Category Modal -->
+    <div id="add-category-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold text-accent font-orbitron">Thêm Danh Mục Mới</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Mã Danh Mục</label>
+                        <input type="text" id="add-category-code" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập mã danh mục">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tên Danh Mục</label>
+                        <input type="text" id="add-category-name" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập tên danh mục">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Hình Ảnh</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-primary/20 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-accent/70 font-open-sans">
+                                    <label for="add-category-file-upload" class="relative cursor-pointer bg-secondary rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none">
+                                        <span>Tải lên tệp</span>
+                                        <input id="add-category-file-upload" name="file-upload" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pl-1">hoặc kéo thả</p>
+                                </div>
+                                <p class="text-xs text-accent/70 font-open-sans">
+                                    PNG, JPG, GIF tối đa 10MB
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-category-modal" type="button" class="px-4 py-2 border border-primary/20 rounded-md text-accent hover:bg-secondary/70 font-open-sans">
+                    Hủy
+                </button>
+                <button id="save-add-category" type="button" class="px-4 py-2 bg-primary text-accent rounded-md hover:bg-primary/90 font-open-sans">
+                    Lưu Danh Mục
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-title" class="text-lg font-semibold text-accent font-orbitron">Sửa Danh Mục</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="current-image-container" style="display: none;">
+                    <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Hình ảnh hiện tại</label>
+                    <img id="edit-current-image" class="w-full h-32 object-cover rounded mb-4" alt="Hình ảnh hiện tại">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Mã Danh Mục</label>
+                        <input type="text" id="edit-code" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập mã danh mục">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tên Danh Mục</label>
+                        <input type="text" id="edit-name" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans" placeholder="Nhập tên danh mục">
+                    </div>
+                    <div id="parent-row" class="md:col-span-2" style="display: none;">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Danh Mục Cha</label>
+                        <select id="edit-parent-select" class="w-full px-3 py-2 border border-primary/20 rounded-md bg-secondary text-accent focus:outline-none focus:ring-2 focus:ring-primary font-open-sans">
+                            <option value="">Chọn danh mục cha</option>
+                            <option value="Áo Đấu Esports">Áo Đấu Esports</option>
+                            <option value="Tai Nghe Gaming">Tai Nghe Gaming</option>
+                            <option value="Bàn Phím Cơ">Bàn Phím Cơ</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Hình Ảnh Mới (tùy chọn)</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-primary/20 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-accent/70 font-open-sans">
+                                    <label for="edit-file-upload" class="relative cursor-pointer bg-secondary rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none">
+                                        <span>Tải lên tệp</span>
+                                        <input id="edit-file-upload" name="file-upload" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pl-1">hoặc kéo thả</p>
+                                </div>
+                                <p class="text-xs text-accent/70 font-open-sans">
+                                    PNG, JPG, GIF tối đa 10MB
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-edit-modal" type="button" class="px-4 py-2 border border-primary/20 rounded-md text-accent hover:bg-secondary/70 font-open-sans">
+                    Hủy
+                </button>
+                <button id="save-edit" type="button" class="px-4 py-2 bg-primary text-accent rounded-md hover:bg-primary/90 font-open-sans">
+                    Lưu Thay Đổi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pure JS for interactivity
+        document.addEventListener('DOMContentLoaded', function () {
+            let sidebarOpen = false;
+            let notificationsOpen = false;
+            let profileOpen = false;
+
+            const sidebar = document.querySelector('.fixed.inset-y-0.left-0');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            const notificationsToggle = document.getElementById('notifications-toggle');
+            const notificationsDropdown = document.getElementById('notifications-dropdown');
+            const profileToggle = document.getElementById('profile-toggle');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            const profileChevron = document.getElementById('profile-chevron');
+            const notificationsContainer = notificationsDropdown.parentNode;
+            const profileContainer = profileDropdown.parentNode;
+
+            // Trigger animations after load - all together
+            setTimeout(() => {
+                document.querySelectorAll('.animate-slideUpFromBottom').forEach(el => {
+                    el.style.opacity = '1';
+                });
+                document.querySelectorAll('.table-container tbody tr, .divide-y > div, .grid-cols-3 > div').forEach(el => {
+                    el.classList.add('animate-in');
+                });
+                document.querySelectorAll('nav > a, .sidebar-item').forEach(el => {
+                    el.style.opacity = '1';
+                });
+            }, 200);
+
+            // Function to close a specific dropdown
+            function closeDropdown(name) {
+                if (name === 'notifications') {
+                    notificationsOpen = false;
+                    notificationsDropdown.classList.remove('show');
+                    setTimeout(() => {
+                        if (!notificationsOpen) {
+                            notificationsContainer.appendChild(notificationsDropdown);
+                            notificationsDropdown.style.position = 'absolute';
+                            notificationsDropdown.style.top = '100%';
+                            notificationsDropdown.style.right = '0';
+                            notificationsDropdown.style.left = 'auto';
+                        }
+                    }, 300);
+                } else if (name === 'profile') {
+                    profileOpen = false;
+                    profileDropdown.classList.remove('show');
+                    profileChevron.classList.remove('rotate-180');
+                    setTimeout(() => {
+                        if (!profileOpen) {
+                            profileContainer.appendChild(profileDropdown);
+                            profileDropdown.style.position = 'absolute';
+                            profileDropdown.style.top = '100%';
+                            profileDropdown.style.right = '0';
+                            profileDropdown.style.left = 'auto';
+                        }
+                    }, 300);
+                }
+            }
+
+            // Function to close all dropdowns
+            function closeAllDropdowns() {
+                closeDropdown('notifications');
+                closeDropdown('profile');
+            }
+
+            // Sidebar toggle
+            function updateSidebar() {
+                if (sidebarOpen) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                    sidebarBackdrop.classList.add('show');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebar.classList.remove('translate-x-0');
+                    sidebarBackdrop.classList.remove('show');
+                }
+            }
+
+            sidebarToggle.addEventListener('click', () => {
+                sidebarOpen = !sidebarOpen;
+                updateSidebar();
+            });
+
+            sidebarBackdrop.addEventListener('click', () => {
+                sidebarOpen = false;
+                updateSidebar();
+            });
+
+            // Notifications dropdown
+            notificationsToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!notificationsOpen) {
+                    closeAllDropdowns();
+                    const rect = notificationsToggle.getBoundingClientRect();
+                    notificationsDropdown.style.position = 'fixed';
+                    notificationsDropdown.style.top = `${rect.bottom}px`;
+                    notificationsDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                    notificationsDropdown.style.left = 'auto';
+                    document.body.appendChild(notificationsDropdown);
+                    notificationsOpen = true;
+                    notificationsDropdown.classList.add('show');
+                } else {
+                    closeDropdown('notifications');
+                }
+            });
+
+            // Profile dropdown
+            profileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!profileOpen) {
+                    closeAllDropdowns();
+                    const rect = profileToggle.getBoundingClientRect();
+                    profileDropdown.style.position = 'fixed';
+                    profileDropdown.style.top = `${rect.bottom}px`;
+                    profileDropdown.style.right = `${window.innerWidth - rect.right}px`;
+                    profileDropdown.style.left = 'auto';
+                    document.body.appendChild(profileDropdown);
+                    profileOpen = true;
+                    profileDropdown.classList.add('show');
+                    profileChevron.classList.add('rotate-180');
+                } else {
+                    closeDropdown('profile');
+                }
+            });
+
+            // Click away handlers
+            document.addEventListener('click', (e) => {
+                if (notificationsOpen && !notificationsToggle.contains(e.target) && !notificationsDropdown.contains(e.target)) {
+                    closeDropdown('notifications');
+                }
+
+                if (profileOpen && !profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                    closeDropdown('profile');
+                }
+            });
+
+            // Add Category Modal functionality
+            const openAddCategoryBtn = document.getElementById('openAddCategory');
+            const addCategoryModal = document.getElementById('add-category-modal');
+            const closeAddCategoryBtn = addCategoryModal.querySelector('.close');
+            const cancelCategoryBtn = document.getElementById('cancel-category-modal');
+            const saveAddCategoryBtn = document.getElementById('save-add-category');
+            const categoryCodeInput = document.getElementById('add-category-code');
+            const categoryNameInput = document.getElementById('add-category-name');
+            const categoryFileInput = document.getElementById('add-category-file-upload');
+
+            function openAddCategoryModal() {
+                addCategoryModal.classList.remove('hidden');
+                addCategoryModal.classList.add('show');
+            }
+
+            function closeAddCategoryModal() {
+                addCategoryModal.classList.remove('show');
+                addCategoryModal.classList.add('hidden');
+                categoryCodeInput.value = '';
+                categoryNameInput.value = '';
+                categoryFileInput.value = '';
+            }
+
+            openAddCategoryBtn.addEventListener('click', openAddCategoryModal);
+            closeAddCategoryBtn.addEventListener('click', closeAddCategoryModal);
+            cancelCategoryBtn.addEventListener('click', closeAddCategoryModal);
+
+            saveAddCategoryBtn.addEventListener('click', () => {
+                const code = categoryCodeInput.value.trim();
+                const name = categoryNameInput.value.trim();
+                if (!code || !name) {
+                    alert('Vui lòng nhập đầy đủ mã và tên danh mục!');
+                    return;
+                }
+                alert('Danh mục đã được thêm thành công!');
+                closeAddCategoryModal();
+            });
+
+            addCategoryModal.addEventListener('click', (e) => {
+                if (e.target === addCategoryModal) {
+                    closeAddCategoryModal();
+                }
+            });
+
+            // Edit Modal functionality
+            const editModal = document.getElementById('edit-modal');
+            const closeEditBtn = editModal.querySelector('.close');
+            const cancelEditBtn = document.getElementById('cancel-edit-modal');
+            const saveEditBtn = document.getElementById('save-edit');
+            const editCodeInput = document.getElementById('edit-code');
+            const editNameInput = document.getElementById('edit-name');
+            const editParentSelect = document.getElementById('edit-parent-select');
+            const editFileInput = document.getElementById('edit-file-upload');
+            const editTitle = document.getElementById('edit-title');
+            const parentRow = document.getElementById('parent-row');
+            const currentImageContainer = document.getElementById('current-image-container');
+            const editCurrentImage = document.getElementById('edit-current-image');
+
+
+            function openEditModal(code, name, image, isSub, parent) {
+                editCodeInput.value = code;
+                editNameInput.value = name;
+                editTitle.textContent = isSub ? 'Sửa Danh Mục Phụ' : 'Sửa Danh Mục';
+                if (isSub) {
+                    parentRow.style.display = 'block';
+                    if (parent) editParentSelect.value = parent;
+                } else {
+                    parentRow.style.display = 'none';
+                }
+                if (image) {
+                    editCurrentImage.src = image;
+                    currentImageContainer.style.display = 'block';
+                } else {
+                    currentImageContainer.style.display = 'none';
+                }
+                editFileInput.value = '';
+                editModal.classList.remove('hidden');
+                editModal.classList.add('show');
+            }
+
+            function closeEditModal() {
+                editModal.classList.remove('show');
+                editModal.classList.add('hidden');
+            }
+
+            closeEditBtn.addEventListener('click', closeEditModal);
+            cancelEditBtn.addEventListener('click', closeEditModal);
+
+            saveEditBtn.addEventListener('click', () => {
+                const code = editCodeInput.value.trim();
+                const name = editNameInput.value.trim();
+                const isSub = parentRow.style.display !== 'none';
+                const parent = isSub ? editParentSelect.value : null;
+                if (!code || !name || (isSub && !parent)) {
+                    alert('Vui lòng nhập đầy đủ thông tin!');
+                    return;
+                }
+                alert('Đã cập nhật thành công!');
+                closeEditModal();
+            });
+
+            editModal.addEventListener('click', (e) => {
+                if (e.target === editModal) {
+                    closeEditModal();
+                }
+            });
+
+            // Edit button handlers using event delegation (FIXED: Check for button.edit-btn instead of data-feather)
+            document.addEventListener('click', (e) => {
+                const button = e.target.closest('button.edit-btn');
+                if (button) {
+                    const card = button.closest('.category-card');
+                    const code = card.dataset.code;
+                    const name = card.dataset.name;
+                    const image = card.dataset.image;
+                    const isSub = card.classList.contains('sub-category-card');
+                    const parent = isSub ? card.dataset.parent : null;
+                    openEditModal(code, name, image, isSub, parent);
+                }
+            });
+        });
+
+        // Toggle submenu function
+        window.toggleSubmenu = function(id) {
+            const submenu = document.getElementById(id + '-submenu');
+            const chevron = document.getElementById(id + '-chevron');
+            const isOpen = submenu.classList.contains('show');
+
+            // Close all submenus
+            document.querySelectorAll('.sidebar-submenu').forEach(s => s.classList.remove('show'));
+            document.querySelectorAll('[id$="-chevron"]').forEach(c => c.classList.remove('rotate-180'));
+
+            // Toggle current
+            if (!isOpen) {
+                submenu.classList.add('show');
+                chevron.classList.add('rotate-180');
+            }
+        };
+
+        // Initialize Feather Icons
+        feather.replace();
+
+        // Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            preloader.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

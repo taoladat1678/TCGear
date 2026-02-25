@@ -1,0 +1,179 @@
+/* Table animations */
+.table-container tbody tr {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.5s ease-out;
+}
+
+.table-container tbody tr.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* System status animations */
+.grid-cols-3 > div {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.5s ease-out;
+}
+
+.grid-cols-3 > div.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Initial opacity for animations */
+.animate-slideUpFromBottom,
+.table-container tbody tr,
+.divide-y > div,
+.grid-cols-3 > div {
+    opacity: 0;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+.modal-content {
+    background-color: #000000;
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid #e11d48;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e11d48/20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-body {
+    padding: 20px;
+}
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid #e11d48/20;
+    text-align: right;
+}
+.close {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover {
+    color: #e11d48;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.modal-close:hover {
+    opacity: 1;
+}
+
+/* Mobile adjustments for main content and modal */
+@media (max-width: 760px) {
+    .table-container {
+        font-size: 0.75rem;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 0.5rem;
+    }
+
+    /* Additional mobile adjustments for better usability */
+    main {
+        padding: 1rem;
+    }
+
+    /* Modal mobile adjustments */
+    .sm:max-w-3xl {
+        max-width: 95vw;
+        width: 95vw;
+        margin: 1rem;
+    }
+
+    .px-6.py-4 {
+        padding: 1rem;
+    }
+
+    textarea {
+        font-size: 0.875rem;
+    }
+
+    /* System status grid stacks to single column */
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Reduce gaps in grids on mobile */
+    .grid {
+        gap: 1rem;
+    }
+
+    /* Overview cards stack and reduce font sizes slightly */
+    .grid-cols-1 > div h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Customer list images smaller */
+    .h-10.w-10 {
+        height: 2rem;
+        width: 2rem;
+    }
+
+    /* Improve customer list touch targets */
+    .divide-y > div {
+        min-height: 3rem;
+        padding: 0.75rem;
+    }
+
+    /* Ensure icon positions in flex items remain stable */
+    .flex.items-center > [data-feather] {
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    }
+
+    /* Keep icons position and size unchanged on mobile */
+    [data-feather] {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+    }
+
+    /* Hover animation for icons */
+    [data-feather] {
+        transition: transform 0.2s ease;
+    }
+
+    [data-feather]:hover {
+        transform: scale(1.1);
+    }
+}
+
+/* Ensure table is responsive */
+.table-container {
+    -webkit-overflow-scrolling: touch;
+}

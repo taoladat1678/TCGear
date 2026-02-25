@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Meet the professional esports teams that partner with TCGear for premium gaming gear and jerseys."
+    />
+    <meta
+      name="keywords"
+      content="esports teams, professional gaming teams, TCGear partners, esports organizations"
+    />
+    <meta name="author" content="TCGear" />
+    <title>Teams - TCGear Premium Gaming Gear & Jerseys</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e11d48",
+              secondary: "#000000",
+              accent: "#ffffff",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
+
+      h1,
+      h2,
+      h3,
+      .font-orbitron {
+        font-family: "Orbitron", sans-serif;
+      }
+      p,
+      span,
+      a,
+      input,
+      button,
+      .font-open-sans {
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          rgba(225, 29, 72, 0.9) 0%,
+          rgba(0, 0, 0, 0.9) 100%
+        );
+      }
+
+      .team-card {
+        transition: all 0.3s ease;
+        background: #1a1a1a;
+        border-radius: 12px;
+        border: 1px solid rgba(225, 29, 72, 0.2);
+      }
+
+      .team-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px -5px rgba(225, 29, 72, 0.4);
+      }
+
+      .mobile-menu {
+        transition: all 0.3s ease;
+      }
+
+      .nav-links {
+        margin-left: 160px;
+        display: flex;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        gap: 1.5rem;
+      }
+
+      .nav-links a {
+        white-space: nowrap;
+      }
+
+      .actions-container {
+        margin-left: 35px;
+      }
+
+      #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #000000;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .loader {
+        border: 4px solid #e11d48;
+        border-top: 4px solid transparent;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: #000000;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        color: #ffffff;
+      }
+
+      .account-dropdown,
+      .language-dropdown {
+        position: relative;
+      }
+      .account-dropdown-content,
+      .language-dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: -45px;
+        background: #000000;
+        border: 1px solid #e11d48;
+        border-radius: 4px;
+        min-width: 165px;
+        z-index: 50;
+      }
+
+      .counter {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #e11d48;
+        color: #ffffff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      #orders-counter,
+      #mobile-orders-counter {
+        position: static;
+        margin-left: 6px;
+        vertical-align: middle;
+        background: #e11d48;
+        color: #ffffff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .account-dropdown-content a,
+      .language-dropdown-content a {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        color: #ffffff;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+
+      .account-dropdown-content a:hover,
+      .language-dropdown-content a:hover {
+        background: #e11d48;
+      }
+      .account-dropdown.open .account-dropdown-content,
+      .language-dropdown.open .language-dropdown-content {
+        display: block;
+      }
+
+      .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .eye-icon {
+        transition: all 0.3s ease;
+      }
+      .eye-icon:hover {
+        color: #e11d48;
+        transform: scale(1.2);
+      }
+
+      .cart-icon,
+      .wishlist-icon,
+      .account-dropdown-content a {
+        position: relative;
+      }
+
+      .player-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem;
+        border-bottom: 1px solid #333;
+      }
+
+      .player-card img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      #mobile-menu {
+        max-height: 80vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #e11d48 #000000;
+      }
+      #mobile-menu::-webkit-scrollbar {
+        width: 8px;
+      }
+      #mobile-menu::-webkit-scrollbar-track {
+        background: #000000;
+      }
+      #mobile-menu::-webkit-scrollbar-thumb {
+        background: #e11d48;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 760px) {
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown,
+        .language-dropdown {
+          display: none;
+        }
+        
+        .nav-links,
+        .search-bar {
+          display: none;
+        }
+        #mobile-menu-toggle {
+          display: block;
+        }
+        #mobile-menu .mobile-cart,
+        #mobile-menu .mobile-wishlist {
+          display: flex;
+          align-items: center;
+          position: relative;
+        }
+        #mobile-menu .account-dropdown,
+        #mobile-menu .language-dropdown {
+          display: block;
+          align-items: center;
+          position: relative;
+        }
+        #mobile-menu .counter {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+        }
+        #mobile-menu .account-dropdown-content,
+        #mobile-menu .language-dropdown-content {
+          position: static;
+          border: none;
+          background: transparent;
+          width: 100%;
+          padding-left: 2rem;
+          margin-top: 0.5rem;
+        }
+        #mobile-menu .account-dropdown-content a,
+        #mobile-menu .language-dropdown-content a {
+          padding: 4px 8px;
+          display: flex;
+        }
+        .modal-content {
+          padding: 1.5rem;
+          max-width: 95%;
+        }
+        .team-card img {
+          height: 200px;
+        }
+        .hero-section h1 {
+          font-size: 2.5rem;
+        }
+        .hero-section p {
+          font-size: 1rem;
+        }
+        .player-card img {
+          width: 40px;
+          height: 40px;
+        }
+      }
+      @media (min-width: 761px) and (max-width: 1270px) {
+        .nav-links {
+          display: none;
+        }
+        .search-bar,
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown,
+        .language-dropdown {
+          display: flex;
+        }
+        #mobile-menu-toggle {
+          display: block;
+        }
+        #mobile-menu .mobile-cart,
+        #mobile-menu .mobile-wishlist,
+        #mobile-menu .account-dropdown,
+        #mobile-menu .language-dropdown {
+          display: none;
+        }
+      }
+      @media (min-width: 1271px) {
+        .nav-links,
+        .search-bar,
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown,
+        .language-dropdown {
+          display: flex;
+        }
+        #mobile-menu-toggle {
+          display: none;
+        }
+        #mobile-menu {
+          display: none !important;
+        }
+        #mobile-menu .mobile-cart,
+        #mobile-menu .mobile-wishlist,
+        #mobile-menu .account-dropdown,
+        #mobile-menu .language-dropdown,
+        #mobile-menu .account-dropdown-content,
+        #mobile-menu .language-dropdown-content {
+          display: none !important;
+        }
+      }
+      @media (max-width: 640px) {
+        .team-card {
+          margin-bottom: 1.5rem;
+        }
+        .team-card img {
+          height: 150px;
+        }
+      }
+      @media (min-width: 765px) {
+        #mobile-menu .flex.items-center.bg-secondary.border.border-primary\/20.rounded-md.overflow-hidden {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-secondary text-accent">
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="loader"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav
+      class="bg-secondary border-b border-primary/20 sticky top-0 z-50"
+      aria-label="Thanh điều hướng chính"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 gap-8">
+          <div class="flex items-center shop-logo">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+              class="h-10 w-auto"
+              alt="Logo TCGear"
+            />
+            <span class="ml-2 text-xl font-bold text-primary font-orbitron"
+              >TCGEAR</span
+            >
+          </div>
+
+          <div class="flex items-center gap-1">
+            <div class="nav-container flex items-center gap-1">
+              <div class="nav-links">
+                <a
+                  href="index.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Trang chủ</a
+                >
+                <a
+                  href="shop.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Cửa hàng</a
+                >
+                <a
+                  href="teams.html"
+                  class="text-primary transition font-open-sans"
+                  aria-current="page"
+                  >Đội tuyển</a
+                >
+                <a
+                  href="blog.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Blog</a
+                >
+                <a
+                  href="contact.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Liên hệ</a
+                >
+                <a
+                  href="about.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Giới thiệu</a
+                >
+              </div>
+            </div>
+
+            <div class="actions-container flex items-center gap-1 justify-end">
+              <div
+                class="search-bar items-center bg-secondary border border-primary/20 rounded-md overflow-hidden"
+              >
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="Tìm kiếm..."
+                  class="bg-transparent px-3 py-1 text-accent focus:outline-none w-40 lg:w-56 font-open-sans"
+                  aria-label="Tìm kiếm đội tuyển"
+                />
+                <button
+                  class="p-2 text-accent hover:text-primary transition font-orbitron"
+                  aria-label="Tìm kiếm"
+                >
+                  <i data-feather="search" class="h-4 w-4"></i>
+                </button>
+              </div>
+              <a
+                href="cart.html"
+                class="cart-icon p-2 text-accent hover:text-primary transition font-orbitron"
+                aria-label="Giỏ hàng"
+              >
+                <i data-feather="shopping-cart"></i>
+                <span class="counter" id="cart-counter">0</span>
+              </a>
+              <a
+                href="wishlist.html"
+                class="wishlist-icon p-2 text-accent hover:text-primary transition font-orbitron"
+                aria-label="Danh sách yêu thích"
+                data-product="Danh sách yêu thích"
+              >
+                <i data-feather="heart"></i>
+                <span class="counter" id="wishlist-counter">0</span>
+              </a>
+              <div class="account-dropdown">
+                <button
+                  id="account-toggle"
+                  class="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron"
+                  aria-label="Tài khoản người dùng"
+                >
+                  <i data-feather="user"></i>
+                  <i data-feather="chevron-down" class="h-4 w-4"></i>
+                </button>
+                <div class="account-dropdown-content">
+                  <a
+                    href="profile.html"
+                    aria-label="Hồ sơ"
+                    class="font-open-sans"
+                    ><i data-feather="user" class="h-5 w-5"></i> Hồ sơ</a
+                  >
+                  <a href="orders.html" aria-label="Đơn hàng" class="font-open-sans"
+                    ><i data-feather="shopping-bag" class="h-5 w-5"></i> Đơn hàng
+                    <span class="counter" id="orders-counter">0</span></a
+                  >
+                  <a
+                    href="vouchers.html"
+                    aria-label="Voucher"
+                    class="font-open-sans"
+                    ><i data-feather="gift" class="h-5 w-5"></i> Voucher</a
+                  >
+                  <a href="login.html" aria-label="Đăng nhập" class="font-open-sans"
+                    ><i data-feather="log-in" class="h-5 w-5"></i> Đăng nhập</a
+                  >
+                  <a
+                    href="register.html"
+                    aria-label="Đăng ký"
+                    class="font-open-sans"
+                    ><i data-feather="user-plus" class="h-5 w-5"></i> Đăng ký</a
+                  >
+                </div>
+              </div>
+              <div class="language-dropdown">
+                <button
+                  id="language-toggle"
+                  class="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron"
+                  aria-label="Chọn ngôn ngữ"
+                >
+                  <i data-feather="globe"></i>
+                  <i data-feather="chevron-down" class="h-4 w-4"></i>
+                </button>
+                <div class="language-dropdown-content">
+                  <a href="?lang=eng" aria-label="Tiếng Anh" class="font-open-sans"
+                    ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Anh</a
+                  >
+                  <a href="?lang=vie" aria-label="Tiếng Việt" class="font-open-sans"
+                    ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Việt</a
+                  >
+                </div>
+              </div>
+              <button
+                id="mobile-menu-toggle"
+                class="p-2 text-accent font-orbitron"
+                aria-label="Bật/tắt menu di động"
+              >
+                <i data-feather="menu"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div
+          id="mobile-menu"
+          class="mobile-menu hidden bg-secondary border-t border-primary/20"
+        >
+          <div class="flex flex-col space-y-4 py-4 px-4">
+            <div
+              class="flex items-center bg-secondary border border-primary/20 rounded-md overflow-hidden"
+            >
+              <input
+                type="text"
+                id="mobile-search-input"
+                placeholder="Tìm kiếm..."
+                class="bg-transparent px-3 py-1 text-accent focus:outline-none w-full font-open-sans"
+                aria-label="Tìm kiếm đội tuyển"
+              />
+              <button
+                class="p-2 text-accent hover:text-primary transition font-orbitron"
+                aria-label="Tìm kiếm"
+              >
+                <i data-feather="search" class="h-4 w-4"></i>
+              </button>
+            </div>
+            <a
+              href="index.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Trang chủ</a
+            >
+            <a
+              href="shop.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Cửa hàng</a
+            >
+            <a
+              href="teams.html"
+              class="text-primary transition font-open-sans"
+              >Đội tuyển</a
+            >
+            <a
+              href="blog.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Blog</a
+            >
+            <a
+              href="contact.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Liên hệ</a
+            >
+            <a
+              href="about.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Giới thiệu</a
+            >
+            <a
+              href="cart.html"
+              class="mobile-cart text-accent hover:text-primary transition font-open-sans flex items-center gap-2 relative"
+            >
+              <i data-feather="shopping-cart" class="h-5 w-5"></i> Giỏ hàng
+              <span class="counter" id="mobile-cart-counter">0</span>
+            </a>
+            <a
+              href="wishlist.html"
+              class="mobile-wishlist text-accent hover:text-primary transition font-open-sans flex items-center gap-2 relative"
+              aria-label="Danh sách yêu thích"
+              data-product="Danh sách yêu thích"
+            >
+              <i data-feather="heart" class="h-5 w-5"></i> Danh sách yêu thích
+              <span class="counter" id="mobile-wishlist-counter">0</span>
+            </a>
+            <div class="account-dropdown relative">
+              <button
+                id="mobile-account-toggle"
+                class="text-accent hover:text-primary transition font-open-sans flex items-center gap-2 w-full text-left relative"
+                aria-label="Bật/tắt menu tài khoản"
+              >
+                <i data-feather="user" class="h-5 w-5"></i>
+                Tài khoản
+                <i data-feather="chevron-down" class="h-5 w-5"></i>
+              </button>
+              <div class="account-dropdown-content w-full">
+                <a
+                  href="profile.html"
+                  aria-label="Hồ sơ"
+                  class="font-open-sans"
+                  ><i data-feather="user" class="h-5 w-5"></i> Hồ sơ</a
+                >
+                <a href="orders.html" aria-label="Đơn hàng" class="font-open-sans"
+                  ><i data-feather="shopping-bag" class="h-5 w-5"></i> Đơn hàng
+                  <span class="counter" id="mobile-orders-counter">0</span></a
+                >
+                <a
+                  href="vouchers.html"
+                  aria-label="Voucher"
+                  class="font-open-sans"
+                  ><i data-feather="gift" class="h-5 w-5"></i> Voucher</a
+                >
+                <a href="login.html" aria-label="Đăng nhập" class="font-open-sans"
+                  ><i data-feather="log-in" class="h-5 w-5"></i> Đăng nhập</a
+                >
+                <a
+                  href="register.html"
+                  aria-label="Đăng ký"
+                  class="font-open-sans"
+                  ><i data-feather="user-plus" class="h-5 w-5"></i> Đăng ký</a
+                >
+              </div>
+            </div>
+            <div class="language-dropdown relative">
+              <button
+                id="mobile-language-toggle"
+                class="text-accent hover:text-primary transition font-open-sans flex items-center gap-2 w-full text-left relative"
+                aria-label="Bật/tắt menu ngôn ngữ"
+              >
+                <i data-feather="globe" class="h-5 w-5"></i>
+                Ngôn ngữ
+                <i data-feather="chevron-down" class="h-5 w-5"></i>
+              </button>
+              <div class="language-dropdown-content w-full">
+                <a href="?lang=eng" aria-label="Tiếng Anh" class="font-open-sans"
+                  ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Anh</a
+                >
+                <a href="?lang=vie" aria-label="Tiếng Việt" class="font-open-sans"
+                  ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Việt</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-[80vh] flex items-center justify-center">
+      <div class="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+          srcset="
+            https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80 800w,
+            https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80 1770w
+          "
+          sizes="(max-width: 800px) 800px, 1770px"
+          alt="Cuộc thi đội esports"
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+      </div>
+      <div class="absolute inset-0 hero-gradient"></div>
+
+      <div
+        class="relative z-10 text-center px-4 max-w-4xl mx-auto"
+        data-aos="fade-up"
+      >
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 font-orbitron">
+          ĐỘI TUYỂN CỦA CHÚNG TÔI
+        </h1>
+        <p class="text-xl mb-8 font-open-sans">
+          Khám phá các đội esports chuyên nghiệp tin tưởng TCGear để nâng cao sức mạnh cạnh tranh
+        </p>
+      </div>
+    </section>
+
+    <!-- Featured Teams Section -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div class="text-center mb-12" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
+          ĐỘI TUYỂN NỔI BẬT
+        </h2>
+        <p class="text-accent/70 max-w-2xl mx-auto text-lg font-open-sans">
+          Các tổ chức esports chuyên nghiệp sử dụng thiết bị và áo đấu TCGear
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Team T1 -->
+        <div
+          class="team-card rounded-lg overflow-hidden"
+          data-aos="fade-up"
+          data-aos-delay="100"
+        >
+          <div class="h-64 bg-gray-800 relative">
+            <img
+              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80"
+              srcset="
+                https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+                https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80 774w
+              "
+              sizes="(max-width: 400px) 400px, 774px"
+              alt="Đội T1 Esports"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <span
+              class="absolute top-4 left-4 bg-primary text-white text-xs px-2 py-1 rounded font-open-sans"
+              >ĐỐI TÁC</span
+            >
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">T1 Esports</h3>
+            <p class="text-accent/70 mb-4 font-open-sans">
+              Đội Liên Minh Huyền Thoại huyền thoại với nhiều chức vô địch thế giới
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-bold font-open-sans"
+                >Hàn Quốc</span
+              >
+              <button
+                class="team-details eye-icon"
+                data-team="T1 Esports"
+                data-region="Hàn Quốc"
+                data-games="Liên Minh Huyền Thoại, Valorant"
+                data-achievements="3 lần vô địch thế giới, 10 lần vô địch LCK"
+                data-image="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80"
+                data-players='[{"name": "Lee \"Faker\" Sang-hyeok", "image": "https://images.unsplash.com/photo-1506794778202-6d6d5fe6c7eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}, {"name": "Ryu \"Keria\" Min-seok", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}]'
+              >
+                <i data-feather="eye" class="h-6 w-6 text-accent"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team G2 -->
+        <div
+          class="team-card rounded-lg overflow-hidden"
+          data-aos="fade-up"
+          data-aos-delay="200"
+        >
+          <div class="h-64 bg-gray-800">
+            <img
+              src="https://images.unsplash.com/photo-1614687153862-b2342145d91a?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80"
+              srcset="
+                https://images.unsplash.com/photo-1614687153862-b2342145d91a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+                https://images.unsplash.com/photo-1614687153862-b2342145d91a?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80 774w
+              "
+              sizes="(max-width: 400px) 400px, 774px"
+              alt="Đội G2 Esports"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">G2 Esports</h3>
+            <p class="text-accent/70 mb-4 font-open-sans">
+              Cường quốc châu Âu với các danh hiệu vô địch ở nhiều tựa game
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-bold font-open-sans">Châu Âu</span>
+              <button
+                class="team-details eye-icon"
+                data-team="G2 Esports"
+                data-region="Châu Âu"
+                data-games="Liên Minh Huyền Thoại, CS:GO, Valorant"
+                data-achievements="Vô địch MSI, 9 lần vô địch LEC"
+                data-image="https://images.unsplash.com/photo-1614687153862-b2342145d91a?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80"
+                data-players='[{"name": "Rasmus \"Caps\" Borregaard", "image": "https://images.unsplash.com/photo-1522075469751-6603fb686199?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}, {"name": "Jankos \"Jankos\" Marcin", "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}]'
+              >
+                <i data-feather="eye" class="h-6 w-6 text-accent"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Cloud9 -->
+        <div
+          class="team-card rounded-lg overflow-hidden"
+          data-aos="fade-up"
+          data-aos-delay="300"
+        >
+          <div class="h-64 bg-gray-800">
+            <img
+              src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+              srcset="
+                https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+                https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80 1770w
+              "
+              sizes="(max-width: 400px) 400px, 1770px"
+              alt="Đội Cloud9 Esports"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">Cloud9</h3>
+            <p class="text-accent/70 mb-4 font-open-sans">
+              Tổ chức Bắc Mỹ với thành tích vô địch nổi bật
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-bold font-open-sans"
+                >Bắc Mỹ</span
+              >
+              <button
+                class="team-details eye-icon"
+                data-team="Cloud9"
+                data-region="Bắc Mỹ"
+                data-games="Liên Minh Huyền Thoại, CS:GO, Valorant"
+                data-achievements="Vô địch LCS, Vô địch Major CS:GO"
+                data-image="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+                data-players='[{"name": "Fudge \"Fudge\" Ibrahim", "image": "https://images.unsplash.com/photo-1502685104226-ee32379f42f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}, {"name": "Blaber \"Blaber\" Robert", "image": "https://images.unsplash.com/photo-1506794778202-6d6d5fe6c7eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}]'
+              >
+                <i data-feather="eye" class="h-6 w-6 text-accent"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Fnatic -->
+        <div
+          class="team-card rounded-lg overflow-hidden"
+          data-aos="fade-up"
+          data-aos-delay="400"
+        >
+          <div class="h-64 bg-gray-800">
+            <img
+              src="https://images.unsplash.com/photo-1511882150382-421056c89033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+              srcset="
+                https://images.unsplash.com/photo-1511882150382-421056c89033?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+                https://images.unsplash.com/photo-1511882150382-421056c89033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80 1770w
+              "
+              sizes="(max-width: 400px) 400px, 1770px"
+              alt="Đội Fnatic Esports"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">Fnatic</h3>
+            <p class="text-accent/70 mb-4 font-open-sans">
+              Tổ chức tiên phong châu Âu với tầm ảnh hưởng toàn cầu
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-bold font-open-sans"
+                >Châu Âu/Toàn cầu</span
+              >
+              <button
+                class="team-details eye-icon"
+                data-team="Fnatic"
+                data-region="Châu Âu/Toàn cầu"
+                data-games="Liên Minh Huyền Thoại, CS:GO, Dota 2"
+                data-achievements="Vô địch thế giới Liên Minh Huyền Thoại đầu tiên, Nhiều chiến thắng Major"
+                data-image="https://images.unsplash.com/photo-1511882150382-421056c89033?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+                data-players='[{"name": "Martin \"Rekkles\" Larsson", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}, {"name": "Hylissang \"Hylissang\" Galabov", "image": "https://images.unsplash.com/photo-1522075469751-6603fb686199?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}]'
+              >
+                <i data-feather="eye" class="h-6 w-6 text-accent"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team DRX -->
+        <div
+          class="team-card rounded-lg overflow-hidden"
+          data-aos="fade-up"
+          data-aos-delay="500"
+        >
+          <div class="h-64 bg-gray-800">
+            <img
+              src="https://images.unsplash.com/photo-1593113630400-ea4e6817cb31?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80"
+              srcset="
+                https://images.unsplash.com/photo-1593113630400-ea4e6817cb31?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+                https://images.unsplash.com/photo-1593113630400-ea4e6817cb31?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80 774w
+              "
+              sizes="(max-width: 400px) 400px, 774px"
+              alt="Đội DRX Esports"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">DRX</h3>
+            <p class="text-accent/70 mb-4 font-open-sans">
+              Tổ chức Hàn Quốc nổi tiếng với những câu chuyện bất ngờ
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-bold font-open-sans"
+                >Hàn Quốc</span
+              >
+              <button
+                class="team-details eye-icon"
+                data-team="DRX"
+                data-region="Hàn Quốc"
+                data-games="Liên Minh Huyền Thoại, Valorant"
+                data-achievements="Vô địch thế giới 2022"
+                data-image="https://images.unsplash.com/photo-1593113630400-ea4e6817cb31?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80"
+                data-players='[{"name": "Kim \"Deft\" Hyuk-kyu", "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}, {"name": "Hong \"Pyosik\" Chang-hyeon", "image": "https://images.unsplash.com/photo-1502685104226-ee32379f42f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}]'
+              >
+                <i data-feather="eye" class="h-6 w-6 text-accent"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team 100 Thieves -->
+        <div
+          class="team-card rounded-lg overflow-hidden"
+          data-aos="fade-up"
+          data-aos-delay="600"
+        >
+          <div class="h-64 bg-gray-800">
+            <img
+              src="https://images.unsplash.com/photo-1599687351724-d6bdb0d8af0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+              srcset="
+                https://images.unsplash.com/photo-1599687351724-d6bdb0d8af0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80 400w,
+                https://images.unsplash.com/photo-1599687351724-d6bdb0d8af0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80 1770w
+              "
+              sizes="(max-width: 400px) 400px, 1770px"
+              alt="Đội 100 Thieves Esports"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-6">
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">100 Thieves</h3>
+            <p class="text-accent/70 mb-4 font-open-sans">
+              Thương hiệu phong cách sống và game với các đội thi đấu cạnh tranh
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-bold font-open-sans"
+                >Bắc Mỹ</span
+              >
+              <button
+                class="team-details eye-icon"
+                data-team="100 Thieves"
+                data-region="Bắc Mỹ"
+                data-games="Liên Minh Huyền Thoại, Valorant, COD"
+                data-achievements="Vô địch LCS, Mạng lưới nhà sáng tạo nội dung"
+                data-image="https://images.unsplash.com/photo-1599687351724-d6bdb0d8af0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+                data-players='[{"name": "Ssumday \"Ssumday\" Chan-ho", "image": "https://images.unsplash.com/photo-1506794778202-6d6d5fe6c7eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}, {"name": "Asuna \"Asuna\" Peter", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"}]'
+              >
+                <i data-feather="eye" class="h-6 w-6 text-accent"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Partnership Section -->
+    <section class="py-16 bg-black px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto text-center" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
+          TRỞ THÀNH ĐỘI TUYỂN ĐỐI TÁC
+        </h2>
+        <p
+          class="text-accent/70 max-w-3xl mx-auto mb-8 text-lg font-open-sans"
+        >
+          Tham gia gia đình ngày càng phát triển của các tổ chức esports chuyên nghiệp và nâng cao hiệu suất đội của bạn với thiết bị và áo đấu tùy chỉnh TCGear
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div
+            class="bg-secondary/50 rounded-lg p-6"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            <i
+              data-feather="award"
+              class="h-12 w-12 text-primary mx-auto mb-4"
+            ></i>
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">
+              Thiết bị cao cấp
+            </h3>
+            <p class="text-accent/70 font-open-sans">
+              Tiếp cận thiết bị cấp độ giải đấu được thiết kế cho thi đấu chuyên nghiệp
+            </p>
+          </div>
+
+          <div
+            class="bg-secondary/50 rounded-lg p-6"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            <i
+              data-feather="shirt"
+              class="h-12 w-12 text-primary mx-auto mb-4"
+            ></i>
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">
+              Áo đấu tùy chỉnh
+            </h3>
+            <p class="text-accent/70 font-open-sans">
+              Thiết kế áo đấu đội độc đáo với thương hiệu và tên của người chơi
+            </p>
+          </div>
+
+          <div
+            class="bg-secondary/50 rounded-lg p-6"
+            data-aos="fade-up"
+            data-aos-delay="300"
+          >
+            <i
+              data-feather="users"
+              class="h-12 w-12 text-primary mx-auto mb-4"
+            ></i>
+            <h3 class="font-semibold text-xl mb-2 font-orbitron">Tiếp cận</h3>
+            <p class="text-accent/70 font-open-sans">
+              Được giới thiệu trên nền tảng của chúng tôi và tiếp cận hàng nghìn người hâm mộ esports
+            </p>
+          </div>
+        </div>
+
+        <a
+          href="contact.html"
+          class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-md font-semibold transition font-orbitron"
+          >Đăng ký hợp tác</a
+        >
+      </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-primary">
+      <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
+          THAM GIA CỘNG ĐỒNG <span class="font-orbitron">TCGEAR</span>
+        </h2>
+        <p class="mb-8 max-w-2xl mx-auto font-open-sans">
+          Đăng ký nhận bản tin để nhận ưu đãi độc quyền, thông tin sản phẩm mới và tin tức esports
+        </p>
+        <form
+          id="newsletter-form"
+          class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
+        >
+          <input
+            type="email"
+            id="newsletter-email"
+            placeholder="Địa chỉ email của bạn"
+            class="flex-1 px-4 py-3 rounded-md text-secondary focus:outline-none focus:ring-2 focus:ring-accent font-open-sans"
+            aria-label="Email cho bản tin"
+          />
+          <button
+            type="submit"
+            class="bg-secondary text-accent hover:bg-black px-6 py-3 rounded-md font-semibold transition font-orbitron"
+            aria-label="Đăng ký nhận bản tin"
+          >
+            Đăng ký
+          </button>
+        </form>
+        <p
+          id="newsletter-message"
+          class="text-accent mt-4 hidden font-open-sans"
+        ></p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer
+      class="bg-secondary border-t border-primary/20 py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center mb-4">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+              class="h-8 w-auto"
+              alt="Logo TCGear"
+            />
+            <span class="ml-2 text-lg font-bold text-primary font-orbitron"
+              >TCGEAR</span
+            >
+          </div>
+          <p class="text-accent/70 mb-4 font-open-sans">
+            Thiết bị chơi game và áo đấu cao cấp dành cho game thủ chuyên nghiệp và đội esports.
+          </p>
+          <div class="flex space-x-4">
+            <a
+              href="https://facebook.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="Facebook"
+              ><i data-feather="facebook"></i
+            ></a>
+            <a
+              href="https://twitter.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="Twitter"
+              ><i data-feather="twitter"></i
+            ></a>
+            <a
+              href="https://instagram.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="Instagram"
+              ><i data-feather="instagram"></i
+            ></a>
+            <a
+              href="https://youtube.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="YouTube"
+              ><i data-feather="youtube"></i
+            ></a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-4 font-orbitron">Cửa hàng</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="jerseys.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Áo đấu</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=headsets"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Tai nghe</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=keyboards"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Bàn phím</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=mice"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Chuột</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=accessories"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Phụ kiện</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-4 font-orbitron">Công ty</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="about.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Về chúng tôi</a
+              >
+            </li>
+            <li>
+              <a
+                href="contact.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Liên hệ</a
+              >
+            </li>
+            <li>
+              <a
+                href="shipping.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Vận chuyển</a
+              >
+            </li>
+            <li>
+              <a
+                href="returns.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Đổi trả</a
+              >
+            </li>
+            <li>
+              <a
+                href="faq.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Câu hỏi thường gặp</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-4 font-orbitron">Liên hệ</h3>
+          <ul class="space-y-2">
+            <li class="flex items-start">
+              <i
+                data-feather="map-pin"
+                class="mr-2 h-5 w-5 text-primary mt-0.5"
+              ></i>
+              <span class="text-accent/70 font-open-sans"
+                >123 Đường Chơi Game, Thành phố Esports</span
+              >
+            </li>
+            <li class="flex items-start">
+              <i
+                data-feather="mail"
+                class="mr-2 h-5 w-5 text-primary mt-0.5"
+              ></i>
+              <span class="text-accent/70 font-open-sans"
+                >support@tcgear.com</span
+              >
+            </li>
+            <li class="flex items-start">
+              <i
+                data-feather="phone"
+                class="mr-2 h-5 w-5 text-primary mt-0.5"
+              ></i>
+              <span class="text-accent/70 font-open-sans"
+                >+1 (555) 123-4567</span
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="max-w-7xl mx-auto border-t border-primary/20 mt-8 pt-8 text-center text-accent/50 text-sm"
+      >
+        <p class="font-open-sans">© 2025 <span class="font-orbitron">TCGear</span>. Mọi quyền được bảo lưu.</p>
+      </div>
+    </footer>
+
+    <!-- Team Details Modal -->
+    <div id="team-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" aria-label="Đóng modal">&times;</span>
+        <img
+          id="modal-image"
+          src=""
+          alt="Hình ảnh đội"
+          class="w-full h-64 object-cover rounded-lg mb-4"
+        />
+        <h3
+          id="modal-title"
+          class="font-semibold text-xl md:text-2xl mb-4 font-orbitron"
+        ></h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <h4
+              class="font-semibold text-primary mb-1 text-lg font-orbitron"
+            >
+              Khu vực
+            </h4>
+            <p
+              id="modal-region"
+              class="text-accent/70 font-open-sans"
+            ></p>
+          </div>
+          <div>
+            <h4
+              class="font-semibold text-primary mb-1 text-lg font-orbitron"
+            >
+              Trò chơi
+            </h4>
+            <p id="modal-games" class="text-accent/70 font-open-sans"></p>
+          </div>
+        </div>
+        <div class="mb-4">
+          <h4
+            class="font-semibold text-primary mb-1 text-lg font-orbitron"
+          >
+            Thành tựu
+          </h4>
+          <p
+            id="modal-achievements"
+            class="text-accent/70 font-open-sans"
+          ></p>
+        </div>
+        <div class="mb-4">
+          <h4
+            class="font-semibold text-primary mb-2 text-lg font-orbitron"
+          >
+            Người chơi
+          </h4>
+          <div id="modal-players" class="space-y-2"></div>
+        </div>
+        <button
+          class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md transition font-orbitron"
+          aria-label="Liên hệ đội"
+        >
+          Liên hệ đội
+        </button>
+        <div class="flex space-x-4 mt-4">
+          <a
+            href="#"
+            class="text-accent hover:text-primary transition"
+            aria-label="Thăm đội trên Facebook"
+            ><i data-feather="facebook" class="h-6 w-6"></i
+          ></a>
+          <a
+            href="#"
+            class="text-accent hover:text-primary transition"
+            aria-label="Thăm đội trên Twitter"
+            ><i data-feather="twitter" class="h-6 w-6"></i
+          ></a>
+          <a
+            href="#"
+            class="text-accent hover:text-primary transition"
+            aria-label="Thăm đội trên Instagram"
+            ><i data-feather="instagram" class="h-6 w-6"></i
+          ></a>
+          <a
+            href="#"
+            class="text-accent hover:text-primary transition"
+            aria-label="Thăm đội trên YouTube"
+            ><i data-feather="youtube" class="h-6 w-6"></i
+          ></a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Initialize AOS
+      AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        once: true,
+      });
+
+      // Initialize Feather Icons
+      feather.replace();
+
+      // Preloader
+      window.addEventListener("load", () => {
+        const preloader = document.getElementById("preloader");
+        preloader.style.display = "none";
+      });
+
+      // Mobile Menu Toggle
+      const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      function toggleMobileMenu() {
+        if (window.innerWidth <= 1270) {
+          mobileMenu.classList.toggle("hidden");
+          document.body.style.overflow = mobileMenu.classList.contains("hidden")
+            ? "auto"
+            : "hidden";
+        }
+      }
+
+      mobileMenuToggle.addEventListener("click", toggleMobileMenu);
+      mobileMenuToggle.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        toggleMobileMenu();
+      });
+
+      // Dropdown Elements
+      const accountToggle = document.getElementById("account-toggle");
+      const mobileAccountToggle = document.getElementById(
+        "mobile-account-toggle"
+      );
+      const desktopAccountDropdown = document.querySelector(
+        ".account-dropdown:not(#mobile-menu .account-dropdown)"
+      );
+      const mobileAccountDropdown = document.querySelector(
+        "#mobile-menu .account-dropdown"
+      );
+
+      const languageToggle = document.getElementById("language-toggle");
+      const mobileLanguageToggle = document.getElementById(
+        "mobile-language-toggle"
+      );
+      const desktopLanguageDropdown = document.querySelector(
+        ".language-dropdown:not(#mobile-menu .language-dropdown)"
+      );
+      const mobileLanguageDropdown = document.querySelector(
+        "#mobile-menu .language-dropdown"
+      );
+
+      // Function to close all dropdowns except the specified one
+      function closeOtherDropdowns(exceptDropdown) {
+        const dropdowns = [
+          desktopAccountDropdown,
+          mobileAccountDropdown,
+          desktopLanguageDropdown,
+          mobileLanguageDropdown,
+        ].filter(Boolean);
+        dropdowns.forEach((dropdown) => {
+          if (dropdown !== exceptDropdown) {
+            dropdown.classList.remove("open");
+          }
+        });
+      }
+
+      // Function to toggle a dropdown and close others
+      function toggleDropdown(dropdown, isMobile, e) {
+        e.stopPropagation();
+        if (isMobile && window.innerWidth > 1270) {
+          return;
+        }
+        closeOtherDropdowns(dropdown);
+        dropdown.classList.toggle("open");
+      }
+
+      // Event listeners for account dropdown
+      accountToggle.addEventListener("click", (e) => {
+        toggleDropdown(desktopAccountDropdown, false, e);
+      });
+
+      mobileAccountToggle.addEventListener("click", (e) => {
+        toggleDropdown(mobileAccountDropdown, true, e);
+      });
+
+      // Event listeners for language dropdown
+      languageToggle.addEventListener("click", (e) => {
+        toggleDropdown(desktopLanguageDropdown, false, e);
+      });
+
+      mobileLanguageToggle.addEventListener("click", (e) => {
+        toggleDropdown(mobileLanguageDropdown, true, e);
+      });
+
+      // Close dropdowns when clicking outside
+      window.addEventListener("click", (e) => {
+        if (
+          !desktopAccountDropdown.contains(e.target) &&
+          !mobileAccountDropdown.contains(e.target) &&
+          !mobileAccountToggle.contains(e.target) &&
+          !accountToggle.contains(e.target)
+        ) {
+          desktopAccountDropdown.classList.remove("open");
+          mobileAccountDropdown.classList.remove("open");
+        }
+        if (
+          !desktopLanguageDropdown.contains(e.target) &&
+          !mobileLanguageDropdown.contains(e.target) &&
+          !mobileLanguageToggle.contains(e.target) &&
+          !languageToggle.contains(e.target)
+        ) {
+          desktopLanguageDropdown.classList.remove("open");
+          mobileLanguageDropdown.classList.remove("open");
+        }
+      });
+
+      // Handle window resize to close mobile menu and dropdowns on larger screens
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 1270) {
+          mobileMenu.classList.add("hidden");
+          mobileAccountDropdown.classList.remove("open");
+          mobileLanguageDropdown.classList.remove("open");
+          document.body.style.overflow = "auto";
+        }
+      });
+
+      // Counter Functionality
+      let cartCount = 0;
+      let wishlistCount = 0;
+      let orderCount = 0;
+
+      function updateCounters() {
+        document.getElementById("cart-counter").textContent = cartCount;
+        document.getElementById("wishlist-counter").textContent = wishlistCount;
+        document.getElementById("orders-counter").textContent = orderCount;
+        document.getElementById("mobile-cart-counter").textContent = cartCount;
+        document.getElementById("mobile-wishlist-counter").textContent =
+          wishlistCount;
+        document.getElementById("mobile-orders-counter").textContent = orderCount;
+      }
+
+      // Team Details Modal
+      const teamModal = document.getElementById("team-modal");
+      const modalImage = document.getElementById("modal-image");
+      const modalTitle = document.getElementById("modal-title");
+      const modalRegion = document.getElementById("modal-region");
+      const modalGames = document.getElementById("modal-games");
+      const modalAchievements = document.getElementById("modal-achievements");
+      const modalPlayers = document.getElementById("modal-players");
+      const closeModal = document.querySelector(".modal-close");
+
+      document.querySelectorAll(".team-details").forEach((button) => {
+        button.addEventListener("click", function () {
+          modalImage.src = this.dataset.image;
+          modalTitle.textContent = this.dataset.team;
+          modalRegion.textContent = this.dataset.region;
+          modalGames.textContent = this.dataset.games;
+          modalAchievements.textContent = this.dataset.achievements;
+
+          // Clear previous players
+          modalPlayers.innerHTML = "";
+
+          // Parse and display players
+          const players = JSON.parse(this.dataset.players || "[]");
+          players.forEach((player) => {
+            const playerDiv = document.createElement("div");
+            playerDiv.className = "player-card";
+            playerDiv.innerHTML = `
+              <img src="${player.image}" alt="${player.name}" loading="lazy" class="w-12 h-12">
+              <span class="text-accent font-semibold font-open-sans">${player.name}</span>
+            `;
+            modalPlayers.appendChild(playerDiv);
+          });
+
+          teamModal.style.display = "flex";
+          anime({
+            targets: ".modal-content",
+            scale: [0.8, 1],
+            opacity: [0, 1],
+            duration: 300,
+            easing: "easeInOutQuad",
+          });
+
+          // Re-initialize Feather Icons for social media icons
+          feather.replace();
+        });
+      });
+
+      closeModal.addEventListener("click", () => {
+        teamModal.style.display = "none";
+      });
+
+      window.addEventListener("click", (e) => {
+        if (e.target === teamModal) {
+          teamModal.style.display = "none";
+        }
+      });
+
+      // Search Functionality
+      const searchInput = document.getElementById("search-input");
+      const mobileSearchInput = document.getElementById("mobile-search-input");
+      [searchInput, mobileSearchInput].forEach((input) => {
+        if (input) {
+          input.addEventListener("input", function () {
+            const query = this.value.toLowerCase();
+            const teams = document.querySelectorAll(".team-card");
+            teams.forEach((team) => {
+              const teamName = team
+                .querySelector("h3")
+                .textContent.toLowerCase();
+              team.style.display = teamName.includes(query) ? "block" : "none";
+            });
+          });
+        }
+      });
+
+      // Newsletter Form Submission
+      const newsletterForm = document.getElementById("newsletter-form");
+      const newsletterMessage = document.getElementById("newsletter-message");
+      newsletterForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("newsletter-email").value;
+        if (email) {
+          newsletterMessage.textContent = "Cảm ơn bạn đã đăng ký!";
+          newsletterMessage.classList.remove("hidden");
+          newsletterMessage.classList.add("text-accent");
+          newsletterForm.reset();
+          setTimeout(() => {
+            newsletterMessage.classList.add("hidden");
+          }, 3000);
+        } else {
+          newsletterMessage.textContent = "Vui lòng nhập địa chỉ email hợp lệ.";
+          newsletterMessage.classList.remove("hidden");
+          newsletterMessage.classList.add("text-red-500");
+        }
+      });
+
+      // Add to Cart and Wishlist Animation
+      document
+        .querySelectorAll(".cart-icon, .mobile-cart, .wishlist-icon, .mobile-wishlist")
+        .forEach((element) => {
+          element.addEventListener("click", function (e) {
+            e.preventDefault();
+            const isCart = this.classList.contains("cart-icon") || this.classList.contains("mobile-cart");
+            const isMobileWishlist = this.classList.contains("mobile-wishlist");
+            if (isCart) {
+              cartCount++;
+              orderCount++;
+            } else {
+              wishlistCount++;
+            }
+            updateCounters();
+            const originalContent = this.innerHTML;
+            this.innerHTML = isMobileWishlist
+              ? '<i data-feather="check" class="h-5 w-5"></i> Danh sách yêu thích <span class="counter" id="mobile-wishlist-counter">' + wishlistCount + '</span>'
+              : '<i data-feather="check"></i>' + (isCart ? '<span class="counter" id="' + (isCart ? 'cart-counter' : 'wishlist-counter') + '">' + (isCart ? cartCount : wishlistCount) + '</span>' : '');
+            feather.replace();
+            anime({
+              targets: this,
+              scale: [1, 1.2, 1],
+              duration: 300,
+              easing: "easeInOutQuad",
+            });
+            setTimeout(() => {
+              this.innerHTML = originalContent;
+              feather.replace();
+              updateCounters();
+            }, 2000);
+          });
+        });
+    </script>
+  </body>
+</html>

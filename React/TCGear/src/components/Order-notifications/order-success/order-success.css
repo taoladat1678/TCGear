@@ -1,0 +1,9 @@
+/* Notification Icon */
+.success-icon {
+  background: #e11d48;
+  border-radius: 50%;
+  padding: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

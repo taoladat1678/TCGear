@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Realtime Translate</title>
+  <style>
+    #content {
+      padding: 20px;
+      border: 1px solid #ccc;
+      width: 80%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Dịch realtime từ Node API</h2>
+
+<div id="content">Chào mừng bạn đến với TCGear! Đây là ví dụ văn bản gốc bằng tiếng Việt.</div>
+
+<button id="to-en">Tiếng Anh</button>
+<button id="to-vi">Tiếng Việt</button>
+<button id="to-ja">Tiếng Nhật</button>
+<button id="to-ko">Tiếng Hàn</button>
+
+<script>
+  const contentEl = document.getElementById('content');
+  const originalText = contentEl.innerText;
+
+  async function translate(text, target) {
+    try {
+      const res = await fetch("http://localhost:3000/api/user/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, target })
+      });
+      const data = await res.json();
+      return data.result;
+    } catch (err) {
+      console.error("Translate error:", err);
+      return text;
+    }
+  }
+
+  document.getElementById('to-en').addEventListener('click', async () => {
+    contentEl.innerText = "Đang dịch...";
+    contentEl.innerText = await translate(originalText, "en");
+  });
+
+  document.getElementById('to-vi').addEventListener('click', () => {
+    contentEl.innerText = originalText;
+  });
+
+  document.getElementById('to-ja').addEventListener('click', async () => {
+    contentEl.innerText = "Đang dịch...";
+    contentEl.innerText = await translate(originalText, "ja");
+  });
+
+  document.getElementById('to-ko').addEventListener('click', async () => {
+    contentEl.innerText = "Đang dịch...";
+    contentEl.innerText = await translate(originalText, "ko");
+  });
+</script>
+
+</body>
+</html>

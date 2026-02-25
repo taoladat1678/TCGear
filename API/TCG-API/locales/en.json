@@ -1,0 +1,19 @@
+{
+  "home": "Home",
+  "checkout": "Checkout",
+  "welcome": "Welcome to our website",
+  "login": "Login",
+  "logout": "Logout",
+  "profile": "Profile",
+  "cart": "Shopping Cart",
+  "search": "Search",
+  "language": "Language",
+  "submit": "Submit",
+  "cancel": "Cancel",
+  "settings": "Settings",
+  "contact": "Contact Us",
+  "about": "About Us",
+  "help": "Help",
+  "terms": "Terms of Service",
+  "privacy": "Privacy Policy"
+}

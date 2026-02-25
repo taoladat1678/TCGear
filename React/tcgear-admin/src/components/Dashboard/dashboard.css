@@ -1,0 +1,17 @@
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+.chart-container canvas {
+    animation: slideUpFromBottom 1s ease-out both;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+    /* Đã có trong global, thêm nếu cần custom cho charts/table */
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+}

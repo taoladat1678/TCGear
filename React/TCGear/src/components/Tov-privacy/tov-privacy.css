@@ -1,0 +1,68 @@
+.policy-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.policy-section {
+  margin-bottom: 3rem;
+}
+.policy-title {
+  color: #e11d48;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-left: 1.5rem;
+  font-family: "Orbitron", sans-serif;
+}
+.policy-title:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background-color: #e11d48;
+  border-radius: 50%;
+}
+.policy-subtitle {
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+  color: #ffffff;
+  font-family: "Orbitron", sans-serif;
+}
+.policy-text {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-family: "Open Sans", sans-serif;
+}
+.policy-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+.policy-list li {
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Open Sans", sans-serif;
+}
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #e11d48;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 99;
+}
+.back-to-top.visible {
+  opacity: 1;
+}

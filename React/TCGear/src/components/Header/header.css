@@ -1,0 +1,364 @@
+/* Phần nav chung */
+
+.nav-links {
+  margin-left: 160px; /* Khoảng cách từ logo */
+  display: flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  gap: 1.5rem; /* Khoảng cách giữa các link */
+}
+
+.nav-links a {
+  white-space: nowrap; /* Không cho link wrap xuống dòng */
+}
+
+.actions-container {
+  margin-left: 35px; /* Khoảng cách cho các action (search, cart, v.v.) */
+}
+
+/* Mobile menu toggle và dropdown */
+#mobile-menu-toggle {
+  /* Hiển thị/ẩn dựa trên media query */
+}
+
+.mobile-menu {
+  transition: all 0.3s ease; /* Hiệu ứng slide */
+}
+
+/* Dropdown cho account và language */
+.account-dropdown,
+.language-dropdown {
+  position: relative;
+}
+
+.account-dropdown-content,
+.language-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: -45px;
+  background: #000000;
+  border: 1px solid #e11d48;
+  border-radius: 4px;
+  min-width: 140px;
+  z-index: 50;
+}
+
+.account-dropdown-content {
+  min-width: 165px;
+}
+
+/* Counter mặc định (cho cart, wishlist, …) */
+.counter {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #e11d48;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Riêng Orders counter inline */
+#orders-counter,
+#mobile-orders-counter {
+  position: static;
+  /* bỏ absolute */
+  margin-left: 6px;
+  vertical-align: middle;
+  background: #e11d48;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  font-family: "Open Sans", sans-serif;
+}
+
+.account-dropdown-content a,
+.language-dropdown-content a {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  color: #ffffff;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.account-dropdown-content a:hover,
+.language-dropdown-content a:hover {
+  background: #e11d48;
+}
+
+.account-dropdown.open .account-dropdown-content,
+.language-dropdown.open .language-dropdown-content {
+  display: block;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.partner-slider {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.partner-slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  gap: 20px;
+}
+
+.partner-slide {
+  flex: 0 0 calc(100% / 3);
+  box-sizing: border-box;
+  padding: 0 10px;
+}
+
+.partner-slide img {
+  width: 80%;
+  max-width: 150px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.slider-dot.active {
+  background: #e11d48;
+}
+
+.cart-icon,
+.wishlist-icon,
+.account-dropdown-content a {
+  position: relative;
+}
+
+#mobile-menu {
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #e11d48 #000000;
+}
+
+#mobile-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+#mobile-menu::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+#mobile-menu::-webkit-scrollbar-thumb {
+  background: #e11d48;
+  border-radius: 4px;
+}
+
+@media (max-width: 760px) {
+  .cart-icon,
+  .wishlist-icon,
+  .account-dropdown,
+  .language-dropdown {
+    display: none;
+  }
+
+  .nav-links,
+  .search-bar {
+    display: none;
+  }
+
+  #mobile-menu-toggle {
+    display: block;
+  }
+
+  #mobile-menu .mobile-cart,
+  #mobile-menu .mobile-wishlist {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  #mobile-menu .account-dropdown,
+  #mobile-menu .language-dropdown {
+    display: block;
+    align-items: center;
+    position: relative;
+  }
+
+  #mobile-menu .counter {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+  }
+
+  #mobile-menu .account-dropdown-content,
+  #mobile-menu .language-dropdown-content {
+    position: static;
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding-left: 2rem;
+    margin-top: 0.5rem;
+  }
+
+  #mobile-menu .account-dropdown-content a,
+  #mobile-menu .language-dropdown-content a {
+    padding: 4px 8px;
+    display: flex;
+  }
+
+  .partner-slide {
+    flex: 0 0 calc(100% / 2);
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1270px) {
+  .nav-links {
+    display: none;
+  }
+
+  .search-bar,
+  .cart-icon,
+  .wishlist-icon,
+  .account-dropdown,
+  .language-dropdown {
+    display: flex;
+  }
+
+  #mobile-menu-toggle {
+    display: block;
+  }
+
+  #mobile-menu .mobile-cart,
+  #mobile-menu .mobile-wishlist,
+  #mobile-menu .account-dropdown,
+  #mobile-menu .language-dropdown {
+    display: none;
+  }
+}
+
+@media (min-width: 1271px) {
+  .nav-links,
+  .search-bar,
+  .cart-icon,
+  .wishlist-icon,
+  .account-dropdown,
+  .language-dropdown {
+    display: flex;
+  }
+
+  #mobile-menu-toggle {
+    display: none;
+  }
+
+  #mobile-menu {
+    display: none !important;
+  }
+
+  #mobile-menu .mobile-cart,
+  #mobile-menu .mobile-wishlist,
+  #mobile-menu .account-dropdown,
+  #mobile-menu .language-dropdown,
+  #mobile-menu .account-dropdown-content,
+  #mobile-menu .language-dropdown-content {
+    display: none !important;
+  }
+}
+
+@media (min-width: 765px) {
+  #mobile-menu
+    .flex.items-center.bg-secondary.border.border-primary\/20.rounded-md.overflow-hidden {
+    display: none;
+  }
+}
+
+/* Responsive cho nav (ẩn/hiện nav-links, search, cart, mobile menu) */
+@media (max-width: 760px) {
+  .nav-links,
+  .search-bar {
+    display: none; /* Ẩn nav desktop trên mobile nhỏ */
+  }
+
+  #mobile-menu-toggle {
+    display: block; /* Hiện button hamburger */
+  }
+
+  /* Các style cho mobile menu (cart, wishlist, dropdown) */
+  #mobile-menu .mobile-cart,
+  #mobile-menu .mobile-wishlist {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  /* ... (các style khác cho dropdown trong mobile) */
+}
+
+@media (min-width: 761px) and (max-width: 1270px) {
+  .nav-links {
+    display: none; /* Ẩn nav-links trên tablet */
+  }
+
+  .search-bar,
+  .cart-icon,
+  .wishlist-icon,
+  .account-dropdown,
+  .language-dropdown {
+    display: flex; /* Hiện actions */
+  }
+
+  #mobile-menu-toggle {
+    display: block; /* Hiện hamburger cho tablet */
+  }
+}
+
+@media (min-width: 1271px) {
+  .nav-links,
+  .search-bar,
+  .cart-icon,
+  .wishlist-icon,
+  .account-dropdown,
+  .language-dropdown {
+    display: flex; /* Hiện đầy đủ nav desktop */
+  }
+
+  #mobile-menu-toggle {
+    display: none; /* Ẩn hamburger */
+  }
+
+  #mobile-menu {
+    display: none !important; /* Ẩn mobile menu */
+  }
+}

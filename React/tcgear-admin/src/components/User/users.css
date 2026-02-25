@@ -1,0 +1,120 @@
+.table-container tbody tr {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.5s ease-out;
+}
+
+.table-container tbody tr.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Initial opacity for animations */
+.animate-slideUpFromBottom,
+.table-container tbody tr,
+.divide-y > div,
+.grid-cols-3 > div {
+    opacity: 0;
+}
+
+/* Modal styles */
+.modal-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.modal-close:hover {
+    opacity: 1;
+}
+
+/* Mobile adjustments - keep relevant ones */
+@media (max-width: 760px) {
+    .table-container {
+        font-size: 0.75rem;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 0.5rem;
+        min-width: 80px;
+    }
+
+    .table-container th:first-child,
+    .table-container td:first-child,
+    .table-container th:nth-child(2),
+    .table-container td:nth-child(2) {
+        min-width: 60px;
+    }
+
+    .table-container th:nth-child(3),
+    .table-container td:nth-child(3) {
+        min-width: 120px;
+    }
+
+    /* Modal adjustments for mobile */
+    .sm:max-w-3xl {
+        max-width: 95vw;
+        margin: 1rem;
+    }
+
+    .px-6.py-4 {
+        padding: 1rem;
+    }
+
+    .grid-cols-1.md\:grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .space-y-6 {
+        gap: 1rem; /* Use gap instead of space-y for grid */
+    }
+
+    /* System status grid stacks to single column */
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Overview cards stack and reduce font sizes slightly */
+    .grid-cols-1 > div h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Ensure main content padding is minimal but usable */
+    main {
+        padding: 1rem;
+    }
+}
+
+/* Additional shared styles from original */
+.bg-secondary {
+    background-color: #000000;
+}
+
+.text-accent {
+    color: #ffffff;
+}
+
+
+.bg-primary {
+    background-color: #e11d48;
+}
+
+.text-primary {
+    color: #e11d48;
+}
+
+/* Feather icon hover */
+[data-feather]:hover {
+    transform: scale(1.1);
+}
+
+/* Status badges - already handled in TSX, but for consistency */
+.px-2\.py-1\.text-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}

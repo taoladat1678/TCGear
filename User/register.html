@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Tạo tài khoản TCGear để nhận ưu đãi độc quyền, theo dõi đơn hàng và tham gia cộng đồng game thủ"
+    />
+    <meta
+      name="keywords"
+      content="TCGear đăng ký, tạo tài khoản, tham gia cộng đồng game thủ"
+    />
+    <meta name="author" content="TCGear" />
+    <title>Đăng ký - TCGear Thiết bị và Áo đấu Chơi game Cao cấp</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e11d48",
+              secondary: "#000000",
+              accent: "#ffffff",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap");
+
+      h1,
+      h2,
+      h3,
+      .font-orbitron {
+        font-family: "Orbitron", sans-serif;
+      }
+      p,
+      span,
+      a,
+      input,
+      button,
+      .font-open-sans {
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .hero-gradient {
+        background: linear-gradient(
+          135deg,
+          rgba(225, 29, 72, 0.9) 0%,
+          rgba(0, 0, 0, 0.9) 100%
+        );
+      }
+
+      .register-container {
+        min-height: calc(100vh - 200px);
+      }
+
+      .register-card {
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(12px);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      .input-field {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(225, 29, 72, 0.3);
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        height: 48px;
+      }
+
+      .input-field:focus {
+        border-color: #e11d48;
+        box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2);
+        outline: none;
+      }
+
+      .input-field.invalid {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        display: none;
+      }
+
+      .social-register-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(225, 29, 72, 0.3);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+      }
+
+      .social-register-btn:hover {
+        background: rgba(225, 29, 72, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+      }
+
+      .password-strength {
+        height: 6px;
+        background: #333;
+        border-radius: 3px;
+        margin-top: 6px;
+      }
+
+      .password-strength-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease, background-color 0.3s ease;
+      }
+
+      .toggle-password {
+        cursor: pointer;
+        color: #e11d48;
+        transition: color 0.2s ease;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .toggle-password:hover {
+        color: #ffffff;
+      }
+
+      .toggle-password-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 48px;
+        width: 48px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(225, 29, 72, 0.3);
+        align-self: center;
+        margin-top: 29px;
+      }
+
+      .avatar-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e11d48;
+        margin-bottom: 1rem;
+      }
+
+      .avatar-upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #000000;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .loader {
+        border: 4px solid #e11d48;
+        border-top: 4px solid transparent;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .nav-links {
+        margin-left: 160px;
+        display: flex;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        gap: 1.5rem;
+      }
+      .nav-links a {
+        white-space: nowrap;
+      }
+
+      .actions-container {
+        margin-left: 35px;
+      }
+
+      .account-dropdown,
+      .language-dropdown {
+        position: relative;
+      }
+      .account-dropdown-content,
+      .language-dropdown-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: -45px;
+        background: #000000;
+        border: 1px solid #e11d48;
+        border-radius: 4px;
+        min-width: 165px;
+        z-index: 50;
+      }
+
+      .counter {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #e11d48;
+        color: #ffffff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      #orders-counter,
+      #mobile-orders-counter {
+        position: static;
+        margin-left: 6px;
+        vertical-align: middle;
+        background: #e11d48;
+        color: #ffffff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        font-family: "Open Sans", sans-serif;
+      }
+
+      .account-dropdown-content a,
+      .language-dropdown-content a {
+        display: flex;
+        align-items: center;
+        padding: 8px 16px;
+        color: #ffffff;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+
+      .account-dropdown-content a:hover,
+      .language-dropdown-content a:hover {
+        background: #e11d48;
+      }
+      .account-dropdown.open .account-dropdown-content,
+      .language-dropdown.open .language-dropdown-content {
+        display: block;
+      }
+
+      .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .cart-icon,
+      .wishlist-icon,
+      .account-dropdown-content a {
+        position: relative;
+      }
+
+      #mobile-menu {
+        max-height: 80vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #e11d48 #000000;
+      }
+      #mobile-menu::-webkit-scrollbar {
+        width: 8px;
+      }
+      #mobile-menu::-webkit-scrollbar-track {
+        background: #000000;
+      }
+      #mobile-menu::-webkit-scrollbar-thumb {
+        background: #e11d48;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 760px) {
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown,
+        .language-dropdown {
+          display: none;
+        }
+        .nav-links,
+        .search-bar {
+          display: none;
+        }
+        #mobile-menu-toggle {
+          display: block;
+        }
+        #mobile-menu .mobile-cart,
+        #mobile-menu .mobile-wishlist {
+          display: flex;
+          align-items: center;
+          position: relative;
+        }
+        #mobile-menu .account-dropdown,
+        #mobile-menu .language-dropdown {
+          display: block;
+          align-items: center;
+          position: relative;
+        }
+        #mobile-menu .counter {
+          position: absolute;
+          top: -2px;
+          right: -2px;
+        }
+        #mobile-menu .account-dropdown-content,
+        #mobile-menu .language-dropdown-content {
+          position: static;
+          border: none;
+          background: transparent;
+          width: 100%;
+          padding-left: 2rem;
+          margin-top: 0.5rem;
+        }
+        #mobile-menu .account-dropdown-content a,
+        #mobile-menu .language-dropdown-content a {
+          padding: 4px 8px;
+          display: flex;
+        }
+        .register-card {
+          padding: 1.5rem;
+        }
+        .input-field {
+          padding: 0.5rem 0.75rem;
+          height: 40px;
+        }
+        .social-register-btn {
+          font-size: 0.875rem;
+        }
+        .avatar-preview {
+          width: 80px;
+          height: 80px;
+        }
+        .toggle-password-container {
+          height: 40px;
+          width: 40px;
+        }
+        .toggle-password {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      @media (min-width: 761px) and (max-width: 1270px) {
+        .nav-links {
+          display: none;
+        }
+        .search-bar,
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown,
+        .language-dropdown {
+          display: flex;
+        }
+        #mobile-menu-toggle {
+          display: block;
+        }
+        #mobile-menu .mobile-cart,
+        #mobile-menu .mobile-wishlist,
+        #mobile-menu .account-dropdown,
+        #mobile-menu .language-dropdown {
+          display: none;
+        }
+      }
+      @media (min-width: 1271px) {
+        .nav-links,
+        .search-bar,
+        .cart-icon,
+        .wishlist-icon,
+        .account-dropdown,
+        .language-dropdown {
+          display: flex;
+        }
+        #mobile-menu-toggle {
+          display: none;
+        }
+        #mobile-menu {
+          display: none !important;
+        }
+        #mobile-menu .mobile-cart,
+        #mobile-menu .mobile-wishlist,
+        #mobile-menu .account-dropdown,
+        #mobile-menu .language-dropdown,
+        #mobile-menu .account-dropdown-content,
+        #mobile-menu .language-dropdown-content {
+          display: none !important;
+        }
+      }
+      @media (min-width: 765px) {
+        #mobile-menu .flex.items-center.bg-secondary.border.border-primary\/20.rounded-md.overflow-hidden {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-secondary text-accent">
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="loader"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav
+      class="bg-secondary border-b border-primary/20 sticky top-0 z-50"
+      aria-label="Thanh điều hướng chính"
+    >
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 gap-8">
+          <div class="flex items-center shop-logo">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+              class="h-10 w-auto"
+              alt="Logo TCGear"
+            />
+            <span class="ml-2 text-xl font-bold text-primary font-orbitron"
+              >TCGEAR</span
+            >
+          </div>
+
+          <div class="flex items-center gap-1">
+            <div class="nav-container flex items-center gap-1">
+              <div class="nav-links">
+                <a
+                  href="index.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Trang chủ</a
+                >
+                <a
+                  href="shop.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Cửa hàng</a
+                >
+                <a
+                  href="teams.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Đội tuyển</a
+                >
+                <a
+                  href="blog.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Blog</a
+                >
+                <a
+                  href="contact.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Liên hệ</a
+                >
+                <a
+                  href="about.html"
+                  class="text-accent hover:text-primary transition font-open-sans"
+                  >Giới thiệu</a
+                >
+              </div>
+            </div>
+
+            <div class="actions-container flex items-center gap-1 justify-end">
+              <div
+                class="search-bar items-center bg-secondary border border-primary/20 rounded-md overflow-hidden"
+              >
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  class="bg-transparent px-3 py-1 text-accent focus:outline-none w-40 lg:w-56 font-open-sans"
+                  aria-label="Tìm kiếm sản phẩm"
+                />
+                <button
+                  class="p-2 text-accent hover:text-primary transition font-orbitron"
+                  aria-label="Tìm kiếm"
+                >
+                  <i data-feather="search" class="h-4 w-4"></i>
+                </button>
+              </div>
+              <a
+                href="cart.html"
+                class="cart-icon p-2 text-accent hover:text-primary transition font-orbitron"
+                aria-label="Giỏ hàng"
+              >
+                <i data-feather="shopping-cart"></i>
+                <span class="counter" id="cart-counter">0</span>
+              </a>
+              <a
+                href="wishlist.html"
+                class="wishlist-icon p-2 text-accent hover:text-primary transition font-orbitron relative"
+                aria-label="Danh sách yêu thích"
+                data-product="Danh sách yêu thích"
+              >
+                <i data-feather="heart"></i>
+                <span class="counter" id="wishlist-counter">0</span>
+              </a>
+              <div class="account-dropdown">
+                <button
+                  id="account-toggle"
+                  class="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron"
+                  aria-label="Tài khoản người dùng"
+                >
+                  <i data-feather="user"></i>
+                  <i data-feather="chevron-down" class="h-4 w-4"></i>
+                </button>
+                <div class="account-dropdown-content">
+                  <a
+                    href="profile.html"
+                    aria-label="Hồ sơ"
+                    class="font-open-sans"
+                    ><i data-feather="user" class="h-5 w-5"></i> Hồ sơ</a
+                  >
+                  <a href="orders.html" aria-label="Đơn hàng" class="font-open-sans"
+                    ><i data-feather="shopping-bag" class="h-5 w-5"></i> Đơn hàng
+                    <span class="counter" id="orders-counter">0</span></a
+                  >
+                  <a
+                    href="vouchers.html"
+                    aria-label="Voucher"
+                    class="font-open-sans"
+                    ><i data-feather="gift" class="h-5 w-5"></i> Voucher</a
+                  >
+                  <a href="login.html" aria-label="Đăng nhập" class="font-open-sans"
+                    ><i data-feather="log-in" class="h-5 w-5"></i> Đăng nhập</a
+                  >
+                  <a
+                    href="register.html"
+                    aria-label="Đăng ký"
+                    class="text-primary font-open-sans"
+                    ><i data-feather="user-plus" class="h-5 w-5"></i> Đăng ký</a
+                  >
+                </div>
+              </div>
+              <div class="language-dropdown">
+                <button
+                  id="language-toggle"
+                  class="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron"
+                  aria-label="Chọn ngôn ngữ"
+                >
+                  <i data-feather="globe"></i>
+                  <i data-feather="chevron-down" class="h-4 w-4"></i>
+                </button>
+                <div class="language-dropdown-content">
+                  <a href="?lang=eng" aria-label="Tiếng Anh" class="font-open-sans"
+                    ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Anh</a
+                  >
+                  <a href="?lang=vie" aria-label="Tiếng Việt" class="font-open-sans"
+                    ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Việt</a
+                  >
+                </div>
+              </div>
+              <button
+                id="mobile-menu-toggle"
+                class="p-2 text-accent font-orbitron"
+                aria-label="Bật/tắt menu di động"
+              >
+                <i data-feather="menu"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div
+          id="mobile-menu"
+          class="mobile-menu hidden bg-secondary border-t border-primary/20"
+        >
+          <div class="flex flex-col space-y-4 py-4 px-4">
+            <div
+              class="flex items-center bg-secondary border border-primary/20 rounded-md overflow-hidden"
+            >
+              <input
+                type="text"
+                id="mobile-search-input"
+                placeholder="Tìm kiếm sản phẩm..."
+                class="bg-transparent px-3 py-1 text-accent focus:outline-none w-full font-open-sans"
+                aria-label="Tìm kiếm sản phẩm"
+              />
+              <button
+                class="p-2 text-accent hover:text-primary transition font-orbitron"
+                aria-label="Tìm kiếm"
+              >
+                <i data-feather="search" class="h-4 w-4"></i>
+              </button>
+            </div>
+            <a
+              href="index.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Trang chủ</a
+            >
+            <a
+              href="shop.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Cửa hàng</a
+            >
+            <a
+              href="teams.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Đội tuyển</a
+            >
+            <a
+              href="blog.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Blog</a
+            >
+            <a
+              href="contact.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Liên hệ</a
+            >
+            <a
+              href="about.html"
+              class="text-accent hover:text-primary transition font-open-sans"
+              >Giới thiệu</a
+            >
+            <a
+              href="cart.html"
+              class="mobile-cart text-accent hover:text-primary transition font-open-sans flex items-center gap-2 relative"
+            >
+              <i data-feather="shopping-cart" class="h-5 w-5"></i> Giỏ hàng
+              <span class="counter" id="mobile-cart-counter">0</span>
+            </a>
+            <a
+              href="wishlist.html"
+              class="mobile-wishlist text-accent hover:text-primary transition font-open-sans flex items-center gap-2 relative"
+              aria-label="Danh sách yêu thích"
+              data-product="Danh sách yêu thích"
+            >
+              <i data-feather="heart" class="h-5 w-5"></i> Danh sách yêu thích
+              <span class="counter" id="mobile-wishlist-counter">0</span>
+            </a>
+            <div class="account-dropdown relative">
+              <button
+                id="mobile-account-toggle"
+                class="text-accent hover:text-primary transition font-open-sans flex items-center gap-2 w-full text-left relative"
+                aria-label="Bật/tắt menu tài khoản"
+              >
+                <i data-feather="user" class="h-5 w-5"></i>
+                Tài khoản
+                <i data-feather="chevron-down" class="h-5 w-5"></i>
+              </button>
+              <div class="account-dropdown-content w-full">
+                <a
+                  href="profile.html"
+                  aria-label="Hồ sơ"
+                  class="font-open-sans"
+                  ><i data-feather="user" class="h-5 w-5"></i> Hồ sơ</a
+                >
+                <a href="orders.html" aria-label="Đơn hàng" class="font-open-sans"
+                  ><i data-feather="shopping-bag" class="h-5 w-5"></i> Đơn hàng
+                  <span class="counter" id="mobile-orders-counter">0</span></a
+                >
+                <a
+                  href="vouchers.html"
+                  aria-label="Voucher"
+                  class="font-open-sans"
+                  ><i data-feather="gift" class="h-5 w-5"></i> Voucher</a
+                >
+                <a href="login.html" aria-label="Đăng nhập" class="font-open-sans"
+                  ><i data-feather="log-in" class="h-5 w-5"></i> Đăng nhập</a
+                >
+                <a
+                  href="register.html"
+                  aria-label="Đăng ký"
+                  class="text-primary font-open-sans"
+                  ><i data-feather="user-plus" class="h-5 w-5"></i> Đăng ký</a
+                >
+              </div>
+            </div>
+            <div class="language-dropdown relative">
+              <button
+                id="mobile-language-toggle"
+                class="text-accent hover:text-primary transition font-open-sans flex items-center gap-2 w-full text-left relative"
+                aria-label="Bật/tắt menu ngôn ngữ"
+              >
+                <i data-feather="globe" class="h-5 w-5"></i>
+                Ngôn ngữ
+                <i data-feather="chevron-down" class="h-5 w-5"></i>
+              </button>
+              <div class="language-dropdown-content w-full">
+                <a href="?lang=eng" aria-label="Tiếng Anh" class="font-open-sans"
+                  ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Anh</a
+                >
+                <a href="?lang=vie" aria-label="Tiếng Việt" class="font-open-sans"
+                  ><i data-feather="flag" class="h-5 w-5"></i> Tiếng Việt</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Register Section -->
+    <section
+      class="register-container py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center"
+    >
+      <div class="max-w-md w-full" data-aos="fade-up" data-aos-delay="100">
+        <div class="register-card p-8">
+          <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-3 font-orbitron">
+              THAM GIA TCGEAR
+            </h1>
+            <p class="text-accent/70 text-sm font-open-sans">
+              Tạo tài khoản của bạn và tham gia cộng đồng game thủ đỉnh cao
+            </p>
+          </div>
+
+          <form id="register-form" class="space-y-6">
+            <div
+              class="avatar-upload-container"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+                id="avatar-preview"
+                class="avatar-preview"
+                alt="Ảnh đại diện"
+              />
+              <label
+                for="avatar"
+                class="block text-sm font-medium mb-2 font-open-sans"
+                >Ảnh đại diện</label
+              >
+              <input
+                type="file"
+                id="avatar"
+                name="avatar"
+                accept="image/jpeg,image/png"
+                class="input-field w-full"
+                aria-label="Tải lên ảnh đại diện"
+                aria-describedby="avatar-error"
+              />
+              <p id="avatar-error" class="error-message">
+                Vui lòng chọn một hình ảnh hợp lệ (JPEG hoặc PNG)
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="first-name"
+                  class="block text-sm font-medium mb-2 font-open-sans"
+                  >Tên</label
+                >
+                <input
+                  type="text"
+                  id="first-name"
+                  name="first-name"
+                  class="input-field w-full"
+                  placeholder="Nguyễn"
+                  required
+                  aria-label="Tên"
+                  aria-describedby="first-name-error"
+                />
+                <p id="first-name-error" class="error-message">
+                  Vui lòng nhập tên của bạn
+                </p>
+              </div>
+              <div>
+                <label
+                  for="last-name"
+                  class="block text-sm font-medium mb-2 font-open-sans"
+                  >Họ</label
+                >
+                <input
+                  type="text"
+                  id="last-name"
+                  name="last-name"
+                  class="input-field w-full"
+                  placeholder="Văn A"
+                  required
+                  aria-label="Họ"
+                  aria-describedby="last-name-error"
+                />
+                <p id="last-name-error" class="error-message">
+                  Vui lòng nhập họ của bạn
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="email"
+                class="block text-sm font-medium mb-2 font-open-sans"
+                >Địa chỉ Email</label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="input-field w-full"
+                placeholder="your@email.com"
+                required
+                aria-label="Địa chỉ Email"
+                aria-describedby="email-error"
+              />
+              <p id="email-error" class="error-message">
+                Vui lòng nhập địa chỉ email hợp lệ
+              </p>
+            </div>
+
+            <div>
+              <label
+                for="phone"
+                class="block text-sm font-medium mb-2 font-open-sans"
+                >Số điện thoại</label
+              >
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                class="input-field w-full"
+                placeholder="+84 123 456 789"
+                required
+                aria-label="Số điện thoại"
+                aria-describedby="phone-error"
+              />
+              <p id="phone-error" class="error-message">
+                Vui lòng nhập số điện thoại hợp lệ
+              </p>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <div class="flex-1">
+                <label
+                  for="password"
+                  class="block text-sm font-medium mb-2 font-open-sans"
+                  >Mật khẩu</label
+                >
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="input-field w-full"
+                  placeholder="••••••••"
+                  required
+                  aria-label="Mật khẩu"
+                  aria-describedby="password-error password-strength-text"
+                />
+              </div>
+              <div class="toggle-password-container">
+                <i
+                  data-feather="eye"
+                  class="toggle-password"
+                  id="toggle-password"
+                  aria-label="Bật/tắt hiển thị mật khẩu"
+                ></i>
+              </div>
+            </div>
+            <div class="password-strength">
+              <div
+                class="password-strength-fill"
+                id="password-strength-bar"
+              ></div>
+            </div>
+            <p
+              class="text-xs text-accent/50 mt-1 font-open-sans"
+              id="password-strength-text"
+            >
+              Độ mạnh mật khẩu
+            </p>
+            <p id="password-error" class="error-message">
+              Mật khẩu phải có ít nhất 8 ký tự
+            </p>
+
+            <div class="flex items-center space-x-2">
+              <div class="flex-1">
+                <label
+                  for="confirm-password"
+                  class="block text-sm font-medium mb-2 font-open-sans"
+                  >Xác nhận mật khẩu</label
+                >
+                <input
+                  type="password"
+                  id="confirm-password"
+                  name="confirm-password"
+                  class="input-field w-full"
+                  placeholder="••••••••"
+                  required
+                  aria-label="Xác nhận mật khẩu"
+                  aria-describedby="confirm-password-error"
+                />
+              </div>
+              <div class="toggle-password-container">
+                <i
+                  data-feather="eye"
+                  class="toggle-password"
+                  id="toggle-confirm-password"
+                  aria-label="Bật/tắt hiển thị xác nhận mật khẩu"
+                ></i>
+              </div>
+            </div>
+            <p id="confirm-password-error" class="error-message">
+              Mật khẩu không khớp
+            </p>
+
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                required
+                aria-label="Đồng ý với Điều khoản và Chính sách Bảo mật"
+              />
+              <label
+                for="terms"
+                class="ml-2 block text-sm text-accent/70 font-open-sans"
+              >
+                Tôi đồng ý với
+                <a href="#" class="text-primary hover:underline"
+                  >Điều khoản Dịch vụ</a
+                >
+                và
+                <a href="#" class="text-primary hover:underline"
+                  >Chính sách Bảo mật</a
+                >
+              </label>
+            </div>
+
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="newsletter"
+                name="newsletter"
+                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                aria-label="Đăng ký nhận bản tin"
+              />
+              <label
+                for="newsletter"
+                class="ml-2 block text-sm text-accent/70 font-open-sans"
+              >
+                Đăng ký nhận bản tin để nhận ưu đãi độc quyền
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-md font-semibold transition flex items-center justify-center font-orbitron"
+              id="submit-btn"
+            >
+              Tạo tài khoản
+            </button>
+          </form>
+
+          <div class="relative my-8">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-accent/20"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-3 bg-secondary text-accent/70 font-open-sans"
+                >Hoặc đăng ký bằng</span
+              >
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <button
+                class="social-register-btn flex items-center justify-center py-3 px-4 text-sm font-medium font-open-sans"
+              >
+                <i data-feather="facebook" class="h-6 w-6 mr-2"></i>
+                Facebook
+              </button>
+              <button
+                class="social-register-btn flex items-center justify-center py-3 px-4 text-sm font-medium font-open-sans"
+              >
+                <i data-feather="mail" class="h-6 w-6 mr-2"></i>
+                Gmail
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <button
+                class="social-register-btn flex items-center justify-center py-3 px-4 text-sm font-medium font-open-sans"
+              >
+                <i data-feather="github" class="h-6 w-6 mr-2"></i>
+                GitHub
+              </button>
+              <button
+                class="social-register-btn flex items-center justify-center py-3 px-4 text-sm font-medium font-open-sans"
+              >
+                <i data-feather="twitter" class="h-6 w-6 mr-2"></i>
+                Twitter
+              </button>
+            </div>
+          </div>
+
+          <div class="text-center mt-6">
+            <p class="text-accent/70 text-sm font-open-sans">
+              Đã có tài khoản?
+              <a href="login.html" class="text-primary hover:underline"
+                >Đăng nhập</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-primary">
+      <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
+          THAM GIA CỘNG ĐỒNG <span class="font-orbitron">TCGEAR</span>
+        </h2>
+        <p class="mb-8 max-w-2xl mx-auto font-open-sans">
+          Đăng ký nhận bản tin để nhận ưu đãi độc quyền, thông tin sản phẩm mới và tin tức esports
+        </p>
+        <form
+          id="newsletter-form"
+          class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
+        >
+          <input
+            type="email"
+            id="newsletter-email"
+            placeholder="Địa chỉ email của bạn"
+            class="flex-1 px-4 py-3 rounded-md text-secondary focus:outline-none focus:ring-2 focus:ring-accent font-open-sans"
+            aria-label="Email cho bản tin"
+          />
+          <button
+            type="submit"
+            class="bg-secondary text-accent hover:bg-black px-6 py-3 rounded-md font-semibold transition font-orbitron"
+            aria-label="Đăng ký nhận bản tin"
+          >
+            Đăng ký
+          </button>
+        </form>
+        <p
+          id="newsletter-message"
+          class="text-accent mt-4 hidden font-open-sans"
+        ></p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer
+      class="bg-secondary border-t border-primary/20 py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center mb-4">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
+              class="h-8 w-auto"
+              alt="Logo TCGear"
+            />
+            <span class="ml-2 text-lg font-bold text-primary font-orbitron"
+              >TCGEAR</span
+            >
+          </div>
+          <p class="text-accent/70 mb-4 font-open-sans">
+            Thiết bị chơi game và áo đấu cao cấp dành cho game thủ chuyên nghiệp và đội esports.
+          </p>
+          <div class="flex space-x-4">
+            <a
+              href="https://facebook.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="Facebook"
+              ><i data-feather="facebook"></i
+            ></a>
+            <a
+              href="https://twitter.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="Twitter"
+              ><i data-feather="twitter"></i
+            ></a>
+            <a
+              href="https://instagram.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="Instagram"
+              ><i data-feather="instagram"></i
+            ></a>
+            <a
+              href="https://youtube.com/tcgear"
+              class="text-accent/70 hover:text-primary transition font-open-sans"
+              aria-label="YouTube"
+              ><i data-feather="youtube"></i
+            ></a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-4 font-orbitron">Cửa hàng</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="jerseys.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Áo đấu</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=headsets"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Tai nghe</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=keyboards"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Bàn phím</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=mice"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Chuột</a
+              >
+            </li>
+            <li>
+              <a
+                href="shop.html?category=accessories"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Phụ kiện</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-4 font-orbitron">Công ty</h3>
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="about.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Về chúng tôi</a
+              >
+            </li>
+            <li>
+              <a
+                href="contact.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Liên hệ</a
+              >
+            </li>
+            <li>
+              <a
+                href="shipping.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Vận chuyển</a
+              >
+            </li>
+            <li>
+              <a
+                href="returns.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Đổi trả</a
+              >
+            </li>
+            <li>
+              <a
+                href="faq.html"
+                class="text-accent/70 hover:text-primary transition font-open-sans"
+                >Câu hỏi thường gặp</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-lg mb-4 font-orbitron">Liên hệ</h3>
+          <ul class="space-y-2">
+            <li class="flex items-start">
+              <i
+                data-feather="map-pin"
+                class="mr-2 h-5 w-5 text-primary mt-0.5"
+              ></i>
+              <span class="text-accent/70 font-open-sans"
+                >123 Đường Chơi Game, Thành phố Esports</span
+              >
+            </li>
+            <li class="flex items-start">
+              <i
+                data-feather="mail"
+                class="mr-2 h-5 w-5 text-primary mt-0.5"
+              ></i>
+              <span class="text-accent/70 font-open-sans"
+                >support@tcgear.com</span
+              >
+            </li>
+            <li class="flex items-start">
+              <i
+                data-feather="phone"
+                class="mr-2 h-5 w-5 text-primary mt-0.5"
+              ></i>
+              <span class="text-accent/70 font-open-sans"
+                >+1 (555) 123-4567</span
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="max-w-7xl mx-auto border-t border-primary/20 mt-8 pt-8 text-center text-accent/50 text-sm"
+      >
+        <p class="font-open-sans">© 2025 <span class="font-orbitron">TCGear</span>. Mọi quyền được bảo lưu.</p>
+      </div>
+    </footer>
+
+    <script>
+      // Initialize AOS
+      AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        once: true,
+      });
+
+      // Initialize Feather Icons
+      feather.replace();
+
+      // Preloader
+      window.addEventListener("load", () => {
+        const preloader = document.getElementById("preloader");
+        preloader.style.display = "none";
+      });
+
+      // Mobile Menu Toggle
+      const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      function toggleMobileMenu() {
+        if (window.innerWidth <= 1270) {
+          mobileMenu.classList.toggle("hidden");
+          document.body.style.overflow = mobileMenu.classList.contains("hidden")
+            ? "auto"
+            : "hidden";
+        }
+      }
+
+      mobileMenuToggle.addEventListener("click", toggleMobileMenu);
+      mobileMenuToggle.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        toggleMobileMenu();
+      });
+
+      // Dropdown Elements
+      const accountToggle = document.getElementById("account-toggle");
+      const mobileAccountToggle = document.getElementById("mobile-account-toggle");
+      const desktopAccountDropdown = document.querySelector(
+        ".account-dropdown:not(#mobile-menu .account-dropdown)"
+      );
+      const mobileAccountDropdown = document.querySelector(
+        "#mobile-menu .account-dropdown"
+      );
+
+      const languageToggle = document.getElementById("language-toggle");
+      const mobileLanguageToggle = document.getElementById(
+        "mobile-language-toggle"
+      );
+      const desktopLanguageDropdown = document.querySelector(
+        ".language-dropdown:not(#mobile-menu .language-dropdown)"
+      );
+      const mobileLanguageDropdown = document.querySelector(
+        "#mobile-menu .language-dropdown"
+      );
+
+      // Function to close all dropdowns except the specified one
+      function closeOtherDropdowns(exceptDropdown) {
+        const dropdowns = [
+          desktopAccountDropdown,
+          mobileAccountDropdown,
+          desktopLanguageDropdown,
+          mobileLanguageDropdown,
+        ].filter(Boolean);
+        dropdowns.forEach((dropdown) => {
+          if (dropdown !== exceptDropdown) {
+            dropdown.classList.remove("open");
+          }
+        });
+      }
+
+      // Function to toggle a dropdown and close others
+      function toggleDropdown(dropdown, isMobile, e) {
+        e.stopPropagation();
+        if (isMobile && window.innerWidth > 1270) {
+          return;
+        }
+        closeOtherDropdowns(dropdown);
+        dropdown.classList.toggle("open");
+      }
+
+      // Event listeners for account dropdown
+      accountToggle.addEventListener("click", (e) => {
+        toggleDropdown(desktopAccountDropdown, false, e);
+      });
+
+      mobileAccountToggle.addEventListener("click", (e) => {
+        toggleDropdown(mobileAccountDropdown, true, e);
+      });
+
+      // Event listeners for language dropdown
+      languageToggle.addEventListener("click", (e) => {
+        toggleDropdown(desktopLanguageDropdown, false, e);
+      });
+
+      mobileLanguageToggle.addEventListener("click", (e) => {
+        toggleDropdown(mobileLanguageDropdown, true, e);
+      });
+
+      // Close dropdowns when clicking outside
+      window.addEventListener("click", (e) => {
+        if (
+          !desktopAccountDropdown.contains(e.target) &&
+          !mobileAccountDropdown.contains(e.target) &&
+          !mobileAccountToggle.contains(e.target) &&
+          !accountToggle.contains(e.target)
+        ) {
+          desktopAccountDropdown.classList.remove("open");
+          mobileAccountDropdown.classList.remove("open");
+        }
+        if (
+          !desktopLanguageDropdown.contains(e.target) &&
+          !mobileLanguageDropdown.contains(e.target) &&
+          !mobileLanguageToggle.contains(e.target) &&
+          !languageToggle.contains(e.target)
+        ) {
+          desktopLanguageDropdown.classList.remove("open");
+          mobileLanguageDropdown.classList.remove("open");
+        }
+      });
+
+      // Handle window resize to close mobile menu and dropdowns on larger screens
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 1270) {
+          mobileMenu.classList.add("hidden");
+          mobileAccountDropdown.classList.remove("open");
+          mobileLanguageDropdown.classList.remove("open");
+          document.body.style.overflow = "auto";
+        }
+      });
+
+      // Counter Functionality
+      let cartCount = 0;
+      let wishlistCount = 0;
+      let orderCount = 0;
+
+      function updateCounters() {
+        document.getElementById("cart-counter").textContent = cartCount;
+        document.getElementById("wishlist-counter").textContent = wishlistCount;
+        document.getElementById("orders-counter").textContent = orderCount;
+        document.getElementById("mobile-cart-counter").textContent = cartCount;
+        document.getElementById("mobile-wishlist-counter").textContent =
+          wishlistCount;
+        document.getElementById("mobile-orders-counter").textContent = orderCount;
+      }
+
+      // Add to Cart and Wishlist Animation
+      document
+        .querySelectorAll(".cart-icon, .mobile-cart, .wishlist-icon, .mobile-wishlist")
+        .forEach((element) => {
+          element.addEventListener("click", function (e) {
+            e.preventDefault();
+            const isCart = this.classList.contains("cart-icon") || this.classList.contains("mobile-cart");
+            const isMobileWishlist = this.classList.contains("mobile-wishlist");
+            if (isCart) {
+              cartCount++;
+              orderCount++;
+            } else {
+              wishlistCount++;
+            }
+            updateCounters();
+            const originalContent = this.innerHTML;
+            this.innerHTML = isMobileWishlist
+              ? '<i data-feather="check" class="h-5 w-5"></i> Danh sách yêu thích <span class="counter" id="mobile-wishlist-counter">' + wishlistCount + '</span>'
+              : '<i data-feather="check"></i>' + (isCart ? '<span class="counter" id="' + (isCart ? 'cart-counter' : 'wishlist-counter') + '">' + (isCart ? cartCount : wishlistCount) + '</span>' : '');
+            feather.replace();
+            anime({
+              targets: this,
+              scale: [1, 1.2, 1],
+              duration: 300,
+              easing: "easeInOutQuad",
+            });
+            setTimeout(() => {
+              this.innerHTML = originalContent;
+              feather.replace();
+              updateCounters();
+            }, 2000);
+          });
+        });
+
+      // Password Strength Indicator
+      const passwordInput = document.getElementById("password");
+      const strengthBar = document.getElementById("password-strength-bar");
+      const strengthText = document.getElementById("password-strength-text");
+
+      passwordInput.addEventListener("input", function () {
+        const password = this.value;
+        let strength = 0;
+        let message = "Độ mạnh mật khẩu";
+        let color = "#e11d48";
+
+        if (password.length > 0) {
+          if (password.length >= 8) strength += 25;
+          if (/[A-Z]/.test(password)) strength += 25;
+          if (/[0-9]/.test(password)) strength += 25;
+          if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+
+          if (strength < 50) {
+            message = "Mật khẩu yếu";
+            color = "#ef4444";
+          } else if (strength < 75) {
+            message = "Mật khẩu trung bình";
+            color = "#f59e0b";
+          } else {
+            message = "Mật khẩu mạnh";
+            color = "#10b981";
+          }
+        }
+
+        strengthBar.style.width = strength + "%";
+        strengthBar.style.backgroundColor = color;
+        strengthText.textContent = message;
+        strengthText.style.color = color;
+
+        const passwordError = document.getElementById("password-error");
+        if (password.length < 8 && password.length > 0) {
+          passwordInput.classList.add("invalid");
+          passwordError.style.display = "block";
+        } else {
+          passwordInput.classList.remove("invalid");
+          passwordError.style.display = "none";
+        }
+      });
+
+      // Toggle Password Visibility
+      const togglePassword = document.getElementById("toggle-password");
+      const toggleConfirmPassword = document.getElementById(
+        "toggle-confirm-password"
+      );
+
+      togglePassword.addEventListener("click", function () {
+        const isPasswordVisible = passwordInput.type === "password";
+        passwordInput.type = isPasswordVisible ? "text" : "password";
+        this.setAttribute("data-feather", isPasswordVisible ? "eye-off" : "eye");
+        feather.replace();
+        anime({
+          targets: this,
+          scale: [1, 1.2, 1],
+          easing: "easeInOutQuad",
+          duration: 200,
+        });
+      });
+
+      toggleConfirmPassword.addEventListener("click", function () {
+        const confirmPassword = document.getElementById("confirm-password");
+        const isPasswordVisible = confirmPassword.type === "password";
+        confirmPassword.type = isPasswordVisible ? "text" : "password";
+        this.setAttribute("data-feather", isPasswordVisible ? "eye-off" : "eye");
+        feather.replace();
+        anime({
+          targets: this,
+          scale: [1, 1.2, 1],
+          easing: "easeInOutQuad",
+          duration: 200,
+        });
+      });
+
+      // Avatar Upload Preview
+      const avatarInput = document.getElementById("avatar");
+      const avatarPreview = document.getElementById("avatar-preview");
+
+      avatarInput.addEventListener("change", function () {
+        const file = this.files[0];
+        const avatarError = document.getElementById("avatar-error");
+
+        if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            avatarPreview.src = e.target.result;
+            avatarPreview.style.display = "block";
+            avatarInput.classList.remove("invalid");
+            avatarError.style.display = "none";
+            anime({
+              targets: avatarPreview,
+              opacity: [0, 1],
+              scale: [0.8, 1],
+              easing: "easeInOutQuad",
+              duration: 300,
+            });
+          };
+          reader.readAsDataURL(file);
+        } else {
+          avatarInput.classList.add("invalid");
+          avatarError.style.display = "block";
+          avatarPreview.src = "https://via.placeholder.com/100";
+        }
+      });
+
+      // Register Form Validation
+      const registerForm = document.getElementById("register-form");
+      registerForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let isValid = true;
+
+        // Validate avatar
+        const avatar = document.getElementById("avatar");
+        const avatarError = document.getElementById("avatar-error");
+        const file = avatar.files[0];
+        if (file && !["image/jpeg", "image/png"].includes(file.type)) {
+          avatar.classList.add("invalid");
+          avatarError.style.display = "block";
+          isValid = false;
+        } else {
+          avatar.classList.remove("invalid");
+          avatarError.style.display = "none";
+        }
+
+        // Validate first name
+        const firstName = document.getElementById("first-name");
+        const firstNameError = document.getElementById("first-name-error");
+        if (!firstName.value.trim()) {
+          firstName.classList.add("invalid");
+          firstNameError.style.display = "block";
+          isValid = false;
+        } else {
+          firstName.classList.remove("invalid");
+          firstNameError.style.display = "none";
+        }
+
+        // Validate last name
+        const lastName = document.getElementById("last-name");
+        const lastNameError = document.getElementById("last-name-error");
+        if (!lastName.value.trim()) {
+          lastName.classList.add("invalid");
+          lastNameError.style.display = "block";
+          isValid = false;
+        } else {
+          lastName.classList.remove("invalid");
+          lastNameError.style.display = "none";
+        }
+
+        // Validate email
+        const email = document.getElementById("email");
+        const emailError = document.getElementById("email-error");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value)) {
+          email.classList.add("invalid");
+          emailError.style.display = "block";
+          isValid = false;
+        } else {
+          email.classList.remove("invalid");
+          emailError.style.display = "none";
+        }
+
+        // Validate phone number
+        const phone = document.getElementById("phone");
+        const phoneError = document.getElementById("phone-error");
+        const phoneRegex =
+          /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+        if (!phoneRegex.test(phone.value.trim())) {
+          phone.classList.add("invalid");
+          phoneError.style.display = "block";
+          isValid = false;
+        } else {
+          phone.classList.remove("invalid");
+          phoneError.style.display = "none";
+        }
+
+        // Validate password
+        const password = document.getElementById("password");
+        const passwordError = document.getElementById("password-error");
+        if (password.value.length < 8) {
+          password.classList.add("invalid");
+          passwordError.style.display = "block";
+          isValid = false;
+        } else {
+          password.classList.remove("invalid");
+          passwordError.style.display = "none";
+        }
+
+        // Validate confirm password
+        const confirmPassword = document.getElementById("confirm-password");
+        const confirmPasswordError = document.getElementById(
+          "confirm-password-error"
+        );
+        if (password.value !== confirmPassword.value) {
+          confirmPassword.classList.add("invalid");
+          confirmPasswordError.style.display = "block";
+          isValid = false;
+        } else {
+          confirmPassword.classList.remove("invalid");
+          confirmPasswordError.style.display = "none";
+        }
+
+        if (!isValid) return;
+
+        // Simulate registration process with animation
+        const submitBtn = document.getElementById("submit-btn");
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = "Đang tạo tài khoản...";
+        submitBtn.disabled = true;
+
+        anime({
+          targets: submitBtn,
+          scale: [1, 1.05, 1],
+          easing: "easeInOutQuad",
+          duration: 300,
+        });
+
+        setTimeout(() => {
+          alert("Tài khoản đã được tạo thành công! Chào mừng bạn đến với TCGear.");
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          // window.location.href = 'account.html';
+        }, 1500);
+      });
+
+      // Newsletter Form Submission
+      const newsletterForm = document.getElementById("newsletter-form");
+      const newsletterMessage = document.getElementById("newsletter-message");
+      newsletterForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("newsletter-email").value;
+        if (email) {
+          newsletterMessage.textContent = "Cảm ơn bạn đã đăng ký!";
+          newsletterMessage.classList.remove("hidden");
+          newsletterMessage.classList.add("text-accent");
+          newsletterForm.reset();
+          setTimeout(() => {
+            newsletterMessage.classList.add("hidden");
+          }, 3000);
+        } else {
+          newsletterMessage.textContent = "Vui lòng nhập địa chỉ email hợp lệ.";
+          newsletterMessage.classList.remove("hidden");
+          newsletterMessage.classList.add("text-red-500");
+        }
+      });
+
+      // Search Functionality (stubbed for consistency with shop.html)
+      const searchInput = document.getElementById("search-input");
+      const mobileSearchInput = document.getElementById("mobile-search-input");
+      [searchInput, mobileSearchInput].forEach((input) => {
+        if (input) {
+          input.addEventListener("input", function () {
+            // Placeholder for search functionality
+            console.log("Tìm kiếm:", this.value);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

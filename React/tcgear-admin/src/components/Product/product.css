@@ -1,0 +1,129 @@
+.animate-slideUpFromBottom {
+  animation: slideUpFromBottom 0.8s ease-out forwards;
+}
+
+/* Hover animation for icons */
+[data-feather] {
+  transition: transform 0.2s ease;
+}
+
+[data-feather]:hover {
+  transform: scale(1.1);
+}
+
+/* Table row stagger slide up */
+.table-container tbody tr {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.5s ease-out;
+}
+
+.table-container tbody tr.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* System status stagger slide up */
+.grid-cols-3 > div {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.5s ease-out;
+}
+
+.grid-cols-3 > div.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Initial opacity for animations */
+.animate-slideUpFromBottom,
+.table-container tbody tr,
+.grid-cols-3 > div {
+  opacity: 0;
+}
+
+/* .modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.modal-close:hover {
+  color: #e11d48;
+} */
+
+/* Mobile adjustments - product specific */
+@media (max-width: 760px) {
+  .table-container {
+    font-size: 0.75rem;
+  }
+
+  .table-container th,
+  .table-container td {
+    padding: 0.5rem;
+  }
+
+  /* Additional mobile adjustments for better usability */
+  main {
+    padding: 1rem;
+  }
+
+  /* Reduce gaps in grids on mobile */
+  .grid {
+    gap: 1rem;
+  }
+
+  /* Table improvements: make status badges smaller */
+  .px-2.py-1.text-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* System status cards padding */
+  .bg-primary\/10.p-4 {
+    padding: 0.75rem;
+  }
+
+  /* Footer padding */
+  footer {
+    padding: 1rem;
+  }
+
+  /* Ensure dropdowns don't overflow - if any */
+  .dropdown-content {
+    right: auto;
+    left: 0;
+  }
+
+  /* Improve table responsiveness: add horizontal scroll indicator if needed */
+  .table-container {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Overview cards stack and reduce font sizes slightly */
+  .grid-cols-1 > div h3 {
+    font-size: 1.25rem;
+  }
+
+  /* System status grid stacks to single column */
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Keep icons position and size unchanged on mobile */
+  [data-feather] {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+
+  /* Ensure icon positions in flex items remain stable */
+  .flex.items-center > [data-feather] {
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+}

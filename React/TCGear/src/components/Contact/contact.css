@@ -1,0 +1,102 @@
+.contact-hero {
+  /* Tailwind classes converted or kept as is; add custom if needed */
+}
+
+.faq-section {
+  /* Tailwind classes; add custom if needed */
+}
+
+.form-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(225,29,72,0.3);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: #ffffff;
+  transition: all 0.3s ease;
+  width: 100%;
+  font-family: "Open Sans", sans-serif;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #e11d48;
+  box-shadow: 0 0 0 3px rgba(225,29,72,0.3);
+}
+
+.form-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  font-size: 1.1rem;
+  font-family: "Open Sans", sans-serif;
+}
+
+.form-submit {
+  background: #e11d48;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-family: "Orbitron", sans-serif;
+}
+
+.form-submit:hover {
+  background: #be123c;
+  transform: scale(1.05);
+}
+
+details {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(225,29,72,0.2);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+details[open] {
+  background: rgba(225,29,72,0.1);
+}
+
+summary {
+  padding: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Orbitron", sans-serif;
+}
+
+summary:hover {
+  color: #e11d48;
+}
+
+details p {
+  padding: 0 1rem 1rem;
+  color: rgba(255,255,255,0.7);
+  font-family: "Open Sans", sans-serif;
+}
+
+.social-icon {
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: scale(1.2);
+}
+
+/* Additional Tailwind overrides or custom styles can be added here if needed for the component */
+.bg-secondary { background-color: #000000; }
+.text-accent { color: #ffffff; }
+.text-primary { color: #e11d48; }
+.border-primary\/20 { border-color: rgba(225, 29, 72, 0.2); }
+.bg-secondary\/50 { background-color: rgba(0, 0, 0, 0.5); }
+.text-accent\/70 { color: rgba(255, 255, 255, 0.7); }

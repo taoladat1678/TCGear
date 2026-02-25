@@ -1,0 +1,370 @@
+/* blog.css */
+/* Extracted from <style> tag, excluding sidebar/header specific. Added modal styles as shared. */
+
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap");
+
+h1,
+h2,
+h3,
+.font-orbitron {
+    font-family: "Orbitron", sans-serif;
+}
+
+p,
+span,
+a,
+input,
+button,
+.font-open-sans {
+    font-family: "Open Sans", sans-serif;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.backdrop {
+    display: none;
+}
+
+.backdrop.show {
+    display: block;
+}
+
+.active {
+    background-color: #e11d48;
+    color: #ffffff;
+}
+
+/* Slide-up from bottom animation for main sections */
+@keyframes slideUpFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideUpFromBottom {
+    animation: slideUpFromBottom 0.8s ease-out forwards;
+}
+
+/* Apply to sidebar items - but excluded */
+nav > a,
+.sidebar-item {
+    opacity: 0;
+    animation: slideInFromLeft 0.8s ease-out forwards;
+}
+
+/* Slide-in for sidebar items - excluded */
+.sidebar-item {
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Hover animation for icons */
+[data-feather] {
+    transition: transform 0.2s ease;
+}
+
+[data-feather]:hover {
+    transform: scale(1.1);
+}
+
+/* Chart load animation - if used */
+.chart-container canvas {
+    animation: slideUpFromBottom 1s ease-out both;
+}
+
+/* Table row stagger slide up */
+.table-container tbody tr {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.5s ease-out;
+}
+
+.table-container tbody tr.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Customer list stagger slide up - if used */
+.divide-y > div {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.5s ease-out;
+}
+
+.divide-y > div.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* System status stagger slide up */
+.grid-cols-3 > div {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.5s ease-out;
+}
+
+.grid-cols-3 > div.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Mobile adjustments - relevant to main */
+@media (max-width: 760px) {
+    .header-search-container {
+        margin-left: auto;
+        margin-right: auto;
+        flex: 1;
+        max-width: calc(100vw - 4rem - 3rem);
+    }
+
+    .mobile-header-right {
+        display: flex;
+        align-items: center;
+        gap: 0rem;
+    }
+
+    #notifications-toggle {
+        margin-right: 0 !important;
+    }
+
+    .mobile-header-right > div:nth-child(2) {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .table-container {
+        font-size: 0.75rem;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 0.5rem;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    /* Additional mobile adjustments for better usability */
+    header {
+        padding: 0.75rem 1rem;
+    }
+
+    .header-search-container input {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+    /* Keep icons position and size unchanged on mobile */
+    [data-feather] {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+    }
+
+    /* Ensure icon positions in flex items remain stable */
+    .flex.items-center > [data-feather] {
+        flex-shrink: 0;
+        margin-right: 0.5rem;
+    }
+
+    button, .sidebar-toggle {
+        min-height: 2.75rem;
+        min-width: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Stabilize header right icons and counter on mobile */
+    .mobile-header-right > div {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    #notifications-toggle,
+    #profile-toggle {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        position: relative;
+        padding: 0.5rem;
+        margin: 0 !important;
+    }
+
+    #profile-toggle img {
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+
+    #profile-toggle [data-feather] {
+        width: 1rem !important;
+        height: 1rem !important;
+        margin-left: 0.25rem;
+    }
+
+    .counter {
+        top: -2px !important;
+        right: -2px !important;
+        left: auto !important;
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 11px !important;
+    }
+
+    /* Adjust overview cards padding */
+    .grid-cols-1 > div {
+        padding: 1rem;
+    }
+
+    /* Reduce gaps in grids on mobile */
+    .grid {
+        gap: 1rem;
+    }
+
+    /* Table improvements: make status badges smaller */
+    .px-2.py-1.text-xs {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    /* Customer list images smaller */
+    .h-10.w-10 {
+        height: 2rem;
+        width: 2rem;
+    }
+
+    /* System status cards padding */
+    .bg-primary\/10.p-4 {
+        padding: 0.75rem;
+    }
+
+    footer {
+        padding: 1rem;
+    }
+
+    /* Ensure dropdowns don't overflow */
+    .dropdown-content {
+        right: auto;
+        left: 0;
+    }
+
+    /* Improve table responsiveness: add horizontal scroll indicator if needed */
+    .table-container {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Stack header elements vertically if needed for very small screens */
+    .header-search-container {
+        margin-top: 0.5rem;
+    }
+
+    /* Reduce sidebar item padding for better fit - excluded */
+    nav a {
+        padding: 0.75rem 1rem;
+    }
+
+    /* Ensure charts are fully responsive and touch-friendly */
+    .chart-container {
+        touch-action: pan-x pan-y;
+    }
+
+    /* Giữ nguyên width của dropdown thông báo và dropdown user trên màn hình <=760px */
+    #notifications-dropdown {
+        min-width: unset !important;
+        width: 16rem !important;
+    }
+
+    #profile-dropdown {
+        min-width: unset !important;
+        width: 12rem !important;
+    }
+
+    /* Improve customer list touch targets */
+    .divide-y > div {
+        min-height: 3rem;
+        padding: 0.75rem;
+    }
+
+    /* System status grid stacks to single column */
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Overview cards stack and reduce font sizes slightly */
+    .grid-cols-1 > div h3 {
+        font-size: 1.25rem;
+    }
+
+    /* Ensure main content padding is minimal but usable */
+    main {
+        padding: 1rem;
+    }
+}
+
+/* Initial opacity for animations */
+.animate-slideUpFromBottom,
+.table-container tbody tr,
+.divide-y > div,
+.grid-cols-3 > div {
+    opacity: 0;
+}
+
+.table-container {
+    font-size: 0.875rem;
+}
+
+/* Modal specific styles */
+.modal-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.modal-close:hover {
+    opacity: 1;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-published {
+    background-color: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.status-draft {
+    background-color: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+}
+
+.status-scheduled {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}

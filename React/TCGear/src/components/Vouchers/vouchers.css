@@ -1,0 +1,66 @@
+.voucher-card {
+  transition: all 0.3s ease;
+  border: 2px dashed #e11d48;
+}
+.voucher-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.3);
+}
+
+.voucher-code {
+  letter-spacing: 2px;
+  background: rgba(225, 29, 72, 0.1);
+}
+
+.copy-btn {
+  transition: all 0.2s ease;
+}
+.copy-btn:hover {
+  background: #e11d48;
+  color: white;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #e11d48;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+
+@keyframes scalePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.scale-animation {
+  animation: scalePulse 0.3s ease-in-out;
+}
+
+/* Tailwind overrides for custom colors (assuming Tailwind is used) */
+.bg-secondary { background-color: #000000; }
+.text-accent { color: #ffffff; }
+.text-primary { color: #e11d48; }
+.text-accent\/70 { color: rgba(255, 255, 255, 0.7); }
+.text-accent\/50 { color: rgba(255, 255, 255, 0.5); }
+.border-primary\/20 { border-color: rgba(225, 29, 72, 0.2); }
+.bg-secondary\/50 { background-color: rgba(0, 0, 0, 0.5); }
+.bg-primary { background-color: #e11d48; }
+.bg-primary\/90 { background-color: rgba(225, 29, 72, 0.9); }
+.border-primary { border-color: #e11d48; }
+.font-open-sans { font-family: "Open Sans", sans-serif; }
+.font-orbitron { font-family: "Orbitron", sans-serif; }
+.font-mono { font-family: monospace; }
