@@ -94,7 +94,7 @@ const downloadSocialAvatar = async (imageUrl, prefix = 'social', identifier = 'u
   }
 
   try {
-    console.log(`[DOWNLOAD AVATAR] Äang táº£i tá»«: ${imageUrl}`);
+    console.log(`[DOWNLOAD AVATAR] Đang tải từ: ${imageUrl}`);
     const response = await fetch(imageUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -108,10 +108,10 @@ const downloadSocialAvatar = async (imageUrl, prefix = 'social', identifier = 'u
     );
 
     fs.writeFileSync(savePath, buffer);
-    console.log(`âœ… Avatar Ä‘Ă£ lÆ°u: img/${filename}`);
+    console.log(`✅ Avatar đã lưu: img/${filename}`);
     return `img/${filename}`;
   } catch (err) {
-    console.error('âŒ Download avatar tháº¥t báº¡i:', err.message);
+    console.error('âŒ Download avatar thất bại:', err.message);
     return 'img/fanT1.jpg';
   }
 };
@@ -126,7 +126,7 @@ passport.use(new FacebookStrategy({
   passReqToCallback: true
 },
   async (req, accessToken, refreshToken, profile, done) => {
-    console.log('Facebook profile nháº­n Ä‘Æ°á»£c:', profile);
+    console.log('Facebook profile nhận được:', profile);
     try {
       const facebookId = profile.id;
       const email = `${facebookId}@facebook.placeholder.com`;
@@ -212,23 +212,23 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// PHáº¦N ASYNC DB + Táº¤T Cáº¢ ROUTE
+// PHẦN ASYNC DB + TẤT CẢ ROUTE
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let db;
 const removeTone = (str) =>
   str
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/Ä‘/g, "d")
-    .replace(/Ä/g, "D")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
     .toLowerCase();
 
 (async () => {
   try {
     db = await connectDb();
-    console.log("âœ… MySQL Connected");
+    console.log("✅ MySQL Connected");
 
-    // ======================= MULTER - LÆ¯U VĂ€O FRONTEND PUBLIC/IMG =======================
+    // ======================= MULTER - LƯU VÀO FRONTEND PUBLIC/IMG =======================
     const upload = multer({
       storage: multer.diskStorage({
         destination: (req, file, cb) => {
@@ -247,7 +247,7 @@ const removeTone = (str) =>
         if (file.mimetype.startsWith("image/")) {
           cb(null, true);
         } else {
-          cb(new Error("File khĂ´ng pháº£i lĂ  hĂ¬nh áº£nh!"), false);
+          cb(new Error("File không phải là hình ảnh!"), false);
         }
       },
       limits: { fileSize: 5 * 1024 * 1024 },
@@ -259,11 +259,11 @@ const removeTone = (str) =>
       const token = authHeader && authHeader.split(' ')[1];
 
       if (!token) {
-        return res.status(401).json({ status: 'error', message: 'Token khĂ´ng há»£p lá»‡' });
+        return res.status(401).json({ status: 'error', message: 'Token không hợp lệ' });
       }
 
       jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ status: 'error', message: 'Token háº¿t háº¡n hoáº·c khĂ´ng há»£p lá»‡' });
+        if (err) return res.status(403).json({ status: 'error', message: 'Token hết hạn hoặc không hợp lệ' });
         req.user = user;
         next();
       });
@@ -271,11 +271,11 @@ const removeTone = (str) =>
 
     // ======================= GOOGLE LOGIN =======================
     app.post("/api/user/google-login", async (req, res) => {
-      console.log("=== GOOGLE LOGIN ÄĂƒ CHáº M ===");
+      console.log("=== GOOGLE LOGIN ĐÃ CHẠM ===");
       const { code } = req.body;
 
       if (!code) {
-        return res.status(400).json({ status: "error", message: "Thiáº¿u code tá»« Google" });
+        return res.status(400).json({ status: "error", message: "Thiếu code từ Google" });
       }
 
       try {
@@ -287,11 +287,11 @@ const removeTone = (str) =>
         if (!tokens?.access_token) {
           return res.status(400).json({
             status: "error",
-            message: "KhĂ´ng láº¥y Ä‘Æ°á»£c access_token tá»« Google"
+            message: "Không lấy được access_token từ Google"
           });
         }
 
-        console.log("Google tokens nháº­n Ä‘Æ°á»£c:", tokens);
+        console.log("Google tokens nhận được:", tokens);
 
         const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
           method: "GET",
@@ -303,11 +303,11 @@ const removeTone = (str) =>
         if (!userInfoResponse.ok) {
           const errorText = await userInfoResponse.text();
           console.error("Google UserInfo error:", errorText);
-          throw new Error(`Google UserInfo tháº¥t báº¡i: ${userInfoResponse.status} - ${errorText}`);
+          throw new Error(`Google UserInfo thất bại: ${userInfoResponse.status} - ${errorText}`);
         }
 
         const userInfo = await userInfoResponse.json();
-        console.log("Google UserInfo Ä‘áº§y Ä‘á»§:", userInfo);
+        console.log("Google UserInfo đầy đủ:", userInfo);
 
         const googleId = userInfo.sub;
         const email = userInfo.email;
@@ -395,7 +395,7 @@ const removeTone = (str) =>
         console.error("Google login FULL error:", err);
         res.status(500).json({
           status: "error",
-          message: "Lá»—i Google login: " + (err.message || "Unknown error")
+          message: "Lỗi Google login: " + (err.message || "Unknown error")
         });
       }
     });
@@ -447,7 +447,7 @@ const removeTone = (str) =>
 
     // ======================= REGISTER =======================
     app.post("/api/user/register", upload.single("avatar"), async (req, res) => {
-      console.log("=== REGISTER ROUTE ÄĂƒ CHáº M ===");
+      console.log("=== REGISTER ROUTE ĐÃ CHẠM ===");
       console.log("Has file?", !!req.file);
       try {
         const {
@@ -465,29 +465,29 @@ const removeTone = (str) =>
         const password = passwordRaw?.trim();
         const confirmPassword = confirmPasswordRaw?.trim();
         if (!firstName || !lastName || !email || !phone || !password || !confirmPassword) {
-          return res.status(400).json({ status: "error", message: "Vui lĂ²ng Ä‘iá»n Ä‘áº§y Ä‘á»§ cĂ¡c trÆ°á»ng báº¯t buá»™c" });
+          return res.status(400).json({ status: "error", message: "Vui lòng điền đầy đủ các trường bắt buộc" });
         }
         if (password !== confirmPassword) {
-          return res.status(400).json({ status: "error", message: "Máº­t kháº©u xĂ¡c nháº­n khĂ´ng khá»›p" });
+          return res.status(400).json({ status: "error", message: "Mật khẩu xác nhận không khớp" });
         }
         if (password.length < 8) {
-          return res.status(400).json({ status: "error", message: "Máº­t kháº©u pháº£i cĂ³ Ă­t nháº¥t 8 kĂ½ tá»±" });
+          return res.status(400).json({ status: "error", message: "Mật khẩu phải có ít nhất 8 ký tự" });
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-          return res.status(400).json({ status: "error", message: "Ä á»‹a chá»‰ email khĂ´ng há»£p lá»‡" });
+          return res.status(400).json({ status: "error", message: "Địa chỉ email không hợp lệ" });
         }
         const cleanPhone = phone.replace(/\s/g, "");
         if (!/^0[1-9]\d{8,9}$|^\+84[1-9]\d{8,9}$/.test(cleanPhone)) {
-          return res.status(400).json({ status: "error", message: "Sá»‘ Ä‘iá»‡n thoáº¡i khĂ´ng há»£p lá»‡" });
+          return res.status(400).json({ status: "error", message: "Số điện thoại không hợp lệ" });
         }
         const [emailExists] = await db.query("SELECT user_id FROM users WHERE user_email = ?", [email]);
         if (emailExists.length > 0) {
-          return res.status(400).json({ status: "error", message: "Email nĂ y Ä‘Ă£ Ä‘Æ°á»£c sá»­ dá»¥ng" });
+          return res.status(400).json({ status: "error", message: "Email này đã được sử dụng" });
         }
         const [phoneExists] = await db.query("SELECT user_id FROM users WHERE user_phone_number = ?", [cleanPhone]);
         if (phoneExists.length > 0) {
-          return res.status(400).json({ status: "error", message: "Sá»‘ Ä‘iá»‡n thoáº¡i nĂ y Ä‘Ă£ Ä‘Æ°á»£c sá»­ dá»¥ng" });
+          return res.status(400).json({ status: "error", message: "Số điện thoại này đã được sử dụng" });
         }
         const fullname = `${firstName} ${lastName}`;
         let baseUsername = removeTone(fullname).replace(/\s+/g, "");
@@ -582,7 +582,7 @@ const removeTone = (str) =>
         });
       } catch (err) {
         console.error("Register error:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i server khi Ä‘Äƒng kĂ½" });
+        res.status(500).json({ status: "error", message: "Lỗi server khi đăng ký" });
       }
     });
 
@@ -747,7 +747,7 @@ const removeTone = (str) =>
       try {
         const { identifier, password } = req.body;
         if (!identifier || !password) {
-          return res.status(400).json({ status: "error", message: "Vui lĂ²ng cung cáº¥p username/email vĂ  máº­t kháº©u" });
+          return res.status(400).json({ status: "error", message: "Vui lòng cung cấp username/email và mật khẩu" });
         }
         const [rows] = await db.query(
           `SELECT * FROM users
@@ -756,15 +756,15 @@ const removeTone = (str) =>
           [identifier, identifier]
         );
         if (rows.length === 0) {
-          return res.status(401).json({ status: "error", message: "TĂ i khoáº£n hoáº·c máº­t kháº©u khĂ´ng Ä‘Ăºng" });
+          return res.status(401).json({ status: "error", message: "Tài khoản hoặc mật khẩu không đúng" });
         }
         const user = rows[0];
         if (user.user_isActive !== 1) {
-          return res.status(403).json({ status: "error", message: "TĂ i khoáº£n cá»§a báº¡n Ä‘Ă£ bá»‹ khĂ³a" });
+          return res.status(403).json({ status: "error", message: "Tài khoản của bạn đã bị khóa" });
         }
         const isPasswordValid = await bcrypt.compare(password, user.user_password);
         if (!isPasswordValid) {
-          return res.status(401).json({ status: "error", message: "TĂ i khoáº£n hoáº·c máº­t kháº©u khĂ´ng Ä‘Ăºng" });
+          return res.status(401).json({ status: "error", message: "Tài khoản hoặc mật khẩu không đúng" });
         }
         if (!user.user_image || user.user_image.trim() === "" || user.user_image === "img/default-avatar.jpg") {
           user.user_image = "img/fanT1.jpg";
@@ -782,7 +782,7 @@ const removeTone = (str) =>
         );
         res.json({
           status: "success",
-          message: "ÄÄƒng nháº­p thĂ nh cĂ´ng",
+          message: "Đăng nhập thành công",
           token,
           user: {
             user_id: user.user_id,
@@ -797,7 +797,7 @@ const removeTone = (str) =>
         });
       } catch (err) {
         console.error("Login error:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i server" });
+        res.status(500).json({ status: "error", message: "Lỗi server" });
       }
     });
 
@@ -806,7 +806,7 @@ const removeTone = (str) =>
       try {
         const { userId } = req.params;
 
-        // Kiá»ƒm tra user cĂ³ tá»“n táº¡i khĂ´ng
+        // Kiểm tra user có tồn tại không
         const [userCheck] = await db.query(
           'SELECT user_id FROM users WHERE user_id = ?',
           [userId]
@@ -815,7 +815,7 @@ const removeTone = (str) =>
         if (userCheck.length === 0) {
           return res.status(404).json({
             status: 'error',
-            message: 'KhĂ´ng tĂ¬m tháº¥y ngÆ°á»i dĂ¹ng'
+            message: 'Không tìm thấy người dùng'
           });
         }
 
@@ -839,7 +839,7 @@ const removeTone = (str) =>
           return res.json({
             status: 'success',
             data: null,
-            message: 'ChÆ°a cĂ³ Ä‘á»‹a chá»‰ máº·c Ä‘á»‹nh'
+            message: 'Chưa có địa chỉ mặc định'
           });
         }
 
@@ -848,10 +848,10 @@ const removeTone = (str) =>
           data: addresses[0]
         });
       } catch (err) {
-        console.error('Lá»—i láº¥y Ä‘á»‹a chá»‰ máº·c Ä‘á»‹nh:', err);
+        console.error('Lỗi lấy địa chỉ mặc định:', err);
         res.status(500).json({
           status: 'error',
-          message: 'Lá»—i server khi láº¥y Ä‘á»‹a chá»‰ máº·c Ä‘á»‹nh'
+          message: 'Lỗi server khi lấy địa chỉ mặc định'
         });
       }
     });
@@ -874,7 +874,7 @@ const removeTone = (str) =>
         );
 
         if (profileRows.length === 0) {
-          return res.status(404).json({ status: 'error', message: 'KhĂ´ng tĂ¬m tháº¥y ngÆ°á»i dĂ¹ng' });
+          return res.status(404).json({ status: 'error', message: 'Không tìm thấy người dùng' });
         }
 
         const userInfo = profileRows[0];
@@ -899,8 +899,8 @@ const removeTone = (str) =>
              ua.type, 
              ua.ref_id, 
              CASE 
-               WHEN ua.type = 'ORDER' THEN CONCAT('Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng: MĂ£ Ä‘Æ¡n hĂ ng ', ua.ref_id)
-               WHEN ua.type = 'COMMENT' THEN CONCAT('Báº¡n Ä‘Ă£ bĂ¬nh luáº­n á»Ÿ sáº£n pháº©m: ', IFNULL(p.product_name, 'Sáº£n pháº©m'))
+               WHEN ua.type = 'ORDER' THEN CONCAT('Bạn đã đặt đơn hàng thành công: Mã đơn hàng ', ua.ref_id)
+               WHEN ua.type = 'COMMENT' THEN CONCAT('Bạn đã bình luận ở sản phẩm: ', IFNULL(p.product_name, 'Sản phẩm'))
                ELSE ua.description 
              END AS description,
              ua.created_at AS time 
@@ -927,29 +927,29 @@ const removeTone = (str) =>
           activities: activityRows
         });
       } catch (err) {
-        console.error('Lá»—i GET profile:', err);
-        res.status(500).json({ status: 'error', message: 'Lá»—i server' });
+        console.error('Lỗi GET profile:', err);
+        res.status(500).json({ status: 'error', message: 'Lỗi server' });
       }
     });
 
     // ======================= UPDATE AVATAR =======================
     app.put('/api/user/avatar', authenticateToken, upload.single('avatar'), async (req, res) => {
       try {
-        if (!req.file) return res.status(400).json({ status: 'error', message: 'KhĂ´ng cĂ³ file áº£nh' });
+        if (!req.file) return res.status(400).json({ status: 'error', message: 'Không có file ảnh' });
 
         const userId = req.user.user_id;
         const newImagePath = `img/${req.file.filename}`;
 
         await db.query('UPDATE users SET user_image = ? WHERE user_id = ?', [newImagePath, userId]);
         await db.query(
-          `INSERT INTO user_activities (user_id, type, description) VALUES (?, 'UPDATE_AVATAR', 'Báº¡n Ä‘Ă£ cáº­p nháº­t áº£nh Ä‘áº¡i diá»‡n')`,
+          `INSERT INTO user_activities (user_id, type, description) VALUES (?, 'UPDATE_AVATAR', 'Bạn đã cập nhật ảnh đại diện')`,
           [userId]
         );
 
-        res.json({ status: 'success', message: 'Cáº­p nháº­t áº£nh thĂ nh cĂ´ng', image: newImagePath });
+        res.json({ status: 'success', message: 'Cập nhật ảnh thành công', image: newImagePath });
       } catch (err) {
         console.error(err);
-        res.status(500).json({ status: 'error', message: 'Lá»—i server' });
+        res.status(500).json({ status: 'error', message: 'Lỗi server' });
       }
     });
 
@@ -968,13 +968,13 @@ const removeTone = (str) =>
         );
 
         let changes = [];
-        if (oldUser.user_fullname !== fullname) changes.push(`tĂªn thĂ nh "${fullname}"`);
-        if (oldUser.user_email !== email) changes.push(`email thĂ nh "${email}"`);
-        if ((oldUser.user_phone_number || '') !== (phone || '')) changes.push(`sá»‘ Ä‘iá»‡n thoáº¡i thĂ nh "${phone}"`);
+        if (oldUser.user_fullname !== fullname) changes.push(`tên thành "${fullname}"`);
+        if (oldUser.user_email !== email) changes.push(`email thành "${email}"`);
+        if ((oldUser.user_phone_number || '') !== (phone || '')) changes.push(`số điện thoại thành "${phone}"`);
 
-        let description = 'Báº¡n Ä‘Ă£ cáº­p nháº­t thĂ´ng tin cĂ¡ nhĂ¢n';
+        let description = 'Bạn đã cập nhật thông tin cá nhân';
         if (changes.length > 0) {
-          description = `Báº¡n vá»«a cáº­p nháº­t ${changes.join(' vĂ  ')}`;
+          description = `Bạn vừa cập nhật ${changes.join(' và ')}`;
         }
 
         await db.query(
@@ -982,10 +982,10 @@ const removeTone = (str) =>
           [userId, description]
         );
 
-        res.json({ status: 'success', message: 'Cáº­p nháº­t thĂ´ng tin thĂ nh cĂ´ng' });
+        res.json({ status: 'success', message: 'Cập nhật thông tin thành công' });
       } catch (err) {
         console.error(err);
-        res.status(500).json({ status: 'error', message: 'Lá»—i server' });
+        res.status(500).json({ status: 'error', message: 'Lỗi server' });
       }
     });
 
@@ -996,11 +996,11 @@ const removeTone = (str) =>
         const { address, recipient_name, phone_number } = req.body;
 
         if (!address?.trim()) {
-          return res.status(400).json({ status: 'error', message: 'Äá»‹a chá»‰ khĂ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng' });
+          return res.status(400).json({ status: 'error', message: 'Địa chỉ không được để trống' });
         }
 
         if (!recipient_name?.trim()) {
-          return res.status(400).json({ status: 'error', message: 'Vui lĂ²ng nháº­p tĂªn ngÆ°á»i nháº­n' });
+          return res.status(400).json({ status: 'error', message: 'Vui lòng nhập tên người nhận' });
         }
 
         const addressId = `ADDR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -1020,12 +1020,12 @@ const removeTone = (str) =>
         );
         await db.query(
           `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'ADDRESS', ?, ?)`,
-          [userId, addressId, `Báº¡n Ä‘Ă£ thĂªm Ä‘á»‹a chá»‰ má»›i`]
+          [userId, addressId, `Bạn đã thêm địa chỉ mới`]
         );
 
         res.json({
           status: 'success',
-          message: 'ThĂªm Ä‘á»‹a chá»‰ thĂ nh cĂ´ng',
+          message: 'Thêm địa chỉ thành công',
           address: {
             id: addressId,
             address: address.trim(),
@@ -1037,7 +1037,7 @@ const removeTone = (str) =>
         });
       } catch (err) {
         console.error(err);
-        res.status(500).json({ status: 'error', message: 'Lá»—i server khi thĂªm Ä‘á»‹a chá»‰' });
+        res.status(500).json({ status: 'error', message: 'Lỗi server khi thêm địa chỉ' });
       }
     });
 
@@ -1049,9 +1049,9 @@ const removeTone = (str) =>
         await db.query('UPDATE user_addresses SET is_default = FALSE WHERE user_id = ?', [userId]);
         await db.query('UPDATE user_addresses SET is_default = TRUE WHERE address_id = ? AND user_id = ?', [id, userId]);
 
-        res.json({ status: 'success', message: 'Äáº·t máº·c Ä‘á»‹nh thĂ nh cĂ´ng' });
+        res.json({ status: 'success', message: 'Đặt mặc định thành công' });
       } catch (err) {
-        res.status(500).json({ status: 'error', message: 'Lá»—i server' });
+        res.status(500).json({ status: 'error', message: 'Lỗi server' });
       }
     });
 
@@ -1061,15 +1061,15 @@ const removeTone = (str) =>
         const { id } = req.params;
 
         await db.query('DELETE FROM user_addresses WHERE address_id = ? AND user_id = ?', [id, userId]);
-        res.json({ status: 'success', message: 'XĂ³a thĂ nh cĂ´ng' });
+        res.json({ status: 'success', message: 'Xóa thành công' });
       } catch (err) {
-        res.status(500).json({ status: 'error', message: 'Lá»—i server' });
+        res.status(500).json({ status: 'error', message: 'Lỗi server' });
       }
     });
 
     // ======================= TEST GOOGLE =======================
     app.post("/api/user/test-google", (req, res) => {
-      console.log("ÄĂ£ cháº¡m route test-google", req.body);
+      console.log("Đã chạm route test-google", req.body);
       res.json({ status: "ok", message: "Route test OK" });
     });
 
@@ -1176,7 +1176,7 @@ const removeTone = (str) =>
         if (userId) {
           await db.query(
             `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'COMMENT', ?, ?)`,
-            [userId, cmtId, `Báº¡n Ä‘Ă£ Ä‘Ă¡nh giĂ¡ sáº£n pháº©m`]
+            [userId, cmtId, `Bạn đã đánh giá sản phẩm`]
           );
         }
         res.json({ status: "success", data: { cmtId } });
@@ -1523,13 +1523,13 @@ const removeTone = (str) =>
         const [rows] = await db.query("SELECT * FROM vouchers ORDER BY create_at DESC");
 
         if (rows.length === 0) {
-          return res.json({ status: "success", data: [], message: "KhĂ´ng cĂ³ voucher nĂ o" });
+          return res.json({ status: "success", data: [], message: "Không có voucher nào" });
         }
 
         res.json({ status: "success", data: rows });
       } catch (err) {
-        console.error("Lá»—i GET vouchers:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i server khi láº¥y dá»¯ liá»‡u vouchers" });
+        console.error("Lỗi GET vouchers:", err);
+        res.status(500).json({ status: "error", message: "Lỗi server khi lấy dữ liệu vouchers" });
       }
     });
 
@@ -1538,13 +1538,13 @@ const removeTone = (str) =>
       const { user_id, payment_method, shipping_method, note, total_amount, shipping_address, recipient_name, recipient_phone, recipient_email, items, order_date: clientDate, order_time: clientTime, applied_vouchers } = req.body;
 
       if (!user_id || !items || !items.length) {
-        return res.status(400).json({ status: "error", message: "Dá»¯ liá»‡u khĂ´ng há»£p lá»‡" });
+        return res.status(400).json({ status: "error", message: "Dữ liệu không hợp lệ" });
       }
 
       try {
         await db.beginTransaction();
 
-        // 1. Táº¡o order_id
+        // 1. Tạo order_id
         const [[{ count }]] = await db.query('SELECT COUNT(*) AS count FROM orders');
         const nextOrderNum = count + 1;
         const order_id = `TCG-ORD-${String(nextOrderNum).padStart(3, '0')}`;
@@ -1586,7 +1586,7 @@ const removeTone = (str) =>
 
         await db.query(
           `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'ORDER', ?, ?)`,
-          [user_id, order_id, `Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng`]
+          [user_id, order_id, `Bạn đã đặt đơn hàng thành công`]
         );
 
         // 4. Update voucher usage time
@@ -1643,11 +1643,11 @@ const removeTone = (str) =>
           }
         }
 
-        res.json({ status: "success", message: "Ä áº·t hĂ ng thĂ nh cĂ´ng", data: { order_id } });
+        res.json({ status: "success", message: "Đặt hàng thành công", data: { order_id } });
       } catch (err) {
         await db.rollback();
-        console.error("Lá»—i POST /api/orders:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i táº¡o Ä‘Æ¡n hĂ ng" });
+        console.error("Lỗi POST /api/orders:", err);
+        res.status(500).json({ status: "error", message: "Lỗi tạo đơn hàng" });
       }
     });
 
@@ -1784,8 +1784,8 @@ const removeTone = (str) =>
         const sqlSync = `
       UPDATE user_eco_infos
       SET 
-        eco_orders_total = (SELECT COUNT(DISTINCT o.order_id) FROM orders o WHERE o.user_id = ? AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Ä Ă£ giao')),
-        eco_total = (SELECT COALESCE(SUM(od.total_amount), 0) FROM orders o JOIN order_details od ON o.order_id = od.order_id WHERE o.user_id = ? AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Ä Ă£ giao'))
+        eco_orders_total = (SELECT COUNT(DISTINCT o.order_id) FROM orders o WHERE o.user_id = ? AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Đã giao')),
+        eco_total = (SELECT COALESCE(SUM(od.total_amount), 0) FROM orders o JOIN order_details od ON o.order_id = od.order_id WHERE o.user_id = ? AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Đã giao'))
       WHERE user_id = ?;
     `;
         await db.query(sqlSync, [order.user_id, order.user_id, order.user_id]);
@@ -1835,20 +1835,20 @@ const removeTone = (str) =>
 
         res.json({ status: "success", data: orders });
       } catch (err) {
-        console.error("Lá»—i GET /api/orders/user/:userId:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i láº¥y danh sĂ¡ch Ä‘Æ¡n hĂ ng" });
+        console.error("Lỗi GET /api/orders/user/:userId:", err);
+        res.status(500).json({ status: "error", message: "Lỗi lấy danh sách đơn hàng" });
       }
     });
 
-    // API Äá»“ng bá»™ VĂ­ Eco (Gá»i Ä‘á»ƒ tá»± Ä‘á»™ng tĂ­nh toĂ¡n láº¡i tá»« DB)
+    // API Đồng bộ Ví Eco (Gọi để tự động tính toán lại từ DB)
     app.get("/api/user/:userId/sync-eco", async (req, res) => {
       try {
         const { userId } = req.params;
         await syncUserEcoInfo(userId);
-        res.json({ status: "success", message: "Äá»“ng bá»™ Eco Info thĂ nh cĂ´ng" });
+        res.json({ status: "success", message: "Đồng bộ Eco Info thành công" });
       } catch (err) {
-        console.error("Lá»—i GET /api/user/:userId/sync-eco:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i Ä‘á»“ng bá»™ Eco Info" });
+        console.error("Lỗi GET /api/user/:userId/sync-eco:", err);
+        res.status(500).json({ status: "error", message: "Lỗi đồng bộ Eco Info" });
       }
     });
 
@@ -1861,9 +1861,9 @@ const removeTone = (str) =>
               SELECT COUNT(DISTINCT o.order_id)
               FROM orders o
               WHERE o.user_id = ?
-                AND o.payment_status IN ('Đã thanh toán', 'Ä Ă£ thanh toĂ¡n')
-                AND o.order_status IN ('Đã giao', 'Ä Ă£ giao', 'Hoàn thành')
-                AND o.shipping_status IN ('Đã giao', 'Ä Ă£ giao')
+                AND o.payment_status IN ('Đã thanh toán', 'Đã thanh toán')
+                AND o.order_status IN ('Đã giao', 'Đã giao', 'Hoàn thành')
+                AND o.shipping_status IN ('Đã giao', 'Đã giao')
                 AND o.is_received = 'Đã nhận hàng'
             ),
             eco_total = (
@@ -1871,9 +1871,9 @@ const removeTone = (str) =>
               FROM orders o
               JOIN order_details od ON o.order_id = od.order_id
               WHERE o.user_id = ?
-                AND o.payment_status IN ('Đã thanh toán', 'Ä Ă£ thanh toĂ¡n')
-                AND o.order_status IN ('Đã giao', 'Ä Ă£ giao', 'Hoàn thành')
-                AND o.shipping_status IN ('Đã giao', 'Ä Ă£ giao')
+                AND o.payment_status IN ('Đã thanh toán', 'Đã thanh toán')
+                AND o.order_status IN ('Đã giao', 'Đã giao', 'Hoàn thành')
+                AND o.shipping_status IN ('Đã giao', 'Đã giao')
                 AND o.is_received = 'Đã nhận hàng'
             )
           WHERE user_id = ?;
