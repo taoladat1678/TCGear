@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th2 25, 2026 lúc 04:03 PM
+-- Thời gian đã tạo: Th7 09, 2026 lúc 04:23 PM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.2.4
 
@@ -174,6 +174,7 @@ INSERT INTO `comments` (`cmt_id`, `cmt_content`, `user_id`, `product_id`, `guest
 ('TCG-CMT-056432e2', 'sản phẩm như đống cứt', NULL, 'TCG-PRO-004', 'sanr', 1, NULL, '2026-01-15 23:34:22', '2026-01-15 23:34:22'),
 ('TCG-CMT-56fbd386', 'CŨNG ĐẲNG CẤP', NULL, 'TCG-PRO-005', 'Fan T1 1580', 5, NULL, '2026-01-18 00:19:27', '2026-01-18 00:19:27'),
 ('TCG-CMT-7878b5ff', 'sản phẩm ko dc dởm cho mấy', NULL, 'TCG-PRO-005', 'T1 Faker', 5, NULL, '2026-01-12 01:18:18', '2026-01-12 01:18:18'),
+('TCG-CMT-c11decdf', 'OK', NULL, 'TCG-PRO-003', 'TÀY', NULL, NULL, '2026-07-06 18:10:24', '2026-07-06 18:10:24'),
 ('TCG-CMT-f8ae584e', 'đánh giá 4 sao để có gì mai +1', NULL, 'TCG-PRO-005', 'Fan T1 2725', 4, NULL, '2026-01-12 01:49:57', '2026-01-12 01:49:57');
 
 -- --------------------------------------------------------
@@ -197,11 +198,25 @@ CREATE TABLE `messages` (
 --
 
 INSERT INTO `messages` (`message_id`, `user_id`, `guest_name`, `message_text`, `create_at`, `guest_email`, `message_title`) VALUES
+('MSG-I1MJ3U5G0', 'TCG-USR-012', 'Tày', 'tại sao chúng mày thua 3-1?', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'tại sao thua 3-1'),
+('MSG-Z97EQJMQV', 'TCG-USR-012', 'T1 Keria', 'VCL THUHA 3-1 G2', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'tại sao thua 3-1'),
 ('TCG-MSG-001', 'TCG-USR-001', 'Nguyễn Văn An', 'Tôi muốn hỏi về chính sách đổi trả sản phẩm gaming gear.', '2025-10-10 16:00:00', 'an@example.com', 'Hỏi về đổi trả'),
 ('TCG-MSG-002', NULL, 'Khách vãng lai', 'Áo jerseys có ship cod không? Thời gian giao bao lâu?', '2025-10-11 16:00:00', 'khach@example.com', 'Ship cod jerseys'),
 ('TCG-MSG-003', 'TCG-USR-002', 'Trần Thị Bình', 'Làm thế nào để tùy chỉnh áo thi đấu?', '2025-10-12 16:00:00', 'binh@example.com', 'Tùy chỉnh áo'),
 ('TCG-MSG-004', NULL, 'Lê Văn Cường', 'Giá voucher giảm giá hiện tại?', '2025-10-13 16:00:00', 'cuong@example.com', 'Voucher giảm giá'),
-('TCG-MSG-005', 'TCG-USR-003', 'Phạm Thị Dung', 'Thông tin đội tuyển T1?', '2025-10-14 16:00:00', 'dung@example.com', 'Info đội T1');
+('TCG-MSG-005', 'TCG-USR-003', 'Phạm Thị Dung', 'Thông tin đội tuyển T1?', '2025-10-14 16:00:00', 'dung@example.com', 'Info đội T1'),
+('TCG-MSG-006', 'TCG-USR-012', 'T1 Keria', 'vcl chúng mày thua 3 1 thật à', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'tại sao thua 3-1'),
+('TCG-MSG-007', 'TCG-USR-012', 'T1 Keria', 'out top 4', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'thua 31'),
+('TCG-MSG-008', 'TCG-USR-012', 'T1 Keria', 'ádadaddadad', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádasasdad'),
+('TCG-MSG-009', 'TCG-USR-012', 'T1 Keria', 'adsadsadasdasd', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'ádasdasdad'),
+('TCG-MSG-010', 'TCG-USR-012', 'T1 Keria', 'ádadsadasd', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'ádadasdasd'),
+('TCG-MSG-011', 'TCG-USR-012', 'T1 Keria', 'ádadadad', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádadad'),
+('TCG-MSG-012', 'TCG-USR-012', 'T1 Keria', 'adasda', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádasd'),
+('TCG-MSG-013', 'TCG-USR-012', 'T1 Keria', 'd', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádasda'),
+('TCG-MSG-014', 'TCG-USR-012', 'T1 Keria', 'adasdasdad', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádadsad'),
+('TCG-MSG-015', 'TCG-USR-012', 'T1 Keria', 'ádasdasdasda', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádadad'),
+('TCG-MSG-016', 'TCG-USR-012', 'T1 Keria', 'ádsadadasd', '0000-00-00 00:00:00', 'facehugging845@gmail.com', 'ádasdad'),
+('TCG-MSG-017', 'TCG-USR-011', 'Đặng Đạt', 'ádasdad', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'ádasdad');
 
 -- --------------------------------------------------------
 
@@ -242,19 +257,51 @@ CREATE TABLE `orders` (
   `order_date` date NOT NULL,
   `order_time` time NOT NULL,
   `order_status` varchar(50) NOT NULL,
-  `payment_status` varchar(50) NOT NULL
+  `payment_status` varchar(50) NOT NULL,
+  `payment_method` varchar(50) DEFAULT 'cod' COMMENT 'Phương thức thanh toán: cod, vnpay, bank, momo',
+  `shipping_method` varchar(50) DEFAULT 'standard' COMMENT 'Phương thức vận chuyển: standard, express, overnight',
+  `recipient_name` varchar(100) NOT NULL COMMENT 'Tên người nhận',
+  `recipient_phone` varchar(20) NOT NULL COMMENT 'Số điện thoại người nhận',
+  `recipient_email` varchar(100) NOT NULL COMMENT 'Email người nhận',
+  `shipping_address` varchar(255) NOT NULL COMMENT 'Địa chỉ giao hàng',
+  `shipping_status` varchar(50) DEFAULT 'Chờ xử lý' COMMENT 'Trạng thái vận chuyển: Chờ xử lý, Đã xác nhận, Đang giao, Đã giao, Hủy',
+  `note` text DEFAULT NULL,
+  `is_received` varchar(50) DEFAULT 'Chưa nhận hàng',
+  `applied_vouchers` varchar(255) DEFAULT NULL COMMENT 'JSON string of applied voucher codes'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `order_time`, `order_status`, `payment_status`) VALUES
-('TCG-ORD-001', 'TCG-USR-001', '2025-10-10', '14:30:00', 'Đã giao', 'Đã thanh toán'),
-('TCG-ORD-002', 'TCG-USR-002', '2025-10-11', '15:45:00', 'Đang xử lý', 'Chờ thanh toán'),
-('TCG-ORD-003', 'TCG-USR-003', '2025-10-12', '16:20:00', 'Hủy', 'Hoàn tiền'),
-('TCG-ORD-004', 'TCG-USR-004', '2025-10-13', '17:10:00', 'Đã giao', 'Đã thanh toán'),
-('TCG-ORD-005', 'TCG-USR-005', '2025-10-14', '18:05:00', 'Đang giao', 'Đã thanh toán');
+INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `order_time`, `order_status`, `payment_status`, `payment_method`, `shipping_method`, `recipient_name`, `recipient_phone`, `recipient_email`, `shipping_address`, `shipping_status`, `note`, `is_received`, `applied_vouchers`) VALUES
+('TCG-ORD-001', 'TCG-USR-001', '2025-10-10', '14:30:00', 'Đã giao', 'Đã thanh toán', 'cod', 'standard', '', '', '', '', 'Chờ xử lý', NULL, 'Chưa nhận hàng', NULL),
+('TCG-ORD-002', 'TCG-USR-002', '2025-10-11', '15:45:00', 'Đang xử lý', 'Chờ thanh toán', 'cod', 'standard', '', '', '', '', 'Chờ xử lý', NULL, 'Chưa nhận hàng', NULL),
+('TCG-ORD-003', 'TCG-USR-003', '2025-10-12', '16:20:00', 'Hủy', 'Hoàn tiền', 'cod', 'standard', '', '', '', '', 'Chờ xử lý', NULL, 'Chưa nhận hàng', NULL),
+('TCG-ORD-004', 'TCG-USR-004', '2025-10-13', '17:10:00', 'Đã giao', 'Đã thanh toán', 'cod', 'standard', '', '', '', '', 'Chờ xử lý', NULL, 'Chưa nhận hàng', NULL),
+('TCG-ORD-005', 'TCG-USR-005', '2025-10-14', '18:05:00', 'Đang giao', 'Đã thanh toán', 'cod', 'standard', '', '', '', '', 'Chờ xử lý', NULL, 'Chưa nhận hàng', NULL),
+('TCG-ORD-006', 'TCG-USR-011', '2026-07-05', '23:44:28', 'Đang xử lý', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'ĐÂSD', 'Chưa nhận hàng', NULL),
+('TCG-ORD-007', 'TCG-USR-011', '2026-07-06', '00:01:30', 'Đang xử lý', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'VÔ ĐỊCH RỒI', 'Chưa nhận hàng', NULL),
+('TCG-ORD-008', 'TCG-USR-011', '2026-07-06', '00:04:04', 'Đang xử lý', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'SÁDAD', 'Chưa nhận hàng', NULL),
+('TCG-ORD-009', 'TCG-USR-011', '2026-07-06', '00:05:21', 'Đang xử lý', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
+('TCG-ORD-010', 'TCG-USR-011', '2026-07-06', '00:31:59', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'ok', 'Chưa nhận hàng', NULL),
+('TCG-ORD-011', 'TCG-USR-011', '2026-07-06', '00:37:16', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'KJKO;', 'Chưa nhận hàng', NULL),
+('TCG-ORD-012', 'TCG-USR-011', '2026-07-06', '00:42:14', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'Đặng Đạt', '0690036045', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'rdfg', 'Chưa nhận hàng', NULL),
+('TCG-ORD-013', 'TCG-USR-011', '2026-07-06', '17:57:01', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0809060408', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', 'ádasdad', 'Chưa nhận hàng', NULL),
+('TCG-ORD-014', 'TCG-USR-011', '2026-07-06', '18:11:06', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'Đặng Đạt', '08090604010', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
+('TCG-ORD-015', 'TCG-USR-012', '2026-07-07', '18:01:19', 'Đã giao', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'Hunter2 FaceHugging', '0658124978891', 'facehugging845@gmail.com', 'nb20a', 'Đã giao', 'dádadadad', 'Đã nhận hàng', NULL),
+('TCG-ORD-016', 'TCG-USR-012', '2026-07-07', '18:26:06', 'Hoàn thành', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Hunter2 FaceHugging', '63465', 'facehugging845@gmail.com', '14/1', 'Đã giao', 'ádadad', 'Đã nhận hàng', NULL),
+('TCG-ORD-017', 'TCG-USR-012', '2026-07-07', '18:32:24', 'Đã giao', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'Hunter2 FaceHugging', '0364655292', 'facehugging845@gmail.com', '14/1', 'Đã giao', 'ÁDASDAD', 'Đã nhận hàng', NULL),
+('TCG-ORD-018', 'TCG-USR-012', '2026-07-07', '23:45:22', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'ưewerwrwer', 'Chưa nhận hàng', NULL),
+('TCG-ORD-019', 'TCG-USR-011', '2026-07-09', '18:49:45', 'Hoàn thành', 'Chá»  thanh toĂ¡n', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0809060409', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chá»  xá»­ lĂ½', 'dqwdqwdwqdqd', 'Đã nhận hàng', 'NEWUSER20,FREESHIPMAX'),
+('TCG-ORD-020', 'TCG-USR-011', '2026-07-09', '19:10:40', 'Đã giao', 'Chá» thanh toĂ¡n', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'Đặng Đạt', '0809060409', 'datd9079@gmail.com', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', 'Chá» xá»­ lĂ½', 'dqdqdqd', 'Chưa nhận hàng', NULL),
+('TCG-ORD-021', 'TCG-USR-012', '2026-07-09', '19:13:49', 'Hoàn thành', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', 'ádasdad', 'Đã nhận hàng', NULL),
+('TCG-ORD-022', 'TCG-USR-012', '2026-07-09', '19:31:00', 'Hoàn thành', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', 'xazXzxZX', 'Đã nhận hàng', NULL),
+('TCG-ORD-023', 'TCG-USR-012', '2026-07-09', '19:53:36', 'Chá» xĂ¡c nháº­n', 'Chá» thanh toĂ¡n', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chá» xá»­ lĂ½', 'đưqqd', 'Chưa nhận hàng', NULL),
+('TCG-ORD-024', 'TCG-USR-012', '2026-07-09', '20:12:21', 'Đã giao', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', 'ÂDSSADADADA', 'Đã nhận hàng', NULL),
+('TCG-ORD-025', 'TCG-USR-012', '2026-07-09', '20:57:50', 'Chá» xĂ¡c nháº­n', 'Chá» thanh toĂ¡n', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chá» xá»­ lĂ½', 'EASDASDADA', 'Chưa nhận hàng', NULL),
+('TCG-ORD-026', 'TCG-USR-012', '2026-07-09', '21:11:22', 'Chá» xĂ¡c nháº­n', 'Chá» thanh toĂ¡n', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chá» xá»­ lĂ½', 'ÁDADASDAD', 'Chưa nhận hàng', NULL),
+('TCG-ORD-027', 'TCG-USR-012', '2026-07-09', '21:17:52', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Nhanh', 'T1 Keria', '0908090908', 'facehugging845@gmail.com', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'đâsdadad', 'Chưa nhận hàng', 'NEWUSER20');
 
 -- --------------------------------------------------------
 
@@ -279,7 +326,30 @@ INSERT INTO `order_details` (`detail_id`, `order_id`, `variant_id`, `quantity`, 
 ('TCG-ODT-002', 'TCG-ORD-001', 'TCG-VAR-003', 1, 800000),
 ('TCG-ODT-003', 'TCG-ORD-002', 'TCG-VAR-002', 1, 2000000),
 ('TCG-ODT-004', 'TCG-ORD-003', 'TCG-VAR-004', 1, 2500000),
-('TCG-ODT-005', 'TCG-ORD-004', 'TCG-VAR-005', 3, 3600000);
+('TCG-ODT-005', 'TCG-ORD-004', 'TCG-VAR-005', 3, 3600000),
+('TCG-ODT-006', 'TCG-ORD-006', 'TCG-PRO-001', 1, 1580000),
+('TCG-ODT-007', 'TCG-ORD-007', 'TCG-PRO-005', 1, 750000),
+('TCG-ODT-008', 'TCG-ORD-008', 'TCG-PRO-003', 1, 496000),
+('TCG-ODT-009', 'TCG-ORD-009', 'TCG-PRO-004', 1, 2300000),
+('TCG-ODT-010', 'TCG-ORD-010', 'TCG-PRO-002', 1, 1800000),
+('TCG-ODT-011', 'TCG-ORD-011', 'TCG-PRO-001', 1, 1550000),
+('TCG-ODT-012', 'TCG-ORD-012', 'TCG-PRO-003', 1, 640000),
+('TCG-ODT-013', 'TCG-ORD-013', 'TCG-PRO-003', 1, 624000),
+('TCG-ODT-014', 'TCG-ORD-014', 'TCG-PRO-001', 1, 1600000),
+('TCG-ODT-015', 'TCG-ORD-015', 'TCG-PRO-003', 1, 780000),
+('TCG-ODT-016', 'TCG-ORD-016', 'TCG-PRO-005', 1, 900000),
+('TCG-ODT-017', 'TCG-ORD-017', 'TCG-PRO-001', 1, 1600000),
+('TCG-ODT-018', 'TCG-ORD-018', 'TCG-PRO-001', 1, 1584570),
+('TCG-ODT-019', 'TCG-ORD-018', 'TCG-PRO-001', 9, 13815400),
+('TCG-ODT-020', 'TCG-ORD-019', 'TCG-PRO-004', 1, 2300000),
+('TCG-ODT-021', 'TCG-ORD-020', 'TCG-PRO-003', 1, 624000),
+('TCG-ODT-022', 'TCG-ORD-021', 'TCG-PRO-003', 1, 624000),
+('TCG-ODT-023', 'TCG-ORD-022', 'TCG-PRO-003', 1, 624000),
+('TCG-ODT-024', 'TCG-ORD-023', 'TCG-PRO-003', 1, 624000),
+('TCG-ODT-025', 'TCG-ORD-024', 'TCG-VAR-004', 1, 1400000),
+('TCG-ODT-026', 'TCG-ORD-025', 'TCG-VAR-012', 1, 614000),
+('TCG-ODT-027', 'TCG-ORD-026', 'TCG-VAR-017', 2, 1600000),
+('TCG-ODT-028', 'TCG-ORD-027', 'TCG-VAR-017', 2, 1600000);
 
 -- --------------------------------------------------------
 
@@ -498,32 +568,122 @@ CREATE TABLE `users` (
   `user_password` varchar(255) NOT NULL,
   `user_email` varchar(100) NOT NULL,
   `user_phone_number` varchar(20) DEFAULT NULL,
-  `user_address` varchar(255) DEFAULT NULL,
   `user_isActive` int(11) NOT NULL,
   `user_image` varchar(255) DEFAULT NULL,
   `user_isAdmin` int(11) NOT NULL,
   `google_id` varchar(255) DEFAULT NULL,
   `facebook_id` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_confirmed` varchar(30) DEFAULT 'CHƯA XÁC THỰC',
+  `verification_token` varchar(100) DEFAULT NULL,
+  `token_expires_at` datetime DEFAULT NULL,
+  `reset_password_token` varchar(100) DEFAULT NULL,
+  `reset_token_expires_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`user_id`, `user_fullname`, `user_username`, `user_password`, `user_email`, `user_phone_number`, `user_address`, `user_isActive`, `user_image`, `user_isAdmin`, `google_id`, `facebook_id`, `created_at`, `updated_at`) VALUES
-('TCG-USR-001', 'Nguyễn Văn An', 'nguyenvanan', 'hashedpass1', 'an@gmail.com', '0123456789', 'Hà Nội', 1, 'img/user1.jpg', 1, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-002', 'Trần Thị Bình', 'tranthibinh', 'hashedpass2', 'binh@example.com', '0987654321', 'TP.HCM', 1, 'img/user2.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-003', 'Lê Văn Cường', 'levancuong', 'hashedpass3', 'cuong@example.com', '0111222333', 'Đà Nẵng', 1, 'img/user3.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-004', 'Phạm Thị Dung', 'phamthidung', 'hashedpass4', 'dung@example.com', '0444555666', 'Hải Phòng', 1, 'img/user4.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-005', 'Hoàng Văn Em', 'hoangvanem', 'hashedpass5', 'em@example.com', '0777888999', 'Cần Thơ', 1, 'img/user5.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-006', 'Đặng Đặng', 'dangdang', '$2b$10$WkidTZ99460tXD43C/HyWOWGPHPltxIpvPihY35Mu1UhgiMYcWB4m', 'knight@gmail.com', '+84364655292', NULL, 1, 'img/users/1769869084411-530112317-faker.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-007', 'Đặng Đặng', 'dangdang1', '$2b$10$qUchXBxrXS5lJYJD.LC6v.DsM8ZjjmjU6EX.M2RY54L82QC5Y7INe', 'datddntd@gmail.com', '0912371231', NULL, 1, 'img/1769869334299-946672289-faker2025.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-008', 'Bruh Văn', 'bruhvan', '$2b$10$PLG1ZXbxRj8EW5nqXUgV.O/v9kJVJU2Oz0jYBxd1pLTuUeDWzwVma', 'hba87738@gmail.com', '01823644255', NULL, 1, 'img/1769869642315-710987545-fakerW24.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-009', 'Lee Sang Hiếc', 'leesanghiec', '$2b$10$TOOQAEMl65Q4H9hdF.46j.vCBj05aHddl.K7Xx0Eel.jWy.I.g/fy', 'abc@gmail.com', '0907080907', NULL, 1, 'img/1771603512146-202307366-faker2025.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-02-25 21:29:54'),
-('TCG-USR-010', 'Tiến Đạt Đặng Nguyễn', 'tiendatdangnguyen', '', '122109074865227856@facebook.placeholder.com', NULL, NULL, 1, 'https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=122109074865227856&height=200&width=200&ext=1774623538&hash=AT_MxsBIqtvUk5V9bN9g8CiQ', 0, NULL, '122109074865227856', '2026-02-25 21:29:54', '2026-02-25 21:58:58'),
-('TCG-USR-011', 'Đặng Đạt', 'dangdat', '', 'datd9079@gmail.com', NULL, NULL, 1, 'https://lh3.googleusercontent.com/a/ACg8ocLboVX_3bKydjqfEUGHqK9KU5EEbatsUCs12ud2aGjUUTU1OoXYfQ=s400-c', 0, '104143569109046861426', NULL, '2026-02-25 21:30:20', '2026-02-25 21:46:55');
+INSERT INTO `users` (`user_id`, `user_fullname`, `user_username`, `user_password`, `user_email`, `user_phone_number`, `user_isActive`, `user_image`, `user_isAdmin`, `google_id`, `facebook_id`, `created_at`, `updated_at`, `is_confirmed`, `verification_token`, `token_expires_at`, `reset_password_token`, `reset_token_expires_at`) VALUES
+('TCG-USR-001', 'Nguyễn Văn An', 'nguyenvanan', 'hashedpass1', 'an@gmail.com', '0123456789', 1, 'img/user1.jpg', 1, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-002', 'Trần Thị Bình', 'tranthibinh', 'hashedpass2', 'binh@example.com', '0987654321', 1, 'img/user2.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-003', 'Lê Văn Cường', 'levancuong', 'hashedpass3', 'cuong@example.com', '0111222333', 1, 'img/user3.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-004', 'Phạm Thị Dung', 'phamthidung', 'hashedpass4', 'dung@example.com', '0444555666', 1, 'img/user4.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-005', 'Hoàng Văn Em', 'hoangvanem', 'hashedpass5', 'em@example.com', '0777888999', 1, 'img/user5.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-006', 'Đặng Đặng', 'dangdang', '$2b$10$WkidTZ99460tXD43C/HyWOWGPHPltxIpvPihY35Mu1UhgiMYcWB4m', 'knight@gmail.com', '+84364655292', 1, 'img/users/1769869084411-530112317-faker.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-008', 'Bruh Văn', 'bruhvan', '$2b$10$PLG1ZXbxRj8EW5nqXUgV.O/v9kJVJU2Oz0jYBxd1pLTuUeDWzwVma', 'hba87738@gmail.com', '01823644255', 1, 'img/1769869642315-710987545-fakerW24.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-009', 'Lee Sang Hiếc', 'leesanghiec', '$2b$10$TOOQAEMl65Q4H9hdF.46j.vCBj05aHddl.K7Xx0Eel.jWy.I.g/fy', 'abc@gmail.com', '0907080907', 1, 'img/1771603512146-202307366-faker2025.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-010', 'Tiến Đạt Đặng Đặng', 'tiendatdangnguyen', '', 'siuu@gmail.com', '0908090908', 1, 'img/1783419585603-833601717-maxresdefault.jpg', 0, NULL, '122109074865227856', '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-011', 'Đặng Đạt', 'dangdat', '', 'datd9079@gmail.com', '0809060409', 1, 'img/1783418533623-453621022-avatar-google.jpg', 0, '104143569109046861426', NULL, '2026-02-25 21:30:20', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-012', 'T1 Keria', 'hunter2facehugging', '', 'facehugging845@gmail.com', '0908090908', 1, 'img/1783424760130-926208256-avatar-google.jpg', 0, '112761235228829734678', NULL, '2026-07-07 17:57:24', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
+('TCG-USR-013', 'tày tày', 'taytay', '$2b$10$ic79kTpUZNMm7we3WBaaSe7gooU7/1rms4LI4TymLEw2NTgoKnLae', 'datddntd@gmail.com', '0203040501', 1, 'img/1783595078171-713490923-1771602646573-692209447-faker2025.jpg', 0, NULL, NULL, '2026-07-09 18:04:38', '2026-07-09 18:22:25', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `user_activities`
+--
+
+CREATE TABLE `user_activities` (
+  `id` int(11) NOT NULL,
+  `user_id` varchar(50) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `ref_id` varchar(100) DEFAULT NULL,
+  `description` text NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `user_activities`
+--
+
+INSERT INTO `user_activities` (`id`, `user_id`, `type`, `ref_id`, `description`, `created_at`) VALUES
+(1, 'TCG-USR-011', 'UPDATE_PROFILE', NULL, 'Bạn đã cập nhật thông tin cá nhân', '2026-07-06 18:09:20'),
+(2, 'TCG-USR-011', 'ORDER', 'TCG-ORD-014', 'Bạn đã đặt đơn hàng thành công', '2026-07-06 18:11:06'),
+(3, 'TCG-USR-011', 'UPDATE_PROFILE', NULL, 'Bạn vừa cập nhật số điện thoại thành \"0809060409\"', '2026-07-06 18:44:25'),
+(4, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 16:29:28'),
+(5, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 16:36:43'),
+(6, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 16:44:27'),
+(7, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 16:58:21'),
+(8, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 16:59:09'),
+(9, 'TCG-USR-010', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:00:58'),
+(10, 'TCG-USR-010', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:01:17'),
+(11, 'TCG-USR-010', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:01:33'),
+(12, 'TCG-USR-010', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:01:42'),
+(13, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:02:11'),
+(14, 'TCG-USR-011', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:02:13'),
+(15, 'TCG-USR-010', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:19:38'),
+(16, 'TCG-USR-010', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 17:19:45'),
+(17, 'TCG-USR-012', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 18:00:18'),
+(18, 'TCG-USR-012', 'ORDER', 'TCG-ORD-015', 'Bạn đã đặt đơn hàng thành công', '2026-07-07 18:01:19'),
+(19, 'TCG-USR-012', 'ORDER', 'TCG-ORD-016', 'Bạn đã đặt đơn hàng thành công', '2026-07-07 18:26:06'),
+(20, 'TCG-USR-012', 'ORDER', 'TCG-ORD-017', 'Bạn đã đặt đơn hàng thành công', '2026-07-07 18:32:24'),
+(21, 'TCG-USR-012', 'UPDATE_PROFILE', NULL, 'Bạn vừa cập nhật tên thành \"T1 Keria\" và số điện thoại thành \"0809090809\"', '2026-07-07 18:39:34'),
+(22, 'TCG-USR-012', 'ADDRESS', 'ADDR-1783424675449-608', 'Bạn đã thêm địa chỉ mới', '2026-07-07 18:44:35'),
+(23, 'TCG-USR-012', 'UPDATE_AVATAR', NULL, 'Bạn đã cập nhật ảnh đại diện', '2026-07-07 18:46:00'),
+(24, 'TCG-USR-012', 'UPDATE_PROFILE', NULL, 'Bạn vừa cập nhật số điện thoại thành \"\"', '2026-07-07 23:00:24'),
+(25, 'TCG-USR-012', 'UPDATE_PROFILE', NULL, 'Bạn vừa cập nhật số điện thoại thành \"0908090908\"', '2026-07-07 23:06:01'),
+(26, 'TCG-USR-012', 'ADDRESS', 'ADDR-1783440926524-686', 'Bạn đã thêm địa chỉ mới', '2026-07-07 23:15:26'),
+(27, 'TCG-USR-012', 'ORDER', 'TCG-ORD-018', 'Bạn đã đặt đơn hàng thành công', '2026-07-07 23:45:22'),
+(28, 'TCG-USR-011', 'ORDER', 'TCG-ORD-019', 'Báº¡n Ä‘Ă£ đặt đơn hàng thành công', '2026-07-09 18:49:45'),
+(29, 'TCG-USR-011', 'ORDER', 'TCG-ORD-020', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 19:10:40'),
+(30, 'TCG-USR-012', 'ORDER', 'TCG-ORD-021', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 19:13:49'),
+(31, 'TCG-USR-012', 'ORDER', 'TCG-ORD-022', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 19:31:00'),
+(32, 'TCG-USR-012', 'ORDER', 'TCG-ORD-023', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 19:53:36'),
+(33, 'TCG-USR-012', 'ORDER', 'TCG-ORD-024', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 20:12:21'),
+(34, 'TCG-USR-012', 'ORDER', 'TCG-ORD-025', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 20:57:50'),
+(35, 'TCG-USR-012', 'ORDER', 'TCG-ORD-026', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 21:11:22'),
+(36, 'TCG-USR-012', 'ORDER', 'TCG-ORD-027', 'Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng', '2026-07-09 21:17:52');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `user_addresses`
+--
+
+CREATE TABLE `user_addresses` (
+  `address_id` varchar(20) NOT NULL,
+  `user_id` varchar(20) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `recipient_name` varchar(100) DEFAULT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `is_default` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `user_addresses`
+--
+
+INSERT INTO `user_addresses` (`address_id`, `user_id`, `address`, `recipient_name`, `phone_number`, `is_default`, `created_at`, `updated_at`) VALUES
+('ADDR-1772283059235-3', 'TCG-USR-010', 'nb20a, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Burh bruqhs', '090807090', 1, '2026-02-28 19:50:59', '2026-07-01 18:28:20'),
+('ADDR-1783440926524-6', 'TCG-USR-012', 'k1, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'T1 Keria', '6454048484', 1, '2026-07-07 23:15:26', '2026-07-07 23:15:26'),
+('TCG-ADR-001', 'TCG-USR-009', '123 Đường số 1, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', NULL, NULL, 0, '2026-02-26 21:36:50', '2026-02-26 21:36:50'),
+('TCG-ADR-002', 'TCG-USR-011', '456 Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', NULL, NULL, 1, '2026-02-26 21:36:50', '2026-07-05 19:22:02'),
+('TCG-ADR-003', 'TCG-USR-010', '456 Lê Ba Chấm, Phường Chấm Hỏi, Quận 1, TP. Hồ Chí Minh, 700000, Việt Nam', NULL, NULL, 0, '2026-02-26 21:36:50', '2026-07-01 18:28:20');
 
 -- --------------------------------------------------------
 
@@ -543,11 +703,14 @@ CREATE TABLE `user_eco_infos` (
 --
 
 INSERT INTO `user_eco_infos` (`eco_info_id`, `eco_total`, `eco_orders_total`, `user_id`) VALUES
-('TCG-UEC-001', 5000000, 5, 'TCG-USR-001'),
+('TCG-UEC-001', 5000000, 5, 'TCG-USR-010'),
 ('TCG-UEC-002', 3000000, 3, 'TCG-USR-002'),
 ('TCG-UEC-003', 4500000, 4, 'TCG-USR-003'),
 ('TCG-UEC-004', 2000000, 2, 'TCG-USR-004'),
-('TCG-UEC-005', 6000000, 6, 'TCG-USR-005');
+('TCG-UEC-005', 6000000, 6, 'TCG-USR-005'),
+('TCG-UEC-006', 5928000, 6, 'TCG-USR-012'),
+('TCG-UEC-007', 0, 0, 'TCG-USR-013'),
+('TCG-UEC-008', 0, 0, 'TCG-USR-013');
 
 -- --------------------------------------------------------
 
@@ -574,19 +737,19 @@ INSERT INTO `variants` (`variant_id`, `product_id`, `size_id`, `color_id`, `pric
 ('TCG-VAR-001', 'TCG-PRO-001', NULL, 'TCG-COL-003', 1500000, 150, '2025-10-01 13:00:00', '2025-10-01 13:00:00'),
 ('TCG-VAR-002', 'TCG-PRO-001', NULL, 'TCG-COL-004', 1550000, 80, '2025-10-01 13:00:00', '2025-10-01 13:00:00'),
 ('TCG-VAR-003', 'TCG-PRO-001', NULL, 'TCG-COL-001', 1580000, 60, '2025-10-01 13:00:00', '2025-10-01 13:00:00'),
-('TCG-VAR-004', 'TCG-PRO-001', NULL, 'TCG-COL-002', 1600000, 40, '2025-10-01 13:00:00', '2025-10-01 13:00:00'),
+('TCG-VAR-004', 'TCG-PRO-001', NULL, 'TCG-COL-002', 1600000, 39, '2025-10-01 13:00:00', '2025-10-01 13:00:00'),
 ('TCG-VAR-005', 'TCG-PRO-002', NULL, 'TCG-COL-003', 2000000, 100, '2025-10-02 13:00:00', '2025-10-02 13:00:00'),
 ('TCG-VAR-006', 'TCG-PRO-002', NULL, 'TCG-COL-004', 2050000, 70, '2025-10-02 13:00:00', '2025-10-02 13:00:00'),
 ('TCG-VAR-007', 'TCG-PRO-002', NULL, 'TCG-COL-005', 1980000, 90, '2025-10-02 13:00:00', '2025-10-02 13:00:00'),
 ('TCG-VAR-008', 'TCG-PRO-004', NULL, 'TCG-COL-003', 2500000, 80, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
 ('TCG-VAR-009', 'TCG-PRO-004', NULL, 'TCG-COL-004', 2550000, 50, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
 ('TCG-VAR-010', 'TCG-PRO-004', NULL, 'TCG-COL-001', 2600000, 30, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
-('TCG-VAR-011', 'TCG-PRO-003', 'TCG-SIZ-001', NULL, 620000, 60, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
+('TCG-VAR-011', 'TCG-PRO-003', 'TCG-SIZ-001', NULL, 620000, 59, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-012', 'TCG-PRO-003', 'TCG-SIZ-002', NULL, 780000, 200, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-013', 'TCG-PRO-003', 'TCG-SIZ-003', NULL, 800000, 250, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-014', 'TCG-PRO-003', 'TCG-SIZ-004', NULL, 820000, 120, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-015', 'TCG-PRO-003', 'TCG-SIZ-005', NULL, 1050000, 40, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
-('TCG-VAR-016', 'TCG-PRO-005', 'TCG-SIZ-001', NULL, 850000, 50, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
+('TCG-VAR-016', 'TCG-PRO-005', 'TCG-SIZ-001', NULL, 850000, 49, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
 ('TCG-VAR-017', 'TCG-PRO-005', 'TCG-SIZ-002', NULL, 900000, 180, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
 ('TCG-VAR-018', 'TCG-PRO-005', 'TCG-SIZ-003', NULL, 1200000, 220, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
 ('TCG-VAR-019', 'TCG-PRO-005', 'TCG-SIZ-004', NULL, 1250000, 90, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
@@ -619,9 +782,11 @@ CREATE TABLE `vouchers` (
 INSERT INTO `vouchers` (`voucher_id`, `voucher_code`, `voucher_type`, `voucher_value`, `min_order_value`, `max_discount`, `voucher_usage_time`, `start_date`, `end_date`, `create_at`, `update_at`) VALUES
 ('TCG-VCH-001', 'GAMING50', 'Phần trăm', 10, 1000000, 500000, 100, '2025-10-01 00:00:00', '2025-12-31 23:59:59', '2025-10-01 14:00:00', '2025-10-01 14:00:00'),
 ('TCG-VCH-002', 'JERSEY100K', 'Cố định', 100000, 500000, NULL, 50, '2025-10-02 00:00:00', '2025-11-30 23:59:59', '2025-10-02 14:00:00', '2025-10-02 14:00:00'),
-('TCG-VCH-003', 'NEWUSER20', 'Phần trăm', 20, 0, 200000, 200, '2025-10-03 00:00:00', '2025-10-31 23:59:59', '2025-10-03 14:00:00', '2025-10-03 14:00:00'),
-('TCG-VCH-004', 'T1FAN2025', 'Cố định', 150000, 800000, NULL, 30, '2025-10-04 00:00:00', '2025-12-01 23:59:59', '2025-10-04 14:00:00', '2025-10-04 14:00:00'),
-('TCG-VCH-005', 'GEAR300K', 'Cố định', 300000, 2000000, NULL, 20, '2025-10-05 00:00:00', '2025-11-15 23:59:59', '2025-10-05 14:00:00', '2025-10-05 14:00:00');
+('TCG-VCH-003', 'NEWUSER20', 'Phần trăm', 20, 0, 200000, 191, '2025-10-03 00:00:00', '2026-12-31 23:59:59', '2025-10-03 14:00:00', '2025-10-03 14:00:00'),
+('TCG-VCH-004', 'T1FAN2025', 'Cố định', 150000, 800000, NULL, 29, '2025-10-04 00:00:00', '2026-12-31 23:59:59', '2025-10-04 14:00:00', '2025-10-04 14:00:00'),
+('TCG-VCH-005', 'GEAR300K', 'Cố định', 300000, 2000000, NULL, 20, '2025-10-05 00:00:00', '2025-11-15 23:59:59', '2025-10-05 14:00:00', '2025-10-05 14:00:00'),
+('TCG-VCH-006', 'FREESHIPMAX', 'Miễn phí vận chuyển', 100, 500000, 50000, 92, '2026-07-05 00:00:00', '2026-12-31 23:59:59', '2026-07-05 18:56:30', '2026-07-05 18:56:30'),
+('TCG-VCH-007', 'GIAMSHIP15K', 'Giảm phí vận chuyển', 15000, 200000, NULL, 200, '2026-07-05 00:00:00', '2026-12-31 23:59:59', '2026-07-05 18:56:30', '2026-07-05 18:56:30');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -738,6 +903,20 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`);
 
 --
+-- Chỉ mục cho bảng `user_activities`
+--
+ALTER TABLE `user_activities`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_time` (`user_id`,`created_at`);
+
+--
+-- Chỉ mục cho bảng `user_addresses`
+--
+ALTER TABLE `user_addresses`
+  ADD PRIMARY KEY (`address_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Chỉ mục cho bảng `user_eco_infos`
 --
 ALTER TABLE `user_eco_infos`
@@ -756,6 +935,16 @@ ALTER TABLE `vouchers`
   ADD PRIMARY KEY (`voucher_id`);
 
 --
+-- AUTO_INCREMENT cho các bảng đã đổ
+--
+
+--
+-- AUTO_INCREMENT cho bảng `user_activities`
+--
+ALTER TABLE `user_activities`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
 -- Các ràng buộc cho các bảng đã đổ
 --
 
@@ -765,6 +954,12 @@ ALTER TABLE `vouchers`
 ALTER TABLE `responses`
   ADD CONSTRAINT `fk_parent_response` FOREIGN KEY (`parent_response_id`) REFERENCES `responses` (`response_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_responses_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `user_addresses`
+--
+ALTER TABLE `user_addresses`
+  ADD CONSTRAINT `user_addresses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

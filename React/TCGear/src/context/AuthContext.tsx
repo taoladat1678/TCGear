@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx  (SỬA KEY ĐỂ KHỚP VỚI LOGIN: 'token' và 'user')
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
@@ -17,6 +16,7 @@ interface AuthContextType {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
+  updateUser: (updatedFields: Partial<User>) => void;
   isLoggedIn: boolean;
 }
 
@@ -26,13 +26,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  // Load từ localStorage khi app khởi động (dùng key 'user' và 'token')
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+    if (storedUser && storedToken && storedUser !== "undefined") {
+      try {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+      } catch (e) {
+        console.error("Lỗi khi parse user từ localStorage:", e);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    } else if (storedUser === "undefined") {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
     }
   }, []);
 
@@ -43,16 +51,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('token', newToken);
   };
 
+  const updateUser = (updatedFields: Partial<User>) => {
+    if (!user) return;
+    const newUser = { ...user, ...updatedFields };
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    window.location.reload()
+    window.location.reload();
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoggedIn: !!user }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      login, 
+      logout, 
+      updateUser, 
+      isLoggedIn: !!user 
+    }}>
       {children}
     </AuthContext.Provider>
   );

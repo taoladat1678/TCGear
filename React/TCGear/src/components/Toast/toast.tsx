@@ -43,9 +43,8 @@ const Toast: React.FC<ToastProps> = ({ type, title, detail, onClose }) => {
     <div
       className={`
         relative flex items-start gap-4 max-w-sm w-full p-5 rounded-xl
-        border-2 border-red-600/60
-        bg-gradient-to-br from-red-600/20 via-red-500/10 to-rose-600/20
-        backdrop-blur-xl shadow-2xl shadow-red-900/50
+        border-2 border-red-500
+        bg-gray-900 shadow-2xl shadow-red-900/50
         text-white overflow-hidden
         transition-all duration-300 hover:scale-[1.02] hover:shadow-red-800/60
       `}

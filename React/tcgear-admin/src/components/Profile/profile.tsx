@@ -1,5 +1,5 @@
 // profile.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import feather from 'feather-icons'; // Import Feather Icons
 import './profile.css'; // Import the separated CSS
 
@@ -8,6 +8,32 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = () => {
+  const [userProfile, setUserProfile] = useState(() => {
+    const saved = localStorage.getItem('tcgear_userProfile');
+    if (saved) return JSON.parse(saved);
+    // Dữ liệu mock (giả định)
+    return {
+      authProvider: 'google', // 'google' | 'facebook' | 'email'
+      originalAvatarUrl: 'https://ui-avatars.com/api/?name=Google+User&background=0D8ABC&color=fff',
+      currentAvatarUrl: 'http://static.photos/people/200x200/1',
+    };
+  });
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newAvatarUrl = URL.createObjectURL(e.target.files[0]);
+      const updatedProfile = { ...userProfile, currentAvatarUrl: newAvatarUrl };
+      setUserProfile(updatedProfile);
+      localStorage.setItem('tcgear_userProfile', JSON.stringify(updatedProfile));
+    }
+  };
+
+  const restoreOriginalAvatar = () => {
+    const updatedProfile = { ...userProfile, currentAvatarUrl: userProfile.originalAvatarUrl };
+    setUserProfile(updatedProfile);
+    localStorage.setItem('tcgear_userProfile', JSON.stringify(updatedProfile));
+  };
+
   useEffect(() => {
     // Replace all <i data-feather> with SVG icons after component mounts
     feather.replace({
@@ -15,7 +41,7 @@ const Profile: React.FC<ProfileProps> = () => {
       'height': 20,
       'color': '#your-primary-color' // Optional: Customize color, e.g., '#3b82f6' for blue
     });
-  }, []); // Run once after initial render
+  }, [userProfile.currentAvatarUrl]); // Re-run when avatar changes to render new icons if any
 
   return (
     <>
@@ -29,14 +55,27 @@ const Profile: React.FC<ProfileProps> = () => {
               <img
                 id="profile-avatar"
                 className="profile-avatar w-32 h-32 rounded-full object-cover mb-4 transition-transform duration-200 hover:scale-105 border-4 border-primary/20"
-                src="http://static.photos/people/200x200/1"
+                src={userProfile.currentAvatarUrl}
                 alt="Ảnh đại diện"
               />
               <label htmlFor="avatar-upload" className="cursor-pointer bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-md text-primary font-open-sans transition-all duration-200 hover:scale-105">
                 <i data-feather="camera" className="w-4 h-4 inline mr-2" />
                 Thay Đổi Ảnh
               </label>
-              <input type="file" id="avatar-upload" accept="image/*" className="hidden" />
+              <input type="file" id="avatar-upload" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+              
+              {(userProfile.authProvider === 'google' || userProfile.authProvider === 'facebook') && 
+                userProfile.originalAvatarUrl && 
+                userProfile.currentAvatarUrl !== userProfile.originalAvatarUrl && (
+                <button
+                  type="button"
+                  onClick={restoreOriginalAvatar}
+                  className="mt-3 cursor-pointer bg-secondary/50 hover:bg-secondary border border-primary/30 px-3 py-1.5 rounded-md text-accent text-sm font-open-sans transition-all duration-200 flex items-center justify-center hover:scale-105"
+                >
+                  <i data-feather="refresh-ccw" className="w-4 h-4 inline mr-2" />
+                  Khôi phục ảnh {userProfile.authProvider === 'google' ? 'Google' : 'Facebook'}
+                </button>
+              )}
             </div>
             <div className="flex-1">
               <div className="space-y-2">

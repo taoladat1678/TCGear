@@ -12,6 +12,7 @@ import 'aos/dist/aos.css';
 const ForgotPassword: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Initialize AOS
@@ -40,15 +41,37 @@ const ForgotPassword: React.FC = () => {
     }
   }, [showSuccess]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    // Simulate form submission delay
-    setTimeout(() => {
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email')?.toString().trim();
+
+    if (!email) {
+      setError('Vui lòng nhập email');
       setIsLoading(false);
-      setShowSuccess(true);
-    }, 1000);
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/user/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setShowSuccess(true);
+      } else {
+        setError(data.message || 'Có lỗi xảy ra.');
+      }
+    } catch (err) {
+      setError('Lỗi kết nối tới server.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResend = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -83,15 +106,21 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <main className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80')] bg-cover bg-center relative" data-aos="fade-in">
-      <div className="absolute inset-0 auth-gradient"></div>
+    <main className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 max-[499px]:px-4 max-[499px]:py-8 max-[374px]:py-6 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80')] bg-cover bg-center relative" data-aos="fade-in">
+      <div className="absolute inset-0 hero-gradient"></div>
       <div className="w-full max-w-md space-y-8 z-10 relative" data-aos="fade-up" data-aos-delay="200">
         <div className="text-center" data-aos="fade-down" data-aos-delay="100">
-          <h2 className="text-3xl font-bold font-orbitron">Đặt Lại Mật Khẩu</h2>
+          <h2 className="text-3xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold font-orbitron">Đặt Lại Mật Khẩu</h2>
           <p className="mt-2 text-accent/70 font-open-sans">
             Nhập email của bạn để nhận liên kết đặt lại mật khẩu
           </p>
         </div>
+
+        {error && (
+          <div className="p-4 bg-red-600/20 border border-red-600 rounded-md text-red-400 text-center font-open-sans text-sm">
+            {error}
+          </div>
+        )}
 
         {!showSuccess ? (
           <form id="reset-form" className="mt-8 space-y-6" onSubmit={handleSubmit} data-aos="fade-up" data-aos-delay="300">
@@ -107,8 +136,9 @@ const ForgotPassword: React.FC = () => {
                     type="email"
                     autoComplete="email"
                     required
-                    className="block w-full px-4 py-3 bg-secondary border border-primary/20 rounded-md focus:ring-primary focus:border-primary placeholder-accent/50 font-open-sans"
+                    className="block w-full px-4 py-3 max-[499px]:py-2 max-[374px]:text-sm bg-secondary border border-primary/20 rounded-md focus:ring-primary focus:border-primary text-white placeholder-accent/50 font-open-sans"
                     placeholder="your@email.com"
+                    style={{ color: '#ffffff' }}
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                     <i data-feather="mail" className="h-5 w-5 text-primary"></i>
@@ -121,7 +151,7 @@ const ForgotPassword: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition font-orbitron disabled:opacity-50"
+                className="group relative w-full flex justify-center py-3 px-4 max-[499px]:py-2 max-[374px]:text-sm border border-transparent font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition font-orbitron disabled:opacity-50"
               >
                 Gửi Liên Kết Đặt Lại
               </button>

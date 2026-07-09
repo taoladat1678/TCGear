@@ -45,12 +45,11 @@ const OrderSuccess: React.FC = () => {
           <div className="success-icon mb-6">
             <i data-feather="check" className="h-12 w-12 text-accent"></i>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 font-orbitron">
-            Đơn Hàng Đã Đặt Thành Công!
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 font-orbitron uppercase">
+            Đặt hàng thành công
           </h1>
           <p className="text-lg md:text-xl text-accent/80 mb-8 font-open-sans">
-            Cảm ơn bạn đã mua sắm cùng TCGear. Xác nhận đơn hàng đã được gửi đến
-            email của bạn.
+            ĐẶT HÀNG THÀNH CÔNG, HÃY KIỂM TRA EMAIL ĐỂ XÁC NHẬN ĐƠN HÀNG
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

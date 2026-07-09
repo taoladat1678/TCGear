@@ -21,9 +21,13 @@ import Orders from './components/Order/orders';
 import Vouchers from './components/Vouchers/vouchers';
 import Login from './components/Login/login';
 import ForgotPassword from './components/Forgot-password/forgot-password';
+import ResetPassword from './components/ResetPassword/reset-password';
 import Register from './components/Register/register';
+import VerifyEmail from './components/VerifyEmail/verify-email';
+import VerifyPending from './components/VerifyEmail/verify-pending';
 import TovPrivacy from './components/Tov-privacy/tov-privacy';
 import OrderSuccess from './components/Order-notifications/order-success/order-success';
+import OrderConfirm from './components/Order-notifications/order-confirm/order-confirm';
 import OrderFail from './components/Order-notifications/order-fail/order-fail';
 import Checkout from './components/Checkout/checkout';
 import ProductDetail from './components/Detail/Product-Detail/product-detail';
@@ -90,9 +94,13 @@ const App: React.FC = () => {
                           <Route path="/vouchers" element={<Vouchers />} />
                           <Route path="/login" element={<Login />} />
                           <Route path="/forgot-password" element={<ForgotPassword />} />
+                          <Route path="/reset-password" element={<ResetPassword />} />
                           <Route path="/register" element={<Register />} />
+                          <Route path="/verify-email" element={<VerifyEmail />} />
+                          <Route path="/verify-pending" element={<VerifyPending />} />
                           <Route path="/tov-privacy" element={<TovPrivacy />} />
                           <Route path="/order-success" element={<OrderSuccess />} />
+                          <Route path="/order-confirm" element={<OrderConfirm />} />
                           <Route path="/order-fail" element={<OrderFail />} />
                           <Route path="/checkout" element={<Checkout />} />
                           <Route path="/product-detail/:id" element={<ProductDetail />} />

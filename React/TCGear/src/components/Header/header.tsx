@@ -25,35 +25,31 @@ const Header: React.FC = () => {
   const [languageOpen, setLanguageOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [rawSearchResults, setRawSearchResults] = useState<any[]>([]);
+  const [displaySearchResults, setDisplaySearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [ordersCount, setOrdersCount] = useState(0);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const accountRef = useRef<HTMLDivElement>(null);
   const languageRef = useRef<HTMLDivElement>(null);
 
-  // ======================= AVATAR HELPER - TẮT FALLBACK fant1.jpg =======================
   const getAvatarUrl = (image?: string | null): string | null => {
     if (!image || image.trim() === '') return null;
-    if (image.startsWith('http')) return image; // Google/FB avatar
+    if (image.startsWith('http')) return image;
     const clean = image.startsWith('img/') ? image : `img/${image}`;
     return `/${clean}`;
   };
 
-  // ======================= FORMAT FULLNAME (XUỐNG DÒNG NẾU >=4 TỪ) =======================
   const formatFullname = (fullname?: string | null): React.ReactNode => {
     if (!fullname) return '';
-
     const words = fullname.trim().split(/\s+/).filter(w => w.length > 0);
-
     if (words.length < 4) {
       return fullname.trim();
     }
-
     const line1 = words.slice(0, 2).join(' ');
     const line2 = words.slice(2).join(' ');
-
     return (
       <>
         {line1}
@@ -67,12 +63,11 @@ const Header: React.FC = () => {
     (query: string) => {
       const trimmed = query.trim();
       if (!trimmed) {
-        setSearchResults([]);
+        setRawSearchResults([]);
         setShowResults(false);
         clearSearch();
         return;
       }
-
       setLoading(true);
       const timer = setTimeout(async () => {
         try {
@@ -82,25 +77,90 @@ const Header: React.FC = () => {
           const json = await res.json();
           if (json.status === 'success') {
             const results = json.data;
-            setSearchResults(results.slice(0, 6));
-            setSearchData(results, trimmed);
+            setRawSearchResults(results);
           } else {
-            setSearchResults([]);
-            setSearchData([], trimmed);
+            setRawSearchResults([]);
           }
         } catch (err) {
           console.error('Search error:', err);
-          setSearchResults([]);
-          setSearchData([], trimmed);
+          setRawSearchResults([]);
         } finally {
           setLoading(false);
         }
       }, 400);
-
       return () => clearTimeout(timer);
     },
-    [setSearchData, clearSearch]
+    [clearSearch]
   );
+
+  const autoTranslate = async (text: string): Promise<string> => {
+    if (!text || text.trim() === '') return text;
+    const cacheKey = `trans_search_${text}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) return cached;
+    try {
+      const res = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=${encodeURIComponent(text)}`
+      );
+      const data = await res.json();
+      const translated = data[0][0][0];
+      localStorage.setItem(cacheKey, translated);
+      return translated;
+    } catch (err) {
+      return text;
+    }
+  };
+
+  useEffect(() => {
+    const translateResults = async () => {
+      if (!searchQuery.trim()) {
+        setSearchData([], '');
+        setDisplaySearchResults([]);
+        return;
+      }
+      if (rawSearchResults.length === 0) {
+        setSearchData([], searchQuery.trim());
+        setDisplaySearchResults([]);
+        return;
+      }
+
+      setLoading(true);
+      let finalResults = rawSearchResults;
+      if (i18n.language === 'en') {
+        finalResults = await Promise.all(
+          rawSearchResults.map(async (item: any) => ({
+            ...item,
+            product_name: await autoTranslate(item.product_name),
+            product_description: item.product_description ? await autoTranslate(item.product_description) : undefined,
+          }))
+        );
+      }
+      setDisplaySearchResults(finalResults.slice(0, 6));
+      setSearchData(finalResults, searchQuery.trim());
+      setLoading(false);
+    };
+
+    translateResults();
+  }, [rawSearchResults, i18n.language, searchQuery]);
+
+  useEffect(() => {
+    const fetchOrdersCount = async () => {
+      if (!user || !user.user_id) {
+        setOrdersCount(0);
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:3000/api/orders/user/${user.user_id}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+          setOrdersCount(data.data.length);
+        }
+      } catch (err) {
+        console.error('Error fetching orders count:', err);
+      }
+    };
+    fetchOrdersCount();
+  }, [user]);
 
   useEffect(() => {
     debounceSearch(searchQuery);
@@ -118,7 +178,7 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     feather.replace();
-  }, [searchResults, user]);
+  }, [displaySearchResults, user]);
 
   const toggleAccount = () => {
     setLanguageOpen(false);
@@ -163,6 +223,26 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
+  const getMissingFieldsCount = () => {
+    if (!user) return 0;
+    const missing = [];
+    const fullName = (user.fullname || '').trim();
+    if (!fullName) {
+      missing.push('họ');
+      missing.push('tên');
+    } else {
+      const parts = fullName.split(/\s+/);
+      if (parts.length < 2) {
+        missing.push('họ');
+      }
+    }
+    if (!user.email || !user.email.trim()) missing.push('email');
+    if (!user.phone || !user.phone.trim()) missing.push('sdt');
+    if (!user.address || !user.address.trim()) missing.push('địa chỉ');
+    return missing.length;
+  };
+  const missingCount = getMissingFieldsCount();
+
   const accountDropdownContent = (
     <div className="account-dropdown-content">
       {user && (
@@ -174,13 +254,18 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      <Link to="/profile" className="font-open-sans" onClick={() => setAccountOpen(false)}>
-        <i data-feather="user" className="h-5 w-5"></i> {t("Hồ sơ")}
+      <Link to="/profile" className="font-open-sans flex justify-between items-center" onClick={() => setAccountOpen(false)}>
+        <div className="flex items-center gap-1.5"><i data-feather="user" className="h-5 w-5"></i> {t("Hồ sơ")}</div>
+        {missingCount > 0 && (
+          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center justify-center">
+            {missingCount}
+          </span>
+        )}
       </Link>
 
       <Link to="/orders" className="font-open-sans" onClick={() => setAccountOpen(false)}>
         <i data-feather="shopping-bag" className="h-5 w-5"></i> {t("Đơn hàng")}
-        <span className="counter" id="orders-counter">0</span>
+        <span className="counter" id="orders-counter">{ordersCount}</span>
       </Link>
 
       <Link to="/vouchers" className="font-open-sans" onClick={() => setAccountOpen(false)}>
@@ -216,14 +301,14 @@ const Header: React.FC = () => {
   return (
     <nav className="bg-secondary border-b border-primary/20 sticky top-0 z-50" aria-label="Thanh điều hướng chính">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-8">
+        <div className="flex items-center justify-between h-16 gap-8 max-[767px]:gap-4 max-[499px]:gap-2">
           <Link to="/" className="flex items-center shop-logo hover:opacity-85 transition-opacity duration-200">
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
-              className="h-10 w-auto"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/3840px-T1_esports_logo.svg.png"
+              className="h-10 w-auto max-[499px]:h-8 max-[374px]:h-7"
               alt="Logo TCGear"
             />
-            <span className="ml-2 text-xl font-bold text-primary font-orbitron">TCGEAR</span>
+            <span className="ml-2 text-xl max-[499px]:text-lg max-[374px]:text-base font-bold text-primary font-orbitron">TCGEAR</span>
           </Link>
 
           <div className="flex items-center gap-1">
@@ -257,8 +342,8 @@ const Header: React.FC = () => {
                   <div className="absolute top-full left-0 right-0 mt-2 bg-secondary border border-primary/30 rounded-md shadow-xl z-50 max-h-96 overflow-y-auto">
                     {loading ? (
                       <div className="p-4 text-center text-sm text-accent/70">Đang tìm...</div>
-                    ) : searchResults.length > 0 ? (
-                      searchResults.map((item) => (
+                    ) : displaySearchResults.length > 0 ? (
+                      displaySearchResults.map((item) => (
                         <div
                           key={item.product_id}
                           onClick={() => handleProductClick(item.product_id)}
@@ -294,7 +379,7 @@ const Header: React.FC = () => {
                 <button
                   id="account-toggle"
                   onClick={toggleAccount}
-                  className="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron flex items-center gap-1"
+                  className="dropdown-toggle p-2 text-accent hover:text-primary transition font-orbitron flex items-center gap-1 relative"
                 >
                   {user ? (
                     <div className="relative h-8 w-8 rounded-full border-2 border-primary/30 flex items-center justify-center bg-gray-800 overflow-hidden">
@@ -316,6 +401,11 @@ const Header: React.FC = () => {
                     <i data-feather="user" className="h-6 w-6"></i>
                   )}
                   <i data-feather="chevron-down" className="h-4 w-4"></i>
+                  {user && missingCount > 0 && (
+                    <span className="absolute top-1 left-7 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-secondary">
+                      {missingCount}
+                    </span>
+                  )}
                 </button>
                 {accountDropdownContent}
               </div>
@@ -353,7 +443,6 @@ const Header: React.FC = () => {
         {/* MOBILE MENU */}
         <div id="mobile-menu" className={`mobile-menu ${mobileOpen ? '' : 'hidden'} bg-secondary border-t border-primary/20`}>
           <div className="flex flex-col space-y-4 py-4 px-4">
-            {/* search mobile */}
             <div ref={searchRef} className="flex items-center bg-secondary border border-primary/20 rounded-md overflow-hidden relative">
               <input
                 type="text"
@@ -369,8 +458,8 @@ const Header: React.FC = () => {
 
               {showResults && (
                 <div className="absolute top-full left-4 right-4 mt-2 bg-secondary border border-primary/30 rounded-md shadow-xl z-50 max-h-80 overflow-y-auto">
-                  {searchResults.length > 0 ? (
-                    searchResults.map((item) => (
+                  {displaySearchResults.length > 0 ? (
+                    displaySearchResults.map((item) => (
                       <div
                         key={item.product_id}
                         onClick={() => handleProductClick(item.product_id)}
@@ -392,7 +481,6 @@ const Header: React.FC = () => {
               )}
             </div>
 
-            {/* links mobile */}
             <Link to="/" className={`text-accent hover:text-primary transition font-open-sans ${isActive('/') ? 'text-primary' : ''}`}>{t("Trang chủ")}</Link>
             <Link to="/shop" className={`text-accent hover:text-primary transition font-open-sans ${isActive('/shop') ? 'text-primary' : ''}`}>{t("Cửa hàng")}</Link>
             <Link to="/teams" className={`text-accent hover:text-primary transition font-open-sans ${isActive('/teams') ? 'text-primary' : ''}`}>{t("Đội tuyển")}</Link>

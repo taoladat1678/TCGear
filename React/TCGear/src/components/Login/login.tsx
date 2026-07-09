@@ -11,6 +11,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [requireVerification, setRequireVerification] = useState(false);
+  const [identifierEmail, setIdentifierEmail] = useState('');
 
   useEffect(() => {
     AOS.init({
@@ -79,10 +81,37 @@ const Login = () => {
         setTimeout(() => (window.location.href = '/'), 1500);
       } else {
         setError(data.message || 'Đăng nhập thất bại');
+        if (data.require_verification) {
+          setRequireVerification(true);
+          setIdentifierEmail(data.email || identifier);
+        } else {
+          setRequireVerification(false);
+        }
       }
     } catch (err) {
       setError('Lỗi kết nối server. Vui lòng thử lại.');
       console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('http://localhost:3000/api/user/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: identifierEmail })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        alert('Đã gửi lại email xác nhận. Vui lòng kiểm tra hộp thư của bạn.');
+      } else {
+        alert(data.message || 'Có lỗi xảy ra khi gửi lại email.');
+      }
+    } catch (err) {
+      alert('Lỗi kết nối.');
     } finally {
       setLoading(false);
     }
@@ -136,14 +165,14 @@ const Login = () => {
 
   return (
     <section
-      className="register-container py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center bg-secondary text-accent"
+      className="register-container py-16 px-4 sm:px-6 lg:px-8 max-[499px]:px-4 max-[499px]:py-8 max-[374px]:py-6 flex items-center justify-center bg-secondary text-accent"
       data-aos="fade-in"
       data-aos-duration="800"
     >
       <div className="max-w-md w-full">
-        <div className="register-card p-8" data-aos="zoom-in" data-aos-delay="0">
+        <div className="register-card p-8 max-[499px]:p-6 max-[374px]:p-4" data-aos="zoom-in" data-aos-delay="0">
           <div className="text-center mb-8" data-aos="fade-down" data-aos-delay="0">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 font-orbitron text-accent">
+            <h1 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-3 font-orbitron text-accent">
               ĐĂNG NHẬP TCGEAR
             </h1>
             <p className="text-accent/70 text-sm font-open-sans">
@@ -158,8 +187,18 @@ const Login = () => {
           )}
 
           {error && (
-            <div className="mb-6 p-4 bg-red-600/20 border border-red-600 rounded-md text-red-400 text-center">
-              {error}
+            <div className="mb-6 p-4 bg-red-600/20 border border-red-600 rounded-md text-red-400 text-center flex flex-col items-center gap-3">
+              <span>{error}</span>
+              {requireVerification && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={loading}
+                  className="px-4 py-2 border border-red-500 rounded text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                >
+                  Gửi lại email xác nhận
+                </button>
+              )}
             </div>
           )}
 
@@ -204,10 +243,16 @@ const Login = () => {
               </div>
             </div>
 
+            <div className="flex justify-end mb-4" data-aos="fade-up" data-aos-delay="250">
+              <a href="/forgot-password" className="text-sm text-primary hover:underline font-open-sans">
+                Quên mật khẩu?
+              </a>
+            </div>
+
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 text-white py-3 px-4 rounded-md font-semibold transition flex items-center justify-center font-orbitron text-base"
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 text-white py-3 px-4 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center justify-center font-orbitron text-base"
               data-aos="fade-up"
               data-aos-delay="300"
             >
@@ -226,7 +271,7 @@ const Login = () => {
                   googleLogin();
                 }}
                 disabled={loading || googleLoading}
-                className="w-full bg-[#4285F4] hover:bg-[#357ae8] text-white py-3 px-4 rounded-md font-semibold transition flex items-center justify-center gap-3 disabled:opacity-60 font-orbitron text-base"
+                className="w-full bg-[#4285F4] hover:bg-[#357ae8] text-white py-3 px-4 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center justify-center gap-3 disabled:opacity-60 font-orbitron text-base"
               >
                 {googleLoading ? (
                   'Đang xử lý...'
@@ -247,7 +292,7 @@ const Login = () => {
                 type="button"
                 onClick={handleFacebookLogin}
                 disabled={loading || googleLoading}
-                className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white py-3 px-4 rounded-md font-semibold transition flex items-center justify-center gap-3 font-orbitron text-base"
+                className="w-full bg-[#1877F2] hover:bg-[#166FE5] text-white py-3 px-4 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center justify-center gap-3 font-orbitron text-base"
                 data-aos="fade-up"
                 data-aos-delay="400"
               >

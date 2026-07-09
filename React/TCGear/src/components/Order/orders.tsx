@@ -1,9 +1,11 @@
 // orders.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './orders.css';
-import  AOS  from 'aos'; // Assuming AOS is installed and imported
-import 'aos/dist/aos.css'; // Import AOS CSS if not global
-// import anime from 'animejs/lib/anime.es.js'; // Fixed import for animejs if needed; currently unused, so commented out
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import feather from 'feather-icons';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '../../context/ToastContext';
 
 AOS.init({
   duration: 800,
@@ -12,184 +14,117 @@ AOS.init({
 });
 
 const Orders: React.FC = () => {
+  const { t } = useTranslation();
+  const { success, error } = useToast();
   const [activeFilter, setActiveFilter] = useState('all');
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
-  const [orders] = useState([
-    {
-      id: 'TCG-2025-001',
-      date: '15 tháng 10 năm 2025',
-      status: 'delivered',
-      statusText: 'Đã giao',
-      products: [
-        {
-          name: 'Tai nghe chơi game chuyên nghiệp',
-          quantity: 1,
-          price: '$129.99',
-          sku: 'PGH-001',
-          image: 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-        {
-          name: 'Áo đấu T1',
-          quantity: 2,
-          price: '$64.99 mỗi cái',
-          sku: 'TTJ-002',
-          image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '123 Đường Chơi Game',
-        city: 'Thành phố Esports, EC 12345',
-        country: 'Hoa Kỳ',
-        phone: '+1 (555) 123-4567',
-        email: 'john.doe@example.com',
-      },
-      paymentMethod: 'Thẻ tín dụng kết thúc bằng 4242',
-      paymentDate: '15 tháng 10 năm 2025',
-      trackingSteps: [
-        { step: 'Đã đặt hàng', date: '15 tháng 10, 2025', completed: true },
-        { step: 'Đang xử lý', date: '15 tháng 10, 2025', completed: true },
-        { step: 'Đã vận chuyển', date: '16 tháng 10, 2025', completed: true },
-        { step: 'Đã giao', date: '18 tháng 10, 2025', completed: true },
-      ],
-    },
-    {
-      id: 'TCG-2025-002',
-      date: '20 tháng 10 năm 2025',
-      status: 'pending',
-      statusText: 'Chờ xác nhận',
-      products: [
-        {
-          name: 'Bàn phím cơ gaming',
-          quantity: 1,
-          price: '$89.99',
-          sku: 'MKB-003',
-          image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '123 Đường Chơi Game',
-        city: 'Thành phố Esports, EC 12345',
-        country: 'Hoa Kỳ',
-        phone: '+1 (555) 123-4567',
-        email: 'john.doe@example.com',
-      },
-      paymentMethod: 'Thẻ tín dụng kết thúc bằng 4242',
-      paymentDate: '20 tháng 10 năm 2025',
-      trackingSteps: [
-        { step: 'Đã đặt hàng', date: '20 tháng 10, 2025', completed: true },
-        { step: 'Đang xử lý', date: '', completed: false },
-        { step: 'Đã vận chuyển', date: '', completed: false },
-        { step: 'Đã giao', date: '', completed: false },
-      ],
-    },
-    {
-      id: 'TCG-2025-003',
-      date: '18 tháng 10 năm 2025',
-      status: 'processing',
-      statusText: 'Đang xử lý',
-      products: [
-        {
-          name: 'Chuột gaming không dây',
-          quantity: 1,
-          price: '$59.99',
-          sku: 'WGM-004',
-          image: 'https://images.unsplash.com/photo-1587829741301-dc798b83defb?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-        {
-          name: 'Áo đấu Faker',
-          quantity: 1,
-          price: '$79.99',
-          sku: 'FFJ-005',
-          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '456 Đại lộ Esports',
-        city: 'Thành phố Gaming, GC 67890',
-        country: 'Hoa Kỳ',
-        phone: '+1 (555) 987-6543',
-        email: 'john.doe@example.com',
-      },
-      paymentMethod: 'PayPal',
-      paymentDate: '18 tháng 10 năm 2025',
-      trackingSteps: [
-        { step: 'Đã đặt hàng', date: '18 tháng 10, 2025', completed: true },
-        { step: 'Đang xử lý', date: '19 tháng 10, 2025', completed: true },
-        { step: 'Đã vận chuyển', date: '', completed: false },
-        { step: 'Đã giao', date: '', completed: false },
-      ],
-    },
-    {
-      id: 'TCG-2025-004',
-      date: '22 tháng 10 năm 2025',
-      status: 'shipped',
-      statusText: 'Đang vận chuyển',
-      products: [
-        {
-          name: 'Ghế gaming ergonomics',
-          quantity: 1,
-          price: '$199.99',
-          sku: 'ERG-006',
-          image: 'https://images.unsplash.com/photo-1588880331177-57b1d1c9a1a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '123 Đường Chơi Game',
-        city: 'Thành phố Esports, EC 12345',
-        country: 'Hoa Kỳ',
-        phone: '+1 (555) 123-4567',
-        email: 'john.doe@example.com',
-      },
-      paymentMethod: 'Thẻ tín dụng kết thúc bằng 4242',
-      paymentDate: '22 tháng 10 năm 2025',
-      trackingSteps: [
-        { step: 'Đã đặt hàng', date: '22 tháng 10, 2025', completed: true },
-        { step: 'Đang xử lý', date: '22 tháng 10, 2025', completed: true },
-        { step: 'Đã vận chuyển', date: '23 tháng 10, 2025', completed: true },
-        { step: 'Đã giao', date: '', completed: false },
-      ],
-    },
-    {
-      id: 'TCG-2025-005',
-      date: '10 tháng 10 năm 2025',
-      status: 'cancelled',
-      statusText: 'Đã hủy',
-      products: [
-        {
-          name: 'Bàn gaming LED',
-          quantity: 1,
-          price: '$299.99',
-          sku: 'LED-007',
-          image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-        },
-      ],
-      shippingAddress: {
-        name: 'John Doe',
-        street: '123 Đường Chơi Game',
-        city: 'Thành phố Esports, EC 12345',
-        country: 'Hoa Kỳ',
-        phone: '+1 (555) 123-4567',
-        email: 'john.doe@example.com',
-      },
-      paymentMethod: 'Thẻ tín dụng kết thúc bằng 4242',
-      paymentDate: '10 tháng 10 năm 2025',
-      trackingSteps: [
-        { step: 'Đã đặt hàng', date: '10 tháng 10, 2025', completed: true },
-        { step: 'Đang xử lý', date: '', completed: false },
-        { step: 'Đã vận chuyển', date: '', completed: false },
-        { step: 'Đã giao', date: '', completed: false },
-      ],
-    },
-  ]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // States quản lý Popup Hoàn Trả
+  const [returnModalOrder, setReturnModalOrder] = useState<any>(null);
+  const [returnQuantities, setReturnQuantities] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
-    // Initialize Feather Icons if needed
-    // feather.replace(); // Assuming feather-icons is set up
+    setCurrentPage(1);
+  }, [activeFilter]);
+
+  const fetchOrders = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const userStr = localStorage.getItem('user');
+      const currentUser = userStr ? JSON.parse(userStr) : null;
+      if (!currentUser || !currentUser.user_id) {
+        setIsLoading(false);
+        return;
+      }
+
+      const res = await fetch(`http://localhost:3000/api/orders/user/${currentUser.user_id}`);
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        const formattedOrders = data.data.map((o: any) => {
+          const date = new Date(o.order_date).toLocaleDateString('vi-VN');
+          const statusMap: any = {
+            'Chờ xử lý': 'processing',
+            'Đang xử lý': 'processing',
+            'Đã giao': 'delivered',
+            'Đang vận chuyển': 'shipped',
+            'Đang giao': 'shipped',
+            'Hủy': 'cancelled',
+            'Chờ xác nhận': 'pending',
+            'Hoàn thành': 'completed',
+            'Hoàn trả': 'returned'
+          };
+
+          const originalStatusText = o.order_status || 'Chờ xác nhận';
+          let mapStatusText = originalStatusText;
+          let internalStatus = statusMap[mapStatusText] || 'processing';
+          const isReceivedVal = o.is_received || 'Chưa nhận hàng';
+
+          if (internalStatus === 'delivered' && isReceivedVal === 'Đã nhận hàng') {
+            internalStatus = 'completed';
+            mapStatusText = 'Hoàn thành';
+          }
+
+          const isProcessing = ['Chờ xử lý', 'Đang xử lý', 'Đang vận chuyển', 'Đang giao', 'Đã giao', 'Hoàn thành', 'Hoàn trả'].includes(originalStatusText);
+          const isShipped = ['Đang vận chuyển', 'Đang giao', 'Đã giao', 'Hoàn thành', 'Hoàn trả'].includes(originalStatusText);
+          const isDelivered = ['Đã giao', 'Hoàn thành', 'Hoàn trả'].includes(originalStatusText);
+
+          const trackingSteps = [
+            { step: 'Chờ xác nhận', date: date, completed: true },
+            { step: 'Chờ xử lý', date: isProcessing ? date : '', completed: isProcessing },
+            { step: 'Đang vận chuyển', date: isShipped ? date : '', completed: isShipped },
+            { step: 'Đã giao', date: isDelivered ? date : '', completed: isDelivered },
+          ];
+
+          return {
+            id: o.order_id,
+            date: date,
+            timeString: o.order_time,
+            status: internalStatus,
+            statusText: mapStatusText,
+            products: (o.products || [])
+              .filter((p: any) => p.quantity > 0) // Chỉ hiển thị các món có số lượng > 0
+              .map((p: any) => ({
+                ...p,
+                name: p.name,
+                image: p.image,
+                priceString: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(p.price)
+              })),
+            shippingAddress: {
+              name: o.recipient_name,
+              street: o.shipping_address,
+              city: '',
+              country: 'Việt Nam',
+              phone: o.recipient_phone,
+              email: o.recipient_email,
+            },
+            paymentMethod: o.payment_method || 'Thanh Toán Khi Nhận Hàng',
+            paymentDate: date,
+            trackingSteps: trackingSteps,
+            isReceived: isReceivedVal
+          };
+        });
+
+        // Lọc bỏ những order trống (đã bị hoàn trả hết sản phẩm nhưng đôi khi API vẫn nhả ra mảng rỗng)
+        setOrders(formattedOrders.filter((o: any) => o.products.length > 0));
+      }
+    } catch (err) {
+      console.error('Error fetching orders:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  useEffect(() => {
+    feather.replace();
+  }, [orders, expandedOrders, activeFilter, currentPage, returnModalOrder]);
 
   const toggleOrderDetails = (orderId: string) => {
     setExpandedOrders((prev) => {
@@ -203,12 +138,111 @@ const Orders: React.FC = () => {
     });
   };
 
+  const handleConfirmReceived = async (orderId: string) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/orders/${orderId}/receive`, {
+        method: 'PUT'
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        success?.("Thành công", "Đã xác nhận nhận hàng");
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, isReceived: 'Đã nhận hàng', status: 'completed', statusText: 'Hoàn thành' } : o));
+        
+        // Gọi API sync-eco để cập nhật ECO_TOTAL và ECO_ORDER_TOTAL
+        try {
+          const userStr = localStorage.getItem('user');
+          const currentUser = userStr ? JSON.parse(userStr) : null;
+          if (currentUser && currentUser.user_id) {
+            await fetch(`http://localhost:3000/api/user/${currentUser.user_id}/sync-eco`, { method: 'POST' });
+          }
+        } catch (e) {
+          console.error("Lỗi khi gọi sync-eco", e);
+        }
+      } else {
+        error?.("Lỗi", data.message || "Không thể xác nhận");
+      }
+    } catch (err) {
+      console.error(err);
+      error?.("Lỗi", "Lỗi kết nối máy chủ");
+    }
+  };
+
+  // --- LOGIC POPUP HOÀN TRẢ ---
+  const openReturnModal = (order: any) => {
+    setReturnModalOrder(order);
+    const initialQuantities: any = {};
+    order.products.forEach((p: any) => {
+      initialQuantities[p.sku] = 0; // Mặc định số lượng hoàn trả ban đầu là 0
+    });
+    setReturnQuantities(initialQuantities);
+  };
+
+  const closeReturnModal = () => {
+    setReturnModalOrder(null);
+    setReturnQuantities({});
+  };
+
+  const handleQuantityChange = (sku: string, value: number, max: number) => {
+    if (value < 0) value = 0;
+    if (value > max) value = max;
+    setReturnQuantities(prev => ({ ...prev, [sku]: value }));
+  };
+
+  const submitReturn = async () => {
+    const itemsToReturn = Object.entries(returnQuantities)
+      .filter(([_, qty]) => qty > 0)
+      .map(([sku, qty]) => ({ variant_id: sku, return_quantity: qty }));
+
+    if (itemsToReturn.length === 0) {
+      error?.("Lỗi", "Vui lòng chọn ít nhất 1 sản phẩm để hoàn trả");
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/orders/${returnModalOrder.id}/return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ returnItems: itemsToReturn })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        success?.("Thành công", "Đã xử lý yêu cầu hoàn trả thành công.");
+        closeReturnModal();
+        fetchOrders(); // Refresh lại danh sách để lấy số tiền/số lượng mới nhất
+      } else {
+        error?.("Lỗi", data.message || "Không thể hoàn trả");
+      }
+    } catch (err) {
+      console.error(err);
+      error?.("Lỗi", "Lỗi kết nối máy chủ");
+    }
+  };
+
+  const counts = {
+    all: orders.length,
+    pending: orders.filter(o => o.status === 'pending').length,
+    processing: orders.filter(o => o.status === 'processing').length,
+    shipped: orders.filter(o => o.status === 'shipped').length,
+    delivered: orders.filter(o => o.status === 'delivered').length,
+    completed: orders.filter(o => o.status === 'completed').length,
+    cancelled: orders.filter(o => o.status === 'cancelled').length,
+    returned: orders.filter(o => o.status === 'returned').length,
+  };
+
   const filteredOrders = orders.filter((order) =>
     activeFilter === 'all' ? true : order.status === activeFilter
   );
 
+  const ITEMS_PER_PAGE = 3;
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const currentOrders = filteredOrders.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const getStatusClass = (status: string) => {
     switch (status) {
+      case 'completed':
       case 'delivered':
         return 'status-delivered';
       case 'processing':
@@ -216,28 +250,29 @@ const Orders: React.FC = () => {
       case 'shipped':
         return 'status-shipped';
       case 'cancelled':
+      case 'returned':
         return 'status-cancelled';
       case 'pending':
-        return 'status-processing'; // Reuse processing style for pending
+        return 'status-processing';
       default:
         return '';
     }
   };
 
   const getButtonText = (orderId: string) => {
-    return expandedOrders.has(orderId) ? 'Ẩn chi tiết' : 'Xem chi tiết';
+    return expandedOrders.has(orderId) ? t('Ẩn chi tiết') : t('Xem chi tiết');
   };
 
   return (
-    <div className="bg-secondary text-accent">
+    <div className="bg-secondary text-accent min-h-screen">
       {/* Orders Header */}
       <section className="py-12 px-4 sm:px-6 lg:px-8 bg-black">
         <div className="max-w-7xl mx-auto text-center" data-aos="fade-up">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
-            ĐƠN HÀNG CỦA TÔI
+          <h1 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron">
+            {t("ĐƠN HÀNG CỦA TÔI")}
           </h1>
           <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
-            Theo dõi các giao dịch mua và xem lịch sử đơn hàng
+            {t("Theo dõi các giao dịch mua và xem lịch sử đơn hàng")}
           </p>
         </div>
       </section>
@@ -246,47 +281,80 @@ const Orders: React.FC = () => {
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Filter Options */}
-          <div className="mb-8 flex flex-wrap gap-4" data-aos="fade-up">
+          <div className="mb-8 flex flex-wrap gap-4 max-[499px]:gap-2" data-aos="fade-up">
             <button
-              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''} px-4 py-2 rounded-md border border-primary/20 font-open-sans`}
-              data-filter="all"
+              className={`filter-btn ${activeFilter === 'all' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
               onClick={() => setActiveFilter('all')}
             >
-              Tất cả đơn hàng
+              <i data-feather="list" className="w-4 h-4"></i>
+              {t("Tất cả đơn hàng")}
+              {counts.all > 0 && <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.all}</span>}
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'pending' ? 'active' : ''} px-4 py-2 rounded-md border border-primary/20 font-open-sans`}
-              data-filter="pending"
+              className={`filter-btn ${activeFilter === 'pending' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
               onClick={() => setActiveFilter('pending')}
             >
-              Chờ xác nhận
+              <i data-feather="clock" className="w-4 h-4"></i>
+              {t("Chờ xác nhận")}
+              {counts.pending > 0 && <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.pending}</span>}
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'processing' ? 'active' : ''} px-4 py-2 rounded-md border border-primary/20 font-open-sans`}
-              data-filter="processing"
+              className={`filter-btn ${activeFilter === 'processing' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
               onClick={() => setActiveFilter('processing')}
             >
-              Đang xử lý
+              <i data-feather="settings" className="w-4 h-4"></i>
+              {t("Đang xử lý")}
+              {counts.processing > 0 && <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.processing}</span>}
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'shipped' ? 'active' : ''} px-4 py-2 rounded-md border border-primary/20 font-open-sans`}
-              data-filter="shipped"
+              className={`filter-btn ${activeFilter === 'shipped' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
               onClick={() => setActiveFilter('shipped')}
             >
-              Đang vận chuyển
+              <i data-feather="truck" className="w-4 h-4"></i>
+              {t("Đang vận chuyển")}
+              {counts.shipped > 0 && <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.shipped}</span>}
             </button>
             <button
-              className={`filter-btn ${activeFilter === 'delivered' ? 'active' : ''} px-4 py-2 rounded-md border border-primary/20 font-open-sans`}
-              data-filter="delivered"
+              className={`filter-btn ${activeFilter === 'delivered' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
               onClick={() => setActiveFilter('delivered')}
             >
-              Đã giao hàng
+              <i data-feather="map-pin" className="w-4 h-4"></i>
+              {t("Đã giao hàng")}
+              {counts.delivered > 0 && <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.delivered}</span>}
             </button>
+            <button
+              className={`filter-btn ${activeFilter === 'completed' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
+              onClick={() => setActiveFilter('completed')}
+            >
+              <i data-feather="check-circle" className="w-4 h-4"></i>
+              {t("Hoàn thành")}
+              {counts.completed > 0 && <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.completed}</span>}
+            </button>
+            {counts.cancelled > 0 && (
+              <button
+                className={`filter-btn ${activeFilter === 'cancelled' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
+                onClick={() => setActiveFilter('cancelled')}
+              >
+                <i data-feather="x-circle" className="w-4 h-4"></i>
+                {t("Đã hủy")}
+                <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.cancelled}</span>
+              </button>
+            )}
+            {counts.returned > 0 && (
+              <button
+                className={`filter-btn ${activeFilter === 'returned' ? 'active' : ''} px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-sm rounded-md border border-primary/20 font-open-sans flex items-center gap-2`}
+                onClick={() => setActiveFilter('returned')}
+              >
+                <i data-feather="corner-down-left" className="w-4 h-4"></i>
+                {t("Hoàn trả")}
+                <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">{counts.returned}</span>
+              </button>
+            )}
           </div>
 
           {/* Orders List */}
           <div className="space-y-6">
-            {filteredOrders.map((order) => (
+            {!isLoading && currentOrders.map((order) => (
               <div
                 key={order.id}
                 className="order-card bg-secondary/50 rounded-lg p-6"
@@ -295,16 +363,16 @@ const Orders: React.FC = () => {
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold text-lg font-orbitron">
-                      Đơn hàng #{order.id}
+                    <h3 className="font-semibold text-lg max-[499px]:text-base font-orbitron">
+                      {t("Đơn hàng")} #{order.id}
                     </h3>
                     <p className="text-accent/70 text-sm font-open-sans">
-                      Đặt hàng ngày {order.date}
+                      {t("Đặt hàng lúc")} {order.timeString} - {order.date}
                     </p>
                   </div>
                   <div className="mt-2 md:mt-0">
                     <span className={`status-badge ${getStatusClass(order.status)}`}>
-                      {order.statusText}
+                      {t(order.statusText)}
                     </span>
                   </div>
                 </div>
@@ -312,37 +380,34 @@ const Orders: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between">
                   <div className="flex space-x-3 mt-3 md:mt-0">
                     <button
-                      className="view-details-btn bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded text-sm transition font-open-sans"
+                      className="view-details-btn bg-primary hover:bg-primary/90 text-white px-4 py-2 max-[499px]:px-3 max-[499px]:py-1.5 max-[499px]:text-xs rounded text-sm transition font-open-sans"
                       onClick={() => toggleOrderDetails(order.id)}
                     >
                       {getButtonText(order.id)}
-                    </button>
-                    <button className="bg-transparent border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded text-sm transition font-open-sans">
-                      Mua lại
                     </button>
                   </div>
                 </div>
 
                 {/* Order Details (Hidden by default) */}
                 {expandedOrders.has(order.id) && (
-                  <div className="order-details mt-4">
+                  <div className="order-details open mt-4">
                     <div className="border-t border-primary/20 pt-4">
-                      <h4 className="font-semibold mb-3 font-orbitron">Chi tiết đơn hàng</h4>
+                      <h4 className="font-semibold mb-3 font-orbitron">{t("Chi tiết đơn hàng")}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <h5 className="font-medium mb-2 font-open-sans">
-                            Địa chỉ giao hàng
+                            {t("Địa chỉ giao hàng")}
                           </h5>
                           <p className="text-accent/70 font-open-sans">{order.shippingAddress.name}</p>
                           <p className="text-accent/70 font-open-sans">
-                            {order.shippingAddress.street}
+                            {t(order.shippingAddress.street)}
                           </p>
                           <p className="text-accent/70 font-open-sans">
-                            {order.shippingAddress.city}
+                            {t(order.shippingAddress.city)}
                           </p>
-                          <p className="text-accent/70 font-open-sans">{order.shippingAddress.country}</p>
+                          <p className="text-accent/70 font-open-sans">{t(order.shippingAddress.country)}</p>
                           <p className="text-accent/70 font-open-sans mt-2">
-                            Điện thoại: {order.shippingAddress.phone}
+                            {t("Điện thoại")}: {order.shippingAddress.phone}
                           </p>
                           <p className="text-accent/70 font-open-sans">
                             Email: {order.shippingAddress.email}
@@ -350,36 +415,33 @@ const Orders: React.FC = () => {
                         </div>
                         <div>
                           <h5 className="font-medium mb-2 font-open-sans">
-                            Phương thức thanh toán
+                            {t("Phương thức thanh toán")}
                           </h5>
                           <p className="text-accent/70 font-open-sans">
-                            {order.paymentMethod}
+                            {t(order.paymentMethod)}
                           </p>
                           <p className="text-accent/70 font-open-sans">
-                            Thanh toán ngày {order.paymentDate}
+                            {t("Thanh toán ngày")} {order.paymentDate}
                           </p>
                         </div>
                         <div className="md:col-span-2">
                           <h5 className="font-medium mb-2 font-open-sans">
-                            Thông tin sản phẩm
+                            {t("Thông tin sản phẩm")}
                           </h5>
-                          <div className="product-grid">
-                            {order.products.map((product, index) => (
-                              <div key={index} className="flex items-center space-x-3">
+                          <div className="space-y-4">
+                            {order.products.map((product: any, index: number) => (
+                              <div key={index} className="flex gap-4 items-center p-3 hover:bg-black/20 rounded-lg transition-colors border border-primary/5">
                                 <img
                                   src={product.image}
-                                  alt={product.name}
+                                  alt={t(product.name)}
                                   className="w-12 h-12 object-cover rounded"
                                 />
                                 <div>
                                   <p className="font-medium font-open-sans">
-                                    {product.name}
+                                    {t(product.name)}
                                   </p>
                                   <p className="text-accent/70 text-sm font-open-sans">
-                                    Số lượng: {product.quantity}
-                                  </p>
-                                  <p className="text-accent/70 text-sm font-open-sans">
-                                    Giá: {product.price}
+                                    {t("Số lượng")}: {product.quantity} | {t("Tổng giá trị")}: {product.priceString}
                                   </p>
                                   <p className="text-accent/70 text-sm font-open-sans">
                                     SKU: {product.sku}
@@ -391,23 +453,46 @@ const Orders: React.FC = () => {
                         </div>
                         <div className="md:col-span-2">
                           <h5 className="font-medium mb-2 font-open-sans">
-                            Theo dõi vận chuyển
+                            {t("Theo dõi vận chuyển")}
                           </h5>
                           <div className="tracking-progress mb-4">
-                            <div
-                              className="tracking-progress-bar"
-                              style={{ width: `${(order.trackingSteps.filter(s => s.completed).length / order.trackingSteps.length) * 100}%` }}
+                            <div className="tracking-progress-bar"
+                              style={{ width: `${order.trackingSteps.filter((s: any) => s.completed).length === 0 ? 0 : ((order.trackingSteps.filter((s: any) => s.completed).length - 1) / (order.trackingSteps.length - 1)) * 100}%` }}
                             ></div>
                           </div>
-                          <div className="flex justify-between text-sm font-open-sans">
-                            {order.trackingSteps.map((step, index) => (
+                          <div className="tracking-step-container flex justify-between text-sm font-open-sans">
+                            {order.trackingSteps.map((step: any, index: number) => (
                               <div key={index} className={`tracking-step ${step.completed ? 'completed' : ''}`}>
-                                <p>{step.step}</p>
-                                <p className="text-accent/70 text-xs">{step.date || 'Chưa hoàn thành'}</p>
+                                <p>{t(step.step)}</p>
+                                <p className="text-accent/70 text-xs">{step.completed ? step.date : t('Chưa hoàn thành')}</p>
                               </div>
                             ))}
                           </div>
                         </div>
+                        {(order.statusText === 'Đã giao' || order.statusText === 'Hoàn thành') && (
+                          <div className="md:col-span-2 flex justify-end mt-4 border-t border-primary/20 pt-4 gap-4">
+                            {order.statusText === 'Hoàn thành' && (
+                              <button
+                                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded text-sm transition font-open-sans"
+                                onClick={() => openReturnModal(order)}
+                              >
+                                {t("Hoàn trả sản phẩm")}
+                              </button>
+                            )}
+                            {order.isReceived === 'Đã nhận hàng' ? (
+                              <button className="bg-gray-600 text-white px-6 py-2 rounded text-sm transition font-open-sans cursor-not-allowed" disabled>
+                                {t("Đã nhận hàng")}
+                              </button>
+                            ) : (
+                              <button
+                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm transition font-open-sans"
+                                onClick={() => handleConfirmReceived(order.id)}
+                              >
+                                {t("Đã nhận được hàng")}
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -416,43 +501,63 @@ const Orders: React.FC = () => {
             ))}
           </div>
 
-          {/* Empty State */}
-          {filteredOrders.length === 0 && (
+          {/* Empty State / Loading State */}
+          {isLoading ? (
+            <div className="text-center py-16" data-aos="fade-up">
+              <h3 className="text-xl font-semibold mb-2 font-orbitron text-primary">
+                {t("Đang tải dữ liệu...")}
+              </h3>
+            </div>
+          ) : filteredOrders.length === 0 && (
             <div className="empty-orders text-center py-16" data-aos="fade-up">
               <i data-feather="package" className="h-16 w-16 text-primary mx-auto mb-4"></i>
               <h3 className="text-xl font-semibold mb-2 font-orbitron">
-                Không tìm thấy đơn hàng
+                {t("Không tìm thấy đơn hàng")}
               </h3>
               <p className="text-accent/70 mb-6 font-open-sans">
-                Bạn chưa đặt đơn hàng nào.
+                {t("Bạn chưa đặt đơn hàng nào hoặc không có đơn hàng nào phù hợp.")}
               </p>
               <a
-                href="shop.html"
+                href="/shop"
                 className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-md font-semibold transition font-open-sans"
               >
-                Bắt đầu mua sắm
+                {t("Bắt đầu mua sắm")}
               </a>
             </div>
           )}
 
           {/* Pagination */}
-          {orders.length > 0 && (
+          {totalPages > 1 && (
             <div className="mt-12 flex justify-center" data-aos="fade-up">
               <nav className="flex items-center space-x-2">
-                <button className="p-2 text-accent/70 hover:text-primary transition" aria-label="Trang trước">
+                <button
+                  className="p-2 text-accent/70 hover:text-primary transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={t("Trang trước")}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
                   <i data-feather="chevron-left" className="h-5 w-5"></i>
                 </button>
-                <button className="w-8 h-8 rounded bg-primary text-white font-medium font-open-sans">
-                  1
-                </button>
-                <button className="w-8 h-8 rounded text-accent/70 hover:text-primary transition font-open-sans">
-                  2
-                </button>
-                <button className="w-8 h-8 rounded text-accent/70 hover:text-primary transition font-open-sans">
-                  3
-                </button>
-                <span className="px-2 text-accent/70 font-open-sans">...</span>
-                <button className="p-2 text-accent/70 hover:text-primary transition" aria-label="Trang tiếp theo">
+
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const page = idx + 1;
+                  return (
+                    <button
+                      key={page}
+                      className={`w-8 h-8 rounded font-open-sans transition ${currentPage === page ? 'bg-primary text-white font-medium' : 'text-accent/70 hover:text-primary'}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+
+                <button
+                  className="p-2 text-accent/70 hover:text-primary transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label={t("Trang tiếp theo")}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
                   <i data-feather="chevron-right" className="h-5 w-5"></i>
                 </button>
               </nav>
@@ -460,6 +565,68 @@ const Orders: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* --- MODAL HOÀN TRẢ SẢN PHẨM --- */}
+      {returnModalOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#111111] border border-primary/40 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6">
+            <div className="flex justify-between items-center mb-6 border-b border-primary/20 pb-4">
+              <h2 className="text-2xl font-bold font-orbitron text-red-500">
+                {t("Hoàn Trả Đơn Hàng")} #{returnModalOrder.id}
+              </h2>
+              <button onClick={closeReturnModal} className="text-accent/60 hover:text-red-500 transition">
+                <i data-feather="x" className="w-6 h-6"></i>
+              </button>
+            </div>
+
+            <p className="text-accent/80 font-open-sans mb-6 text-sm">
+              * Vui lòng chọn số lượng sản phẩm bạn muốn hoàn trả. Số tiền tương ứng sẽ được trừ đi từ tổng tích lũy.
+            </p>
+
+            <div className="space-y-4 mb-8">
+              {returnModalOrder.products.map((p: any) => (
+                <div key={p.sku} className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg border border-primary/10">
+                  <img src={p.image} alt={p.name} className="w-16 h-16 object-cover rounded-md" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold font-open-sans line-clamp-1">{p.name}</h3>
+                    <p className="text-sm text-accent/60">Đã mua: {p.quantity}</p>
+                  </div>
+
+                  {/* Cụm tăng giảm số lượng */}
+                  <div className="flex items-center border border-primary/30 rounded-lg bg-black/50">
+                    <button
+                      onClick={() => handleQuantityChange(p.sku, (returnQuantities[p.sku] || 0) - 1, p.quantity)}
+                      className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
+                    >−</button>
+                    <span className="w-12 text-center font-bold font-open-sans text-primary">
+                      {returnQuantities[p.sku] || 0}
+                    </span>
+                    <button
+                      onClick={() => handleQuantityChange(p.sku, (returnQuantities[p.sku] || 0) + 1, p.quantity)}
+                      className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
+                    >+</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={closeReturnModal}
+                className="px-6 py-2.5 rounded font-open-sans bg-gray-600 hover:bg-gray-700 text-white transition"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={submitReturn}
+                className="px-6 py-2.5 rounded font-open-sans bg-red-600 hover:bg-red-700 text-white transition font-semibold shadow-[0_0_15px_rgba(220,38,38,0.5)]"
+              >
+                Xác nhận Hoàn Trả
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

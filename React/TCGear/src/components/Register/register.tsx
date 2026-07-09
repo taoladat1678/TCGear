@@ -13,6 +13,7 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>('Đăng ký thành công! Đang chuyển hướng...');
 
   useEffect(() => {
     AOS.init({
@@ -81,17 +82,19 @@ const Register: React.FC = () => {
 
       if (data.status === 'success') {
         setSuccess(true);
+        setSuccessMessage(data.message || 'Đăng ký thành công!');
 
-        console.log('ĐĂNG KÝ THÀNH CÔNG');
-        console.log('User info:', data.user);
-        console.log('Token:', data.token);
-
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+        if (data.require_verification) {
+          setTimeout(() => {
+            window.location.href = '/verify-pending';
+          }, 1500);
+        } else {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        }
       } else {
         setError(data.message || 'Đăng ký thất bại');
       }
@@ -105,14 +108,14 @@ const Register: React.FC = () => {
 
   return (
     <section 
-      className="register-container py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center bg-secondary text-accent"
+      className="register-container py-16 px-4 sm:px-6 lg:px-8 max-[499px]:px-4 max-[499px]:py-8 max-[374px]:py-6 flex items-center justify-center bg-secondary text-accent"
       data-aos="fade-in"
       data-aos-duration="800"
     >
       <div className="max-w-md w-full">
-        <div className="register-card p-8" data-aos="zoom-in" data-aos-delay="0">
+        <div className="register-card p-8 max-[499px]:p-6 max-[374px]:p-4" data-aos="zoom-in" data-aos-delay="0">
           <div className="text-center mb-8" data-aos="fade-down" data-aos-delay="0">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3 font-orbitron text-accent">
+            <h1 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-3 font-orbitron text-accent">
               THAM GIA TCGEAR
             </h1>
             <p className="text-accent/70 text-sm font-open-sans">
@@ -122,7 +125,7 @@ const Register: React.FC = () => {
 
           {success && (
             <div className="mb-6 p-4 bg-green-600/20 border border-green-600 rounded-md text-green-400 text-center">
-              Đăng ký thành công! Đang chuyển hướng...
+              {successMessage}
             </div>
           )}
 
@@ -286,7 +289,7 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 text-white py-3 px-4 rounded-md font-semibold transition flex items-center justify-center font-orbitron"
+              className="w-full bg-primary hover:bg-primary/90 disabled:opacity-70 text-white py-3 px-4 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center justify-center font-orbitron"
               data-aos="fade-up"
               data-aos-delay="700"
             >

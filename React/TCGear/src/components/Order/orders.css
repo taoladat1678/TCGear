@@ -69,6 +69,8 @@
   background: #e5e7eb;
   border-radius: 4px;
   overflow: hidden;
+  margin-left: 12.5%;
+  margin-right: 12.5%;
 }
 
 .tracking-progress-bar {
@@ -141,5 +143,42 @@
 @media (max-width: 640px) {
   .product-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .tracking-progress {
+    display: none;
+  }
+  
+  .tracking-step-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .tracking-step {
+    text-align: left;
+    padding-left: 45px;
+  }
+
+  .tracking-step::before {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
+
+  .tracking-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 11px;
+    width: 4px;
+    height: calc(100% + 1.5rem);
+    background: #e5e7eb;
+    z-index: 1;
+  }
+
+  .tracking-step.completed:not(:last-child)::after {
+    background: #10b981;
   }
 }

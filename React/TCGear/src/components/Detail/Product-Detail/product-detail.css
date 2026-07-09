@@ -256,3 +256,31 @@
         font-size: 14px;
     }
 }
+
+@media (max-width: 374px) {
+    .gallery-main {
+        height: 220px;
+    }
+    .gallery-thumb {
+        width: 60px;
+        height: 60px;
+    }
+    .tab-button {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+    .quantity-selector {
+        flex-direction: row;
+    }
+    .quantity-btn {
+        width: 30px;
+    }
+    .quantity-input {
+        font-size: 14px;
+    }
+    .size-selector label {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}

@@ -437,7 +437,7 @@ const Shop: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 max-[499px]:gap-y-6 max-[374px]:gap-y-4">
           {searchResults.map((product, index) => {
             const isBestSeller = (product.product_buying || 0) >= maxBuying && maxBuying > 0;
             const inWishlist = isInWishlist(product.product_id);
@@ -450,7 +450,7 @@ const Shop: React.FC = () => {
                 data-aos="fade-up"
                 data-aos-delay={(index % 9) * 100}
               >
-                <div className="h-64 bg-gray-800 relative overflow-hidden">
+                <div className="h-64 max-[767px]:h-56 max-[499px]:h-48 max-[374px]:h-40 bg-gray-800 relative overflow-hidden">
                   <img
                     src={getImage(product.product_image)}
                     alt={product.product_name}
@@ -482,9 +482,10 @@ const Shop: React.FC = () => {
                       {t("Từ")} {formatPrice(product.product_price)}
                     </span>
 
-                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex gap-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                       <button
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           addToCart({
                             id: product.product_id,
@@ -510,6 +511,7 @@ const Shop: React.FC = () => {
 
                       <button
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           const item = {
                             id: product.product_id,
@@ -567,20 +569,20 @@ const Shop: React.FC = () => {
         </div>
         <div className="absolute inset-0 hero-gradient"></div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" data-aos="fade-up">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 font-orbitron">{t("CỬA HÀNG")}</h1>
-          <p className="text-xl mb-8 font-open-sans">
+          <h1 className="text-4xl md:text-6xl max-[767px]:text-3xl max-[499px]:text-2xl font-bold mb-6 font-orbitron">{t("CỬA HÀNG")}</h1>
+          <p className="text-xl max-[499px]:text-lg max-[374px]:text-base mb-8 font-open-sans">
             {t("Thiết bị chơi game cao cấp và áo đấu esports")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/jerseys"
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-md font-semibold transition font-orbitron"
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 max-[499px]:px-6 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron"
             >
               {t("Mua Áo Đấu")}
             </Link>
             <Link
               to="/shop"
-              className="bg-transparent border-2 border-accent hover:bg-accent hover:text-secondary text-accent px-8 py-3 rounded-md font-semibold transition font-orbitron"
+              className="bg-transparent border-2 border-accent hover:bg-accent hover:text-secondary text-accent px-8 py-3 max-[499px]:px-6 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron"
             >
               {t("Khám Phá Thiết Bị")}
             </Link>
@@ -900,13 +902,13 @@ const Shop: React.FC = () => {
 
                 <div
                   ref={productsGridRef}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 max-[499px]:gap-y-6 max-[374px]:gap-y-4"
                   id="products-grid"
                 >
                   {loading ? (
                     Array(3).fill(0).map((_, i) => (
                       <div key={i} className="product-card bg-secondary/50 rounded-lg overflow-hidden border border-primary/20 animate-pulse">
-                        <div className="h-64 bg-gray-800"></div>
+                        <div className="h-64 max-[767px]:h-56 max-[499px]:h-48 max-[374px]:h-40 bg-gray-800"></div>
                         <div className="p-4">
                           <div className="h-4 bg-gray-600 rounded w-3/4 mb-3"></div>
                           <div className="h-6 bg-gray-600 rounded w-1/2"></div>
@@ -934,7 +936,7 @@ const Shop: React.FC = () => {
                           data-aos="fade-up"
                           data-aos-delay={index * 100}
                         >
-                          <div className="h-64 bg-gray-800 relative overflow-hidden">
+                          <div className="h-64 max-[767px]:h-56 max-[499px]:h-48 max-[374px]:h-40 bg-gray-800 relative overflow-hidden">
                             <img
                               src={getImage(product.product_image)}
                               alt={product.product_name}
@@ -972,9 +974,10 @@ const Shop: React.FC = () => {
                                 </span>
                               </div>
 
-                              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex gap-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                                 <button
                                   onClick={(e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
                                     addToCart({
                                       id: product.product_id,
@@ -1000,6 +1003,7 @@ const Shop: React.FC = () => {
 
                                 <button
                                   onClick={(e) => {
+                                    e.preventDefault();
                                     e.stopPropagation();
                                     const item = {
                                       id: product.product_id,

@@ -6,31 +6,21 @@ import 'aos/dist/aos.css';
 import './blog.css';
 import { useTranslation } from 'react-i18next';
 
-// HÀM DỊCH ĐẶT TRỰC TIẾP TRONG FILE
 const translateText = async (text: string): Promise<string> => {
-  if (!text.trim()) return text;
-
-  // Delay 400ms để tránh bị Google block
-  await new Promise(resolve => setTimeout(resolve, 400));
-
+  if (!text || text.trim() === '') return text;
+  const cacheKey = `trans_blog_${text.trim()}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return cached;
   try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.warn('Google Translate HTTP error:', response.status);
-      return text;
-    }
-
-    const data = await response.json();
-
-    if (data && data[0] && Array.isArray(data[0])) {
-      return data[0].map((item: any[]) => item[0] || '').join('');
-    }
-
-    return text;
-  } catch (error) {
-    console.error('Lỗi dịch Google Translate:', error);
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=${encodeURIComponent(text.trim())}`
+    );
+    const data = await res.json();
+    const translated = data[0][0][0];
+    localStorage.setItem(cacheKey, translated);
+    return translated;
+  } catch (err) {
+    console.warn('Translate error:', err);
     return text;
   }
 };
@@ -321,10 +311,10 @@ const Blog: React.FC = () => {
         </div>
         <div className="absolute inset-0 hero-gradient"></div>
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" data-aos="fade-up">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 font-orbitron">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl max-[499px]:text-3xl max-[374px]:text-2xl font-bold mb-6 font-orbitron">
             {t('BLOG TCGEAR')}
           </h1>
-          <p className="text-lg md:text-xl mb-8 font-open-sans">
+          <p className="text-lg md:text-xl max-[499px]:text-base max-[374px]:text-sm mb-8 font-open-sans">
             {t('Tin tức esports mới nhất, đánh giá thiết bị và thông tin chi tiết về game cạnh tranh')}
           </p>
         </div>
@@ -338,7 +328,7 @@ const Blog: React.FC = () => {
             {/* Featured Blog */}
             {featuredBlog && (
               <>
-                <h2 className="text-3xl md:text-4xl font-bold mb-8 font-orbitron">
+                <h2 className="text-3xl md:text-4xl max-[499px]:text-2xl font-bold mb-8 font-orbitron">
                   {selectedCategory
                     ? `${t('Bài viết mới nhất thuộc danh mục')} ${getCateName(selectedCategory)}`
                     : t('Bài viết mới nhất')}
@@ -348,7 +338,7 @@ const Blog: React.FC = () => {
                   className="blog-card rounded-lg overflow-hidden block hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   data-aos="fade-up"
                 >
-                  <div className="h-[500px] md:h-[600px] overflow-hidden">
+                  <div className="h-[500px] md:h-[600px] max-[499px]:h-[300px] max-[374px]:h-[250px] overflow-hidden">
                     <img
                       src={featuredBlog.blog_img.startsWith('http') ? featuredBlog.blog_img : `/${featuredBlog.blog_img}`}
                       alt={getBlogTitle(featuredBlog)}
@@ -365,7 +355,7 @@ const Blog: React.FC = () => {
                         {formatDate(featuredBlog.create_at)}
                       </span>
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-4 font-orbitron">
+                    <h2 className="text-2xl md:text-3xl max-[499px]:text-xl font-bold mb-4 font-orbitron">
                       {getBlogTitle(featuredBlog)}
                     </h2>
                     <p className="text-accent/70 mb-6 text-sm md:text-base font-open-sans line-clamp-3">
@@ -383,12 +373,12 @@ const Blog: React.FC = () => {
             {/* Regular Blogs */}
             {regularBlogs.length > 0 && (
               <>
-                <h2 className="text-3xl md:text-4xl font-bold mt-16 mb-8 font-orbitron">
+                <h2 className="text-3xl md:text-4xl max-[499px]:text-2xl font-bold mt-16 max-[499px]:mt-10 mb-8 max-[499px]:mb-6 font-orbitron">
                   {selectedCategory
                     ? `${t('Các bài viết thuộc danh mục')} ${getCateName(selectedCategory)}`
                     : t('Tất cả bài viết')}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-[499px]:gap-6">
                   {currentBlogs.map((blog, index) => (
                     <Link
                       key={blog.blog_id}
@@ -397,7 +387,7 @@ const Blog: React.FC = () => {
                       data-aos="fade-up"
                       data-aos-delay={`${index * 100}`}
                     >
-                      <div className="h-64 md:h-72 overflow-hidden">
+                      <div className="h-64 md:h-72 max-[499px]:h-56 max-[374px]:h-48 overflow-hidden">
                         <img
                           src={blog.blog_img.startsWith('http') ? blog.blog_img : `/${blog.blog_img}`}
                           alt={getBlogTitle(blog)}
@@ -414,7 +404,7 @@ const Blog: React.FC = () => {
                             {formatDate(blog.create_at)}
                           </span>
                         </div>
-                        <h3 className="text-xl md:text-2xl font-bold mb-3 font-orbitron">
+                        <h3 className="text-xl md:text-2xl max-[499px]:text-lg font-bold mb-3 font-orbitron">
                           {getBlogTitle(blog)}
                         </h3>
                         <p className="text-accent/70 mb-4 text-sm md:text-base font-open-sans line-clamp-3">
@@ -464,7 +454,7 @@ const Blog: React.FC = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1 sidebar-section">
             <div className="bg-secondary/50 rounded-lg border border-primary/20 p-6 mb-8" data-aos="fade-left">
-              <h3 className="font-bold text-lg md:text-xl mb-4 font-orbitron">{t('DANH MỤC')}</h3>
+              <h3 className="font-bold text-lg md:text-xl max-[499px]:text-base mb-4 font-orbitron">{t('DANH MỤC')}</h3>
               <ul className="space-y-3">
                 {categories.map((category) => (
                   <li key={category.blog_cate_id}>
@@ -474,7 +464,7 @@ const Blog: React.FC = () => {
                         e.preventDefault();
                         handleCategoryClick(category);
                       }}
-                      className={`text-accent/70 hover:text-primary transition sidebar-link flex justify-between text-sm md:text-base font-open-sans ${
+                      className={`text-accent/70 hover:text-primary transition sidebar-link flex justify-between text-sm md:text-base max-[499px]:text-sm font-open-sans ${
                         selectedCategory?.blog_cate_id === category.blog_cate_id ? 'text-primary font-semibold' : ''
                       }`}
                     >
@@ -495,7 +485,7 @@ const Blog: React.FC = () => {
             </div>
 
             <div className="bg-secondary/50 rounded-lg border border-primary/20 p-6 mb-8" data-aos="fade-left" data-aos-delay="100">
-              <h3 className="font-bold text-lg md:text-xl mb-4 font-orbitron">{t('BÀI VIẾT GẦN ĐÂY')}</h3>
+              <h3 className="font-bold text-lg md:text-xl max-[499px]:text-base mb-4 font-orbitron">{t('BÀI VIẾT GẦN ĐÂY')}</h3>
               <ul className="space-y-4">
                 {displayedBlogs.slice(0, 3).map((blog) => (
                   <li key={blog.blog_id}>
@@ -508,7 +498,7 @@ const Blog: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <h4 className="font-semibold group-hover:text-primary transition text-sm md:text-base font-open-sans line-clamp-2">
+                        <h4 className="font-semibold group-hover:text-primary transition text-sm md:text-base max-[499px]:text-sm font-open-sans line-clamp-2">
                           {getBlogTitle(blog)}
                         </h4>
                         <p className="text-accent/50 text-xs md:text-sm font-open-sans">

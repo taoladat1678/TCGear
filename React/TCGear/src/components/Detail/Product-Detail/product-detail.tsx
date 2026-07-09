@@ -63,21 +63,18 @@ const InteractiveStarRating: React.FC<{
         <button
           type="button"
           key={i}
-          className={`relative h-10 w-10 cursor-pointer transition-all duration-300 ${
-            i <= displayRating ? 'scale-125 drop-shadow-lg' : 'hover:scale-110'
-          }`}
+          className={`relative h-10 w-10 cursor-pointer transition-all duration-300 ${i <= displayRating ? 'scale-125 drop-shadow-lg' : 'hover:scale-110'
+            }`}
           onMouseEnter={() => onHover(i)}
           onClick={() => onSelect(i)}
         >
           <EmptyStarSVG
-            className={`absolute inset-0 transition-colors ${
-              i <= displayRating ? 'text-red-500 opacity-0' : 'text-gray-300 hover:text-red-400'
-            }`}
+            className={`absolute inset-0 transition-colors ${i <= displayRating ? 'text-red-500 opacity-0' : 'text-gray-300 hover:text-red-400'
+              }`}
           />
           <FilledStarSVG
-            className={`absolute inset-0 pointer-events-none transition-opacity ${
-              i <= displayRating ? 'text-red-500 opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 pointer-events-none transition-opacity ${i <= displayRating ? 'text-red-500 opacity-100' : 'opacity-0'
+              }`}
           />
         </button>
       ))}
@@ -213,7 +210,27 @@ const ProductDetail: React.FC = () => {
   const [selectedRating, setSelectedRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [guestName, setGuestName] = useState<string>('');
+  const [isLoggedInWithFullname, setIsLoggedInWithFullname] = useState<boolean>(false);
   const [commentText, setCommentText] = useState<string>('');
+
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      if (storedUser && token) {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser.fullname) {
+          setGuestName(parsedUser.fullname);
+          setIsLoggedInWithFullname(true);
+        } else if (parsedUser.user_fullname) {
+          setGuestName(parsedUser.user_fullname);
+          setIsLoggedInWithFullname(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse user from localStorage', error);
+    }
+  }, []);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const generateRandomName = () => {
@@ -269,12 +286,12 @@ const ProductDetail: React.FC = () => {
     ],
   };
 
-const getDisplayName = (item: any) => {
-  if (item.user_fullname) {
-    return item.user_isAdmin ? `${item.user_fullname} - Admin` : item.user_fullname;
-  }
-  return item.guest_name || 'Khách vãng lai';
-};
+  const getDisplayName = (item: any) => {
+    if (item.user_fullname) {
+      return item.user_isAdmin ? `${item.user_fullname} - Admin` : item.user_fullname;
+    }
+    return item.guest_name || 'Khách vãng lai';
+  };
 
   const getDisplayImage = (item: any) => {
     if (item.user_image) {
@@ -311,7 +328,25 @@ const getDisplayName = (item: any) => {
           };
         };
 
-        const normalizedReviews = (data.data || []).map(normalizeDate);
+        let normalizedReviews = (data.data || []).map(normalizeDate);
+
+        const translateReviewRecursively = async (item: any): Promise<any> => {
+          let translatedText = item.text;
+          if (i18n.language === 'en' && translatedText) {
+            translatedText = await autoTranslate(translatedText);
+          }
+          let translatedReplies = [];
+          if (item.replies && item.replies.length > 0) {
+            translatedReplies = await Promise.all(item.replies.map(translateReviewRecursively));
+          }
+          return {
+            ...item,
+            text: translatedText,
+            replies: translatedReplies
+          };
+        };
+
+        normalizedReviews = await Promise.all(normalizedReviews.map(translateReviewRecursively));
         setReviews(normalizedReviews);
       } else {
         setReviews([]);
@@ -556,7 +591,7 @@ const getDisplayName = (item: any) => {
 
   useEffect(() => {
     fetchReviews();
-  }, [id]);
+  }, [id, i18n.language]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -571,19 +606,29 @@ const getDisplayName = (item: any) => {
       return;
     }
     const current = selectedVariant || product;
+    const colorName = isGear ? variants.find(v => v.color_id === selectedColorId)?.color_name : undefined;
+    const sizeName = isJersey ? variants.find(v => v.size_id === selectedSizeId)?.size_name : undefined;
+
+    // ĐÃ SỬA: Đưa chính xác variant_id vào giỏ hàng để đồng bộ checkout
     addToCart({
-      id: current.product_id || product.product_id,
+      id: product.product_id,
+      variant_id: selectedVariant?.variant_id || undefined,
       name: current.product_name || product.product_name,
       price: current.price || product.product_price,
       image: `/public/${current.product_image || product.product_image}`,
       cate_id: product.cate_id,
-      color: isGear ? variants.find(v => v.color_id === selectedColorId)?.color_name : undefined,
+      color: colorName,
       colorId: selectedColorId || undefined,
-      size: isJersey ? variants.find(v => v.size_id === selectedSizeId)?.size_name : undefined,
+      size: sizeName,
       sizeId: selectedSizeId || undefined,
       description: current.product_desc || product.product_desc,
     }, quantity);
-    success?.(t("Đã thêm vào giỏ!"), `${quantity} × ${current.product_name}`);
+
+    let detailMsg = `${quantity} x ${current.product_name || product.product_name}`;
+    if (isGear && colorName) detailMsg += ` Màu : ${colorName}`;
+    if (isJersey && sizeName) detailMsg += ` Size : ${sizeName}`;
+
+    success?.(t("Đã thêm vào giỏ!"), detailMsg);
   };
 
   const handleToggleWishlist = () => {
@@ -616,12 +661,16 @@ const getDisplayName = (item: any) => {
       size: selectedSize || undefined,
       cate_id: product.cate_id,
     };
+    let detailMsg = `${quantity} x ${current.product_name || product.product_name}`;
+    if (isGear && selectedColor) detailMsg += ` Màu : ${selectedColor.color_name}`;
+    if (isJersey && selectedSize) detailMsg += ` Size : ${selectedSize}`;
+
     if (isInWishlist(product.product_id)) {
       removeFromWishlist(product.product_id);
-      wishlistRemove?.(t("Đã xóa"), product.product_name);
+      wishlistRemove?.(t("Đã xóa"), detailMsg);
     } else {
       addToWishlist(wishlistItem);
-      wishlistAdd?.(t("Đã thêm yêu thích"), `${product.product_name}${selectedColor ? ` - ${selectedColor.color_name}` : ''}${selectedSize ? ` (${selectedSize})` : ''}`);
+      wishlistAdd?.(t("Đã thêm yêu thích"), detailMsg);
     }
   };
 
@@ -653,7 +702,9 @@ const getDisplayName = (item: any) => {
         fetchReviews();
         setSelectedRating(0);
         setHoveredRating(0);
-        setGuestName('');
+        if (!isLoggedInWithFullname) {
+          setGuestName('');
+        }
         setCommentText('');
       } else {
         error?.(data.message || t("Gửi đánh giá thất bại"));
@@ -722,7 +773,7 @@ const getDisplayName = (item: any) => {
         </nav>
       </div>
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-[767px]:gap-6 max-[499px]:gap-4">
           <div className="flex flex-col gap-6" data-aos="fade-right">
             <div className="relative">
               <img
@@ -739,11 +790,10 @@ const getDisplayName = (item: any) => {
                   <button
                     key={index}
                     onClick={() => setCurrentImage(img)}
-                    className={`flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-4 transition-all duration-300 ${
-                      currentImage === img
+                    className={`flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-4 transition-all duration-300 ${currentImage === img
                         ? 'border-primary ring-4 ring-primary/40 shadow-xl scale-105'
                         : 'border-transparent opacity-70 hover:opacity-100 hover:border-primary/50 hover:scale-105'
-                    }`}
+                      }`}
                   >
                     <img
                       src={`/public/${img}`}
@@ -758,8 +808,8 @@ const getDisplayName = (item: any) => {
             )}
           </div>
           <div className="product-info" data-aos="fade-left">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 font-orbitron text-accent">{displayName}</h1>
-            <div className="flex items-center mb-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-3 font-orbitron text-accent">{displayName}</h1>
+            <div className="flex flex-wrap items-center gap-y-2 mb-4">
               {hasRating ? (
                 <>
                   <StarRating rating={currentProduct.product_rating || product.product_rating || 0} />
@@ -773,7 +823,7 @@ const getDisplayName = (item: any) => {
                 <span className="text-sm hidden sm:inline">{t("Yêu thích")}</span>
               </button>
             </div>
-            <p className="text-primary text-xl sm:text-2xl font-bold mb-6 font-open-sans">{displayPrice}</p>
+            <p className="text-primary text-xl sm:text-2xl max-[499px]:text-lg max-[374px]:text-base font-bold mb-6 font-open-sans">{displayPrice}</p>
             <div className="mb-6">
               <p className="text-accent/70 mb-4 text-sm sm:text-base font-open-sans">{displayDesc}</p>
               <div className="space-y-2 mb-6">
@@ -788,7 +838,7 @@ const getDisplayName = (item: any) => {
             {product.cate_id === 'TCG-CAT-001' && variants.length > 0 && (
               <div className="mb-6">
                 <p className="font-semibold mb-2 text-sm sm:text-base font-open-sans text-accent">{t("Màu sắc:")}</p>
-                <div className="flex gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {variants.map((color) => (
                     <button
                       key={color.color_id}
@@ -848,14 +898,14 @@ const getDisplayName = (item: any) => {
         </div>
         <div className={`tab-content ${activeTab === 'description' ? 'active' : ''}`}>
           <div className="prose prose-invert max-w-none">
-            <h3 className="text-lg sm:text-xl mb-4 font-orbitron text-accent">{t("Nâng Tầm Trải Nghiệm Chơi Game")}</h3>
+            <h3 className="text-lg sm:text-xl max-[499px]:text-base mb-4 font-orbitron text-accent">{t("Nâng Tầm Trải Nghiệm Chơi Game")}</h3>
             <p className="mb-4 text-sm sm:text-base font-open-sans">{displayDesc}</p>
           </div>
         </div>
         <div className={`tab-content ${activeTab === 'specs' ? 'active' : ''}`}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-[499px]:gap-4">
             <div>
-              <h3 className="text-lg sm:text-xl mb-4 font-orbitron text-accent">
+              <h3 className="text-lg sm:text-xl max-[499px]:text-base mb-4 font-orbitron text-accent">
                 {product.cate_id === 'TCG-CAT-001' ? t("Thông số kỹ thuật") : t("Chất liệu & Thiết kế")}
               </h3>
               <div className="space-y-3">
@@ -868,7 +918,7 @@ const getDisplayName = (item: any) => {
               </div>
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl mb-4 font-orbitron text-accent">
+              <h3 className="text-lg sm:text-xl max-[499px]:text-base mb-4 font-orbitron text-accent">
                 {product.cate_id === 'TCG-CAT-001' ? t("Kết nối") : t("Hướng dẫn kích thước")}
               </h3>
               <div className="space-y-3">
@@ -922,24 +972,27 @@ const getDisplayName = (item: any) => {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-accent/70 mb-2 font-open-sans">Tên của bạn</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     maxLength={50}
-                    className="flex-1 px-3 py-2 rounded-md bg-secondary text-accent border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary font-open-sans"
+                    disabled={isLoggedInWithFullname}
+                    className={`flex-1 px-3 py-2 rounded-md bg-secondary text-accent border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary font-open-sans ${isLoggedInWithFullname ? 'opacity-70 cursor-not-allowed' : ''}`}
                     placeholder="Nhập tên của bạn"
                     required
                   />
-                  <button
-                    type="button"
-                    onClick={generateRandomName}
-                    className="px-4 py-2 bg-primary/80 hover:bg-primary text-white rounded-md font-semibold transition flex items-center gap-2 whitespace-nowrap"
-                  >
-                    <i data-feather="shuffle" className="h-5 w-5"></i>
-                    Tạo tên ngẫu nhiên
-                  </button>
+                  {!isLoggedInWithFullname && (
+                    <button
+                      type="button"
+                      onClick={generateRandomName}
+                      className="px-4 py-2 bg-primary/80 hover:bg-primary text-white rounded-md font-semibold transition flex items-center gap-2 whitespace-nowrap"
+                    >
+                      <i data-feather="shuffle" className="h-5 w-5"></i>
+                      Tạo tên ngẫu nhiên
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="mb-4">
@@ -966,13 +1019,13 @@ const getDisplayName = (item: any) => {
       </section>
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-12" data-aos="fade-up">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron text-accent">{t("Sản Phẩm Liên Quan")}</h2>
-          <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+          <h2 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron text-accent">{t("Sản Phẩm Liên Quan")}</h2>
+          <p className="text-accent/70 max-w-2xl mx-auto font-open-sans max-[499px]:text-sm">
             {t("Hoàn thiện bộ thiết bị chơi game của bạn với các phụ kiện thiết yếu này")}
           </p>
         </div>
         {relatedProducts && relatedProducts.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-[499px]:gap-6 max-[374px]:gap-4">
             {relatedProducts.map((relProduct: any, index) => {
               const relDisplayName = i18n.language === 'en'
                 ? (translatedRelatedNames[relProduct.product_id] || relProduct.product_name)
@@ -998,7 +1051,7 @@ const getDisplayName = (item: any) => {
                     }
                   }}
                 >
-                  <div className="h-64 bg-gray-800 relative flex-shrink-0">
+                  <div className="h-64 max-[767px]:h-56 max-[499px]:h-48 max-[374px]:h-40 bg-gray-800 relative flex-shrink-0">
                     <img
                       src={`/public/${relProduct.product_image}`}
                       alt={relDisplayName}
@@ -1083,17 +1136,15 @@ const getDisplayName = (item: any) => {
                               wishlistAdd?.(t("Đã thêm yêu thích"), relDisplayName);
                             }
                           }}
-                          className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${
-                            inWishlistRel
+                          className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${inWishlistRel
                               ? 'bg-red-600/20 text-red-600'
                               : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
-                          }`}
+                            }`}
                         >
                           <i
                             data-feather="heart"
-                            className={`h-4 w-4 transition-all duration-300 ${
-                              inWishlistRel ? 'fill-red-600 text-red-600 animate-heartbeat' : ''
-                            }`}
+                            className={`h-4 w-4 transition-all duration-300 ${inWishlistRel ? 'fill-red-600 text-red-600 animate-heartbeat' : ''
+                              }`}
                           />
                         </button>
                       </div>

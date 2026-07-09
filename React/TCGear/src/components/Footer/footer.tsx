@@ -12,22 +12,22 @@ const Footer: React.FC = () => {
   }, []);
 
   return (
-    <footer className="bg-secondary border-t border-primary/20 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-secondary border-t border-primary/20 py-12 px-4 sm:px-6 lg:px-8 max-[499px]:py-8 max-[374px]:py-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 max-[499px]:gap-6">
         {/* Company Info */}
         <div>
           <div className="flex items-center mb-4">
             <img
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png"
-              className="h-8 w-auto"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/3840px-T1_esports_logo.svg.png"
+              className="h-8 w-auto max-[374px]:h-6"
               alt="TCGear Logo"
             />
-            <span className="ml-2 text-lg font-bold text-primary font-orbitron">TCGEAR</span>
+            <span className="ml-2 text-lg max-[374px]:text-base font-bold text-primary font-orbitron">TCGEAR</span>
           </div>
-          <p className="text-accent/70 mb-4 font-open-sans">
+          <p className="text-accent/70 mb-4 font-open-sans max-[499px]:text-sm">
             {t('Thiết bị chơi game và áo đấu cao cấp dành cho game thủ chuyên nghiệp và đội esports.')}
           </p>
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 max-[374px]:space-x-3">
             <a href="https://facebook.com/tcgear" className="text-accent/70 hover:text-primary transition" aria-label="Facebook">
               <i data-feather="facebook" className="h-6 w-6"></i>
             </a>
@@ -109,21 +109,21 @@ const Footer: React.FC = () => {
 
         {/* Contact Info */}
         <div>
-          <h3 className="font-semibold text-lg mb-4 font-orbitron">{t('Liên hệ')}</h3>
-          <ul className="space-y-4">
+          <h3 className="font-semibold text-lg max-[499px]:text-base mb-4 font-orbitron">{t('Liên hệ')}</h3>
+          <ul className="space-y-4 max-[499px]:space-y-3">
             <li className="flex items-start">
-              <i data-feather="map-pin" className="mr-2 h-5 w-5 text-primary mt-0.5"></i>
-              <span className="text-accent/70 font-open-sans">
+              <i data-feather="map-pin" className="mr-2 h-5 w-5 text-primary mt-0.5 max-[499px]:h-4 max-[499px]:w-4"></i>
+              <span className="text-accent/70 font-open-sans max-[499px]:text-sm">
                 {t('627 Seolleung-ro, Gangnam-gu, Seoul, Hàn Quốc (Gần ga Seonjeongneung)')}
               </span>
             </li>
             <li className="flex items-start">
-              <i data-feather="mail" className="mr-2 h-5 w-5 text-primary mt-0.5"></i>
-              <span className="text-accent/70 font-open-sans">support@tcgear.com</span>
+              <i data-feather="mail" className="mr-2 h-5 w-5 text-primary mt-0.5 max-[499px]:h-4 max-[499px]:w-4"></i>
+              <span className="text-accent/70 font-open-sans max-[499px]:text-sm">support@tcgear.com</span>
             </li>
             <li className="flex items-start">
-              <i data-feather="phone" className="mr-2 h-5 w-5 text-primary mt-0.5"></i>
-              <span className="text-accent/70 font-open-sans">+82 2-6009-2503</span>
+              <i data-feather="phone" className="mr-2 h-5 w-5 text-primary mt-0.5 max-[499px]:h-4 max-[499px]:w-4"></i>
+              <span className="text-accent/70 font-open-sans max-[499px]:text-sm">+82 2-6009-2503</span>
             </li>
           </ul>
         </div>

@@ -6,31 +6,21 @@ import 'aos/dist/aos.css';
 import './blog-detail.css';
 import { useTranslation } from 'react-i18next';
 
-// HÀM DỊCH ĐẶT TRỰC TIẾP TRONG FILE - KHÔNG CẦN FILE RIÊNG
 const translateText = async (text: string): Promise<string> => {
-  if (!text.trim()) return text;
-
-  // Delay 400ms để tránh bị Google block spam
-  await new Promise(resolve => setTimeout(resolve, 400));
-
+  if (!text || text.trim() === '') return text;
+  const cacheKey = `trans_blog_${text.trim()}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return cached;
   try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=${encodeURIComponent(text)}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.warn('Google Translate HTTP error:', response.status);
-      return text;
-    }
-
-    const data = await response.json();
-
-    if (data && data[0] && Array.isArray(data[0])) {
-      return data[0].map((item: any[]) => item[0] || '').join('');
-    }
-
-    return text;
-  } catch (error) {
-    console.error('Lỗi dịch Google Translate:', error);
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=vi&tl=en&dt=t&q=${encodeURIComponent(text.trim())}`
+    );
+    const data = await res.json();
+    const translated = data[0][0][0];
+    localStorage.setItem(cacheKey, translated);
+    return translated;
+  } catch (err) {
+    console.warn('Translate error:', err);
     return text;
   }
 };
@@ -291,13 +281,13 @@ const BlogDetail: React.FC = () => {
         <div className="absolute inset-0 hero-gradient"></div>
 
         <div className="relative z-10 text-accent text-center px-4 max-w-4xl mx-auto" data-aos="fade-up">
-          <span className="text-primary text-sm md:text-base font-semibold font-open-sans uppercase tracking-wider">
+          <span className="text-primary text-sm md:text-base max-[499px]:text-sm font-semibold font-open-sans uppercase tracking-wider">
             {getCateName(blog)}
           </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 font-orbitron">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl max-[499px]:text-3xl max-[374px]:text-2xl font-bold mb-6 font-orbitron">
             {getTitle(blog)}
           </h1>
-          <p className="text-lg md:text-xl font-open-sans">
+          <p className="text-lg md:text-xl max-[499px]:text-base font-open-sans">
             {formatDate(blog.create_at)}
           </p>
         </div>
@@ -309,8 +299,8 @@ const BlogDetail: React.FC = () => {
           {/* Nội dung chính */}
           <div className="lg:col-span-2 order-2 lg:order-1">
             <div className="blog-card rounded-lg overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-              <div className="p-6 md:p-10">
-                <article className="prose prose-invert max-w-none font-open-sans leading-relaxed text-lg">
+              <div className="p-6 md:p-10 max-[499px]:p-4">
+                <article className="prose prose-invert max-w-none font-open-sans leading-relaxed text-lg max-[499px]:text-base">
                   {renderContent(getContent())}
                 </article>
               </div>
@@ -331,7 +321,7 @@ const BlogDetail: React.FC = () => {
           <aside className="lg:col-span-1 order-1 lg:order-2">
             <div className="sticky top-24" data-aos="fade-left" data-aos-delay="200">
               <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-primary/10">
-                <h2 className="text-2xl font-bold font-orbitron text-primary mb-6 flex items-center">
+                <h2 className="text-2xl max-[499px]:text-xl font-bold font-orbitron text-primary mb-6 flex items-center">
                   <i data-feather="book-open" className="mr-3 h-6 w-6"></i>
                   {t('Bài viết liên quan')}
                 </h2>
@@ -370,7 +360,7 @@ const BlogDetail: React.FC = () => {
                             <span className="text-xs text-primary/80 font-semibold uppercase tracking-wider">
                               {getCateName(post) || 'News'}
                             </span>
-                            <h3 className="mt-1 text-lg font-semibold font-open-sans text-accent line-clamp-2 group-hover:text-primary transition">
+                            <h3 className="mt-1 text-lg max-[499px]:text-base font-semibold font-open-sans text-accent line-clamp-2 group-hover:text-primary transition">
                               {getTitle(post)}
                             </h3>
                             <time className="text-sm text-accent/60 mt-2 block">

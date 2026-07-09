@@ -74,17 +74,17 @@ const Hero: React.FC = () => {
       <div className="absolute inset-0 hero-gradient"></div>
 
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" data-aos="fade-up">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 font-orbitron">
+        <h1 className="text-4xl md:text-6xl max-[767px]:text-3xl max-[499px]:text-2xl font-bold mb-6 font-orbitron">
           {t("NÂNG TẦM TRÒ CHƠI CỦA BẠN")}
         </h1>
-        <p className="text-xl mb-8 font-open-sans">
+        <p className="text-xl max-[499px]:text-lg max-[374px]:text-base mb-8 font-open-sans">
           {t("Áo đấu cao cấp và thiết bị chơi game dành cho game thủ chuyên nghiệp và đội esports")}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/jerseys" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-md font-semibold transition font-orbitron">
+          <Link to="/jerseys" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 max-[499px]:px-6 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron">
             {t("Mua Áo Đấu")}
           </Link>
-          <Link to="/shop" className="bg-transparent border-2 border-accent hover:bg-accent hover:text-secondary text-accent px-8 py-3 rounded-md font-semibold transition font-orbitron">
+          <Link to="/shop" className="bg-transparent border-2 border-accent hover:bg-accent hover:text-secondary text-accent px-8 py-3 max-[499px]:px-6 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron">
             {t("Khám Phá Thiết Bị")}
           </Link>
         </div>
@@ -115,10 +115,10 @@ const SearchResultsSection: React.FC = () => {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-12" data-aos="fade-up">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
+        <h2 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron">
           {t("Kết quả tìm kiếm cho")}: "<span className="text-primary">{searchQuery}</span>"
         </h2>
-        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans max-[499px]:text-sm">
           {searchResults.length} {t("sản phẩm được tìm thấy")}
           <button onClick={clearSearch} className="ml-4 text-primary hover:underline font-medium">
             [{t("Xóa")}]
@@ -126,7 +126,7 @@ const SearchResultsSection: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-[499px]:gap-6 max-[374px]:gap-4">
         {searchResults.map((product, index) => {
           const isBestSeller = (product.product_buying || 0) === maxBuying && maxBuying > 0;
           const inWishlist = isInWishlist(product.product_id);
@@ -182,9 +182,10 @@ const SearchResultsSection: React.FC = () => {
                     )}
                   </span>
 
-                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex gap-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         addToCart({
                           id: product.product_id,
@@ -210,6 +211,7 @@ const SearchResultsSection: React.FC = () => {
 
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         const item = {
                           id: product.product_id,
@@ -227,17 +229,15 @@ const SearchResultsSection: React.FC = () => {
                           wishlistAdd?.('Đã thêm vào yêu thích', product.product_name);
                         }
                       }}
-                      className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${
-                        inWishlist
-                          ? 'bg-red-600/20 text-red-600'
-                          : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
-                      }`}
+                      className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${inWishlist
+                        ? 'bg-red-600/20 text-red-600'
+                        : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
+                        }`}
                     >
                       <i
                         data-feather="heart"
-                        className={`h-4 w-4 transition-all duration-300 ${
-                          inWishlist ? 'fill-red-600 text-red-600 animate-heartbeat' : ''
-                        }`}
+                        className={`h-4 w-4 transition-all duration-300 ${inWishlist ? 'fill-red-600 text-red-600 animate-heartbeat' : ''
+                          }`}
                       />
                     </button>
                   </div>
@@ -311,13 +311,13 @@ const GearSection: React.FC = () => {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-12" data-aos="fade-up">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron">{t("THIẾT BỊ CHƠI GAME")}</h2>
-        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+        <h2 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron">{t("THIẾT BỊ CHƠI GAME")}</h2>
+        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans max-[499px]:text-sm">
           {t("Khám phá các phụ kiện chơi game hàng đầu để đạt hiệu suất tối ưu")}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-[499px]:gap-6 max-[374px]:gap-4">
         {products.map((product, index) => {
           const isBestSeller = product.product_buying === maxBuying;
           const inWishlist = isInWishlist(product.product_id);
@@ -362,9 +362,10 @@ const GearSection: React.FC = () => {
                     }).format(i18n.language === 'vi' ? product.product_price : product.product_price / 24000)}
                   </span>
 
-                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex gap-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         addToCart({
                           id: product.product_id,
@@ -390,6 +391,7 @@ const GearSection: React.FC = () => {
 
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         const wishlistItem = {
                           id: product.product_id,
@@ -408,19 +410,17 @@ const GearSection: React.FC = () => {
                           wishlistAdd?.('Đã thêm vào danh sách yêu thích', product.product_name);
                         }
                       }}
-                      className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${
-                        inWishlist
-                          ? 'bg-red-600/20 text-red-600'
-                          : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
-                      }`}
+                      className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${inWishlist
+                        ? 'bg-red-600/20 text-red-600'
+                        : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
+                        }`}
                     >
                       <i
                         data-feather="heart"
-                        className={`h-4 w-4 transition-all duration-300 ${
-                          inWishlist
-                            ? 'fill-red-600 text-red-600 animate-heartbeat'
-                            : 'text-primary hover:fill-red-600 hover:text-red-600'
-                        }`}
+                        className={`h-4 w-4 transition-all duration-300 ${inWishlist
+                          ? 'fill-red-600 text-red-600 animate-heartbeat'
+                          : 'text-primary hover:fill-red-600 hover:text-red-600'
+                          }`}
                       />
                     </button>
                   </div>
@@ -490,13 +490,13 @@ const JerseysSection: React.FC = () => {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-12" data-aos="fade-up">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron">{t("ÁO ĐẤU ESPORTS")}</h2>
-        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+        <h2 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron">{t("ÁO ĐẤU ESPORTS")}</h2>
+        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans max-[499px]:text-sm">
           {t("Khám phá áo đấu esports cao cấp để thể hiện tinh thần Đội tuyển")}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-[499px]:gap-6 max-[374px]:gap-4">
         {products.map((product, index) => {
           const isBestSeller = product.product_buying === maxBuying;
           const inWishlist = isInWishlist(product.product_id);
@@ -539,15 +539,16 @@ const JerseysSection: React.FC = () => {
                       currency: i18n.language === 'vi' ? 'VND' : 'USD',
                       minimumFractionDigits: 0
                     }).format(
-                      i18n.language === 'vi' 
-                        ? product.product_price 
+                      i18n.language === 'vi'
+                        ? product.product_price
                         : product.product_price / 24000
                     )}
                   </span>
 
-                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex gap-2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         addToCart({
                           id: product.product_id,
@@ -573,6 +574,7 @@ const JerseysSection: React.FC = () => {
 
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         const wishlistItem = {
                           id: product.product_id,
@@ -591,19 +593,17 @@ const JerseysSection: React.FC = () => {
                           wishlistAdd?.('Đã thêm vào danh sách yêu thích', product.product_name);
                         }
                       }}
-                      className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${
-                        inWishlist
-                          ? 'bg-red-600/20 text-red-600'
-                          : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
-                      }`}
+                      className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${inWishlist
+                        ? 'bg-red-600/20 text-red-600'
+                        : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
+                        }`}
                     >
                       <i
                         data-feather="heart"
-                        className={`h-4 w-4 transition-all duration-300 ${
-                          inWishlist
-                            ? 'fill-red-600 text-red-600 animate-heartbeat'
-                            : 'text-primary hover:fill-red-600 hover:text-red-600'
-                        }`}
+                        className={`h-4 w-4 transition-all duration-300 ${inWishlist
+                          ? 'fill-red-600 text-red-600 animate-heartbeat'
+                          : 'text-primary hover:fill-red-600 hover:text-red-600'
+                          }`}
                       />
                     </button>
                   </div>
@@ -628,14 +628,14 @@ const PartnersSection: React.FC = () => {
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const slides = [
     [
-      { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/1200px-T1_esports_logo.svg.png", alt: "Logo T1" },
+      { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/T1_esports_logo.svg/3840px-T1_esports_logo.svg.png", alt: "Logo T1" },
       { src: "https://i0.wp.com/apeks.gg/wp-content/uploads/2025/02/Samsung_white_Nett-logo.png?fit=800%2C256&ssl=1", alt: "Logo Samsung Odyssey" },
       { src: "https://www.thefpsreview.com/wp-content/uploads/2020/10/Secret-Lab-Logo_white.png", alt: "Logo SecretLab" },
     ],
     [
-      { src: "https://logos-world.net/wp-content/uploads/2020/11/Razer-Symbol.jpg", alt: "Logo Razer" },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzFLosX5arLETcvYzEdWTbzyoR2wqAbuCrjKfdhONLgumj0CkW1sJA7nI&s=10", alt: "Logo Razer" },
       { src: "https://pbs.twimg.com/media/Eq2BnfMUcAIx05W.png", alt: "Logo LCK" },
-      { src: "https://game.gtimg.cn/images/lpl/act/a20220303brand/uploads/2021/09/logo-in-colour-2.png", alt: "Logo LPL" },
+      { src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmzGgBZge__5uE6LYwIcdoFR-Zk3NmnLKjcbN521m95ucuQ7B9KoRVdpLF&s=10", alt: "Logo LPL" },
     ],
   ];
 
@@ -649,8 +649,8 @@ const PartnersSection: React.FC = () => {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-12" data-aos="fade-up">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron">{t("ĐỐI TÁC CỦA CHÚNG TÔI")}</h2>
-        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+        <h2 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron">{t("ĐỐI TÁC CỦA CHÚNG TÔI")}</h2>
+        <p className="text-accent/70 max-w-2xl mx-auto font-open-sans max-[499px]:text-sm">
           {t("Tự hào hợp tác với các thương hiệu và tổ chức hàng đầu trong lĩnh vực esports")}
         </p>
       </div>
@@ -710,15 +710,15 @@ const ReviewsSection: React.FC = () => {
     <section className="py-16 bg-black px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12" data-aos="fade-up">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron">
+          <h2 className="text-3xl md:text-4xl max-[767px]:text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-4 font-orbitron">
             {t("ĐÁNH GIÁ TỪ GAME THỦ")}
           </h2>
-          <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+          <p className="text-accent/70 max-w-2xl mx-auto font-open-sans max-[499px]:text-sm">
             {t("Lắng nghe ý kiến từ các game thủ esports hàng đầu về")} <span className="font-orbitron">TCGear</span>
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-[499px]:gap-6 max-[374px]:gap-4">
           {reviews.map((review, index) => (
             <div
               key={index}
@@ -762,7 +762,7 @@ const Home: React.FC = () => {
   return (
     <div className="bg-secondary text-accent">
       <Hero />
-      
+
       <SearchResultsSection />
 
       {searchResults.length === 0 && (

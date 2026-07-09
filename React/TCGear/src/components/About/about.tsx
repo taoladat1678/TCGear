@@ -39,10 +39,10 @@ const About: React.FC = () => {
         <div className="absolute inset-0 hero-gradient"></div>
 
         <div className="relative z-10 text-center px-4 max-w-3xl mx-auto" data-aos="fade-up">
-          <h1 className="text-4xl md:text-7xl font-bold mb-6 font-orbitron text-accent">
+          <h1 className="text-4xl md:text-7xl max-[767px]:text-5xl max-[499px]:text-3xl max-[374px]:text-2xl font-bold mb-6 font-orbitron text-accent">
             {t('about.title')}
           </h1>
-          <p className="text-lg md:text-xl font-open-sans text-accent">
+          <p className="text-lg md:text-xl max-[499px]:text-base max-[374px]:text-sm font-open-sans text-accent">
             {t('about.subtitle')}
           </p>
         </div>
@@ -52,18 +52,18 @@ const About: React.FC = () => {
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Timeline */}
         <div data-aos="fade-up">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 font-orbitron text-accent text-center">
+          <h2 className="text-3xl md:text-4xl max-[499px]:text-2xl font-bold mb-8 font-orbitron text-accent text-center">
             {t('about.journey_title')}
           </h2>
 
           <div className="timeline">
             <div className="timeline-item left" data-aos="fade-right" data-aos-delay="100">
               <div className="timeline-content">
-                <h3 className="text-xl font-bold font-orbitron text-accent">2004</h3>
-                <h4 className="text-lg font-semibold font-open-sans text-accent">
+                <h3 className="text-xl max-[499px]:text-lg font-bold font-orbitron text-accent">2004</h3>
+                <h4 className="text-lg max-[499px]:text-base font-semibold font-open-sans text-accent">
                   {t('about.timeline.2004.title')}
                 </h4>
-                <p className="text-accent/70 font-open-sans">
+                <p className="text-accent/70 font-open-sans max-[499px]:text-sm">
                   {t('about.timeline.2004.desc')}
                 </p>
                 <img
@@ -77,11 +77,11 @@ const About: React.FC = () => {
 
             <div className="timeline-item right" data-aos="fade-left" data-aos-delay="200">
               <div className="timeline-content">
-                <h3 className="text-xl font-bold font-orbitron text-accent">2013</h3>
-                <h4 className="text-lg font-semibold font-open-sans text-accent">
+                <h3 className="text-xl max-[499px]:text-lg font-bold font-orbitron text-accent">2013</h3>
+                <h4 className="text-lg max-[499px]:text-base font-semibold font-open-sans text-accent">
                   {t('about.timeline.2013.title')}
                 </h4>
-                <p className="text-accent/70 font-open-sans">
+                <p className="text-accent/70 font-open-sans max-[499px]:text-sm">
                   {t('about.timeline.2013.desc')}
                 </p>
                 <img
@@ -95,11 +95,11 @@ const About: React.FC = () => {
 
             <div className="timeline-item left" data-aos="fade-right" data-aos-delay="300">
               <div className="timeline-content">
-                <h3 className="text-xl font-bold font-orbitron text-accent">2019</h3>
-                <h4 className="text-lg font-semibold font-open-sans text-accent">
+                <h3 className="text-xl max-[499px]:text-lg font-bold font-orbitron text-accent">2019</h3>
+                <h4 className="text-lg max-[499px]:text-base font-semibold font-open-sans text-accent">
                   {t('about.timeline.2019.title')}
                 </h4>
-                <p className="text-accent/70 font-open-sans">
+                <p className="text-accent/70 font-open-sans max-[499px]:text-sm">
                   {t('about.timeline.2019.desc')}
                 </p>
                 <img
@@ -113,11 +113,11 @@ const About: React.FC = () => {
 
             <div className="timeline-item right" data-aos="fade-left" data-aos-delay="400">
               <div className="timeline-content">
-                <h3 className="text-xl font-bold font-orbitron text-accent">2021</h3>
-                <h4 className="text-lg font-semibold font-open-sans text-accent">
+                <h3 className="text-xl max-[499px]:text-lg font-bold font-orbitron text-accent">2021</h3>
+                <h4 className="text-lg max-[499px]:text-base font-semibold font-open-sans text-accent">
                   {t('about.timeline.2021.title')}
                 </h4>
-                <p className="text-accent/70 font-open-sans">
+                <p className="text-accent/70 font-open-sans max-[499px]:text-sm">
                   {t('about.timeline.2021.desc')}
                 </p>
                 <img
@@ -131,11 +131,11 @@ const About: React.FC = () => {
 
             <div className="timeline-item left" data-aos="fade-right" data-aos-delay="500">
               <div className="timeline-content">
-                <h3 className="text-xl font-bold font-orbitron text-accent">2025</h3>
-                <h4 className="text-lg font-semibold font-open-sans text-accent">
+                <h3 className="text-xl max-[499px]:text-lg font-bold font-orbitron text-accent">2025</h3>
+                <h4 className="text-lg max-[499px]:text-base font-semibold font-open-sans text-accent">
                   {t('about.timeline.2025.title')}
                 </h4>
-                <p className="text-accent/70 font-open-sans">
+                <p className="text-accent/70 font-open-sans max-[499px]:text-sm">
                   {t('about.timeline.2025.desc')}
                 </p>
                 <img
@@ -151,7 +151,7 @@ const About: React.FC = () => {
           <div className="text-center">
             <a
               href="/shop"
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md font-semibold transition font-orbitron mt-8 inline-block"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 max-[499px]:px-6 max-[499px]:py-2 max-[499px]:text-sm rounded-md font-semibold transition font-orbitron mt-8 inline-block"
             >
               {t('about.shop_button')}
             </a>
@@ -160,7 +160,7 @@ const About: React.FC = () => {
 
         {/* Our Mission */}
         <div className="mt-12" data-aos="fade-up">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 font-orbitron text-accent text-center">
+          <h2 className="text-3xl md:text-4xl max-[499px]:text-2xl font-bold mb-8 font-orbitron text-accent text-center">
             {t('about.mission_title')}
           </h2>
           <p className="text-accent/70 mb-4 font-open-sans text-center max-w-4xl mx-auto">
@@ -172,7 +172,7 @@ const About: React.FC = () => {
           <div className="text-center">
             <a
               href="/contact"
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-md font-semibold transition font-orbitron"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 max-[499px]:px-6 max-[499px]:py-2 max-[499px]:text-sm rounded-md font-semibold transition font-orbitron"
             >
               {t('about.contact_button')}
             </a>
@@ -184,7 +184,7 @@ const About: React.FC = () => {
       <section className="team-section py-16 bg-black px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12" data-aos="fade-up">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 font-orbitron text-accent">
+            <h2 className="text-3xl md:text-4xl max-[499px]:text-2xl font-bold mb-4 font-orbitron text-accent">
               {t('about.leadership_title')}
             </h2>
             <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
@@ -200,9 +200,9 @@ const About: React.FC = () => {
                 className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                 loading="lazy"
               />
-              <h3 className="font-semibold text-lg font-orbitron text-accent">Joe Marsh</h3>
-              <p className="text-accent/70 font-open-sans">{t('about.leadership.ceo')}</p>
-              <p className="text-accent/70 mt-2 font-open-sans">
+              <h3 className="font-semibold text-lg max-[499px]:text-base font-orbitron text-accent">Joe Marsh</h3>
+              <p className="text-accent/70 font-open-sans max-[499px]:text-sm">{t('about.leadership.ceo')}</p>
+              <p className="text-accent/70 mt-2 font-open-sans max-[499px]:text-sm">
                 {t('about.leadership.joe_desc')}
               </p>
             </div>
@@ -214,11 +214,11 @@ const About: React.FC = () => {
                 className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                 loading="lazy"
               />
-              <h3 className="font-semibold text-lg font-orbitron text-accent">
+              <h3 className="font-semibold text-lg max-[499px]:text-base font-orbitron text-accent">
                 Lee "Faker" Sang-hyeok
               </h3>
-              <p className="text-accent/70 font-open-sans">{t('about.leadership.faker_role')}</p>
-              <p className="text-accent/70 mt-2 font-open-sans">
+              <p className="text-accent/70 font-open-sans max-[499px]:text-sm">{t('about.leadership.faker_role')}</p>
+              <p className="text-accent/70 mt-2 font-open-sans max-[499px]:text-sm">
                 {t('about.leadership.faker_desc')}
               </p>
             </div>
@@ -230,9 +230,9 @@ const About: React.FC = () => {
                 className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                 loading="lazy"
               />
-              <h3 className="font-semibold text-lg font-orbitron text-accent">Josh Ahn</h3>
-              <p className="text-accent/70 font-open-sans">{t('about.leadership.coo')}</p>
-              <p className="text-accent/70 mt-2 font-open-sans">
+              <h3 className="font-semibold text-lg max-[499px]:text-base font-orbitron text-accent">Josh Ahn</h3>
+              <p className="text-accent/70 font-open-sans max-[499px]:text-sm">{t('about.leadership.coo')}</p>
+              <p className="text-accent/70 mt-2 font-open-sans max-[499px]:text-sm">
                 {t('about.leadership.josh_desc')}
               </p>
             </div>
