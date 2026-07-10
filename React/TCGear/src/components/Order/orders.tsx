@@ -79,20 +79,45 @@ const Orders: React.FC = () => {
             { step: 'Đã giao', date: isDelivered ? date : '', completed: isDelivered },
           ];
 
+          const validProducts = (o.products || []).filter((p: any) => p.quantity > 0);
+          const groupedProducts: Record<string, any> = {};
+          validProducts.forEach((p: any) => {
+            const groupKey = p.name; // Gom nhóm theo tên sản phẩm
+            if (groupedProducts[groupKey]) {
+              groupedProducts[groupKey].quantity += p.quantity;
+              groupedProducts[groupKey].price += p.price; // price here is actually total_amount from DB
+              
+              if (!groupedProducts[groupKey].skus) {
+                groupedProducts[groupKey].skus = [groupedProducts[groupKey].sku];
+              }
+              if (!groupedProducts[groupKey].skus.includes(p.sku)) {
+                groupedProducts[groupKey].skus.push(p.sku);
+              }
+              // Lưu trữ danh sách các item gốc để phục vụ việc hoàn trả
+              if (!groupedProducts[groupKey].originalItems) {
+                groupedProducts[groupKey].originalItems = [{...groupedProducts[groupKey]}];
+                // Xóa originalItems khỏi bản sao đầu tiên để tránh đệ quy vòng
+                delete groupedProducts[groupKey].originalItems[0].originalItems;
+              }
+              groupedProducts[groupKey].originalItems.push({ ...p });
+            } else {
+              groupedProducts[groupKey] = { ...p, skus: [p.sku], originalItems: [{ ...p }] };
+            }
+          });
+
           return {
             id: o.order_id,
             date: date,
             timeString: o.order_time,
             status: internalStatus,
             statusText: mapStatusText,
-            products: (o.products || [])
-              .filter((p: any) => p.quantity > 0) // Chỉ hiển thị các món có số lượng > 0
-              .map((p: any) => ({
-                ...p,
-                name: p.name,
-                image: p.image,
-                priceString: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(p.price)
-              })),
+            products: Object.values(groupedProducts).map((p: any) => ({
+              ...p,
+              name: p.name,
+              image: p.image,
+              sku: p.skus ? p.skus.join(', ') : p.sku,
+              priceString: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(p.price)
+            })),
             shippingAddress: {
               name: o.recipient_name,
               street: o.shipping_address,
@@ -189,9 +214,29 @@ const Orders: React.FC = () => {
   };
 
   const submitReturn = async () => {
-    const itemsToReturn = Object.entries(returnQuantities)
-      .filter(([_, qty]) => qty > 0)
-      .map(([sku, qty]) => ({ variant_id: sku, return_quantity: qty }));
+    const itemsToReturn: any[] = [];
+    
+    // Phân bổ số lượng hoàn trả vào các SKU thực tế của sản phẩm
+    Object.entries(returnQuantities).forEach(([name, returnQty]) => {
+      let remainingQtyToReturn = returnQty as number;
+      if (remainingQtyToReturn <= 0) return;
+
+      // Tìm sản phẩm đã gom nhóm
+      const groupedProduct = returnModalOrder.products.find((p: any) => p.name === name);
+      
+      if (groupedProduct && groupedProduct.originalItems) {
+        for (const p of groupedProduct.originalItems) {
+          if (remainingQtyToReturn <= 0) break;
+          const qtyToTake = Math.min(p.quantity, remainingQtyToReturn);
+          
+          itemsToReturn.push({ variant_id: p.sku, return_quantity: qtyToTake });
+          remainingQtyToReturn -= qtyToTake;
+        }
+      } else if (groupedProduct) {
+        // Fallback nếu không có originalItems
+        itemsToReturn.push({ variant_id: groupedProduct.sku, return_quantity: remainingQtyToReturn });
+      }
+    });
 
     if (itemsToReturn.length === 0) {
       error?.("Lỗi", "Vui lòng chọn ít nhất 1 sản phẩm để hoàn trả");
@@ -441,7 +486,7 @@ const Orders: React.FC = () => {
                                     {t(product.name)}
                                   </p>
                                   <p className="text-accent/70 text-sm font-open-sans">
-                                    {t("Số lượng")}: {product.quantity} | {t("Tổng giá trị")}: {product.priceString}
+                                    {t("Số lượng")}: {product.quantity} | {t("Đơn giá")}: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(product.price / product.quantity)} | {t("Tổng giá trị")}: {product.priceString}
                                   </p>
                                   <p className="text-accent/70 text-sm font-open-sans">
                                     SKU: {product.sku}
@@ -584,31 +629,61 @@ const Orders: React.FC = () => {
             </p>
 
             <div className="space-y-4 mb-8">
-              {returnModalOrder.products.map((p: any) => (
-                <div key={p.sku} className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg border border-primary/10">
+              {returnModalOrder.products.map((p: any) => {
+                const unitPrice = p.price / p.quantity;
+                const unitPriceString = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(unitPrice);
+                return (
+                <div key={p.name} className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg border border-primary/10">
+                  <input
+                    type="checkbox"
+                    checked={(returnQuantities[p.name] || 0) > 0}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        handleQuantityChange(p.name, p.quantity, p.quantity);
+                      } else {
+                        handleQuantityChange(p.name, 0, p.quantity);
+                      }
+                    }}
+                    className="w-5 h-5 cursor-pointer accent-red-500 shrink-0"
+                  />
                   <img src={p.image} alt={p.name} className="w-16 h-16 object-cover rounded-md" />
                   <div className="flex-1">
                     <h3 className="font-semibold font-open-sans line-clamp-1">{p.name}</h3>
-                    <p className="text-sm text-accent/60">Đã mua: {p.quantity}</p>
+                    <p className="text-sm text-accent/60">Đã mua: {p.quantity} x {unitPriceString}</p>
                   </div>
 
                   {/* Cụm tăng giảm số lượng */}
                   <div className="flex items-center border border-primary/30 rounded-lg bg-black/50">
                     <button
-                      onClick={() => handleQuantityChange(p.sku, (returnQuantities[p.sku] || 0) - 1, p.quantity)}
+                      onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) - 1, p.quantity)}
                       className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
                     >−</button>
                     <span className="w-12 text-center font-bold font-open-sans text-primary">
-                      {returnQuantities[p.sku] || 0}
+                      {returnQuantities[p.name] || 0}
                     </span>
                     <button
-                      onClick={() => handleQuantityChange(p.sku, (returnQuantities[p.sku] || 0) + 1, p.quantity)}
+                      onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) + 1, p.quantity)}
                       className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
                     >+</button>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
+
+            {(() => {
+              const totalRefund = returnModalOrder.products.reduce((sum: number, p: any) => {
+                const unitPrice = p.price / p.quantity;
+                return sum + (returnQuantities[p.name] || 0) * unitPrice;
+              }, 0);
+              return totalRefund > 0 ? (
+                <div className="mb-6 text-right">
+                  <span className="text-accent/80 font-semibold">{t("BẠN SẼ ĐƯỢC HOÀN TRẢ:")} </span>
+                  <span className="text-2xl font-bold text-red-500 ml-2">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(totalRefund)}
+                  </span>
+                </div>
+              ) : null;
+            })()}
 
             <div className="flex gap-4 justify-end">
               <button

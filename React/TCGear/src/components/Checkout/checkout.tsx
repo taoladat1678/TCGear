@@ -6,6 +6,7 @@ import feather from 'feather-icons';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
+import Preloader from '../Preloader/preloader';
 
 const Checkout: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -14,6 +15,7 @@ const Checkout: React.FC = () => {
   const { success, error: toastError } = useToast();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const getInitialState = (key: string, defaultVal: any) => {
     try {
@@ -98,9 +100,12 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     let itemsToProcess: any[] = [];
     try {
+      const storedCheckout = localStorage.getItem('checkoutItems');
       const storedCart = localStorage.getItem('cartItems');
-      if (storedCart) {
-        const parsedCart = JSON.parse(storedCart);
+      const cartData = storedCheckout || storedCart;
+      
+      if (cartData) {
+        const parsedCart = JSON.parse(cartData);
         if (Array.isArray(parsedCart) && parsedCart.length > 0) {
           itemsToProcess = parsedCart;
         }
@@ -411,6 +416,8 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    setIsProcessing(true);
+
     try {
       const now = new Date();
       const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -444,6 +451,29 @@ const Checkout: React.FC = () => {
         })
       };
 
+      if (paymentMethod === 'Thanh Toán VNPAY') {
+        localStorage.setItem('pending_order_payload', JSON.stringify(payload));
+        const res = await fetch('http://localhost:3000/api/payment/vnpay_create_url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ total_amount: total })
+        });
+        const data = await res.json();
+        if (data.status === 'success' && data.paymentUrl) {
+          window.location.href = data.paymentUrl;
+        } else {
+          toastError?.(t("Lỗi tạo URL thanh toán VNPAY"));
+          setIsProcessing(false);
+        }
+        return; // Dừng lại ở đây vì đã redirect
+      }
+
+      if (paymentMethod === 'Chuyển Khoản Ngân Hàng') {
+        // Giả lập delay 3 giây
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+
+      // Xử lý tạo đơn hàng (Cho COD hoặc sau khi giả lập Chuyển Khoản Ngân Hàng)
       const res = await fetch('http://localhost:3000/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -453,20 +483,42 @@ const Checkout: React.FC = () => {
 
       if (data.status === 'success') {
         success?.(t("Đặt hàng thành công!"), t("Cảm ơn bạn đã mua hàng tại TCGear."));
-        localStorage.removeItem('cartItems');
+        const storedCheckout = localStorage.getItem('checkoutItems');
+        if (storedCheckout) {
+          try {
+            const checkoutItems = JSON.parse(storedCheckout);
+            const storedCart = localStorage.getItem('cartItems');
+            if (storedCart) {
+              const cartList = JSON.parse(storedCart);
+              const remaining = cartList.filter((cItem: any) => 
+                !checkoutItems.some((chk: any) => 
+                  chk.id === cItem.id && chk.colorId === cItem.colorId && chk.sizeId === cItem.sizeId
+                )
+              );
+              localStorage.setItem('cartItems', JSON.stringify(remaining));
+            }
+          } catch(e){}
+          localStorage.removeItem('checkoutItems');
+        } else {
+          localStorage.removeItem('cartItems');
+        }
         sessionStorage.removeItem('checkoutState');
-        navigate('/order-success');
+        window.location.href = '/order-success';
       } else {
         toastError?.(data.message || t("Có lỗi xảy ra khi đặt hàng"));
       }
     } catch (err) {
       console.error(err);
       toastError?.(t("Lỗi kết nối khi đặt hàng"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-accent">
+    <>
+      <Preloader visible={isProcessing} />
+      <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-accent">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form giao hàng */}
         <div className="lg:col-span-2">
@@ -693,7 +745,7 @@ const Checkout: React.FC = () => {
 
             <div className="flex justify-end pt-6">
               <button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 max-[499px]:w-full max-[499px]:justify-center max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center font-orbitron">
-                {t("Tiếp Tục Thanh Toán")}
+                {isProcessing ? t("Đang xử lý...") : t("Mua Ngay")}
                 <i data-feather="arrow-right" className="ml-2 h-5 w-5"></i>
               </button>
             </div>
@@ -837,6 +889,7 @@ const Checkout: React.FC = () => {
         </div>
       </div>
     </main>
+    </>
   );
 };
 

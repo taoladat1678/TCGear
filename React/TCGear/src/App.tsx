@@ -31,6 +31,7 @@ import OrderConfirm from './components/Order-notifications/order-confirm/order-c
 import OrderFail from './components/Order-notifications/order-fail/order-fail';
 import Checkout from './components/Checkout/checkout';
 import ProductDetail from './components/Detail/Product-Detail/product-detail';
+import VNPayReturn from './components/Checkout/vnpay-return';
 
 // TẤT CẢ CÁC PROVIDER
 import { ToastProvider } from './context/ToastContext';
@@ -100,6 +101,7 @@ const App: React.FC = () => {
                           <Route path="/verify-pending" element={<VerifyPending />} />
                           <Route path="/tov-privacy" element={<TovPrivacy />} />
                           <Route path="/order-success" element={<OrderSuccess />} />
+                          <Route path="/vnpay-return" element={<VNPayReturn />} />
                           <Route path="/order-confirm" element={<OrderConfirm />} />
                           <Route path="/order-fail" element={<OrderFail />} />
                           <Route path="/checkout" element={<Checkout />} />

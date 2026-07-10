@@ -5,7 +5,7 @@ interface CartItem {
   name: string;
   price: number;
   image: string;
-  quantity: number;
+  quantity: number | string;
   description?: string;
   cate_id: string;
   color?: string;
@@ -31,7 +31,7 @@ interface AddToCartProduct {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: AddToCartProduct, quantity?: number) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  updateQuantity: (key: string, quantity: number | string) => void;
   removeItem: (key: string) => void;
   clearCart: () => void;
   cartCount: number;
@@ -96,14 +96,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
-    if (quantity < 1) {
-      setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const updateQuantity = (key: string, quantity: number | string) => {
+    const qty = Number(quantity);
+    if (quantity !== '' && qty < 1) {
+      setCartItems((prev) => prev.filter((item) => getItemKey(item) !== key));
       return;
     }
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity } : item
+        getItemKey(item) === key ? { ...item, quantity } : item
       )
     );
   };
@@ -114,7 +115,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearCart = () => setCartItems([]);
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = cartItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 
   return (
     <CartContext.Provider

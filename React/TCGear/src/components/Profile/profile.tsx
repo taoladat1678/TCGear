@@ -832,7 +832,7 @@ const Profile: React.FC = () => {
                             if (!isAddingAddress) {
                               setRecipientName('');
                               setStreetName('');
-                              setPhoneNumber('');
+                              setPhoneNumber(settingsForm.phone || '');
                               setSelectedProvince('');
                               setSelectedDistrict('');
                               setSelectedWard('');

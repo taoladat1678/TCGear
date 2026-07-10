@@ -4,6 +4,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import feather from 'feather-icons';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 import { useTranslation } from 'react-i18next';
 import { autoTranslate } from '../../utils/autoTranslate';
 import './cart.css';
@@ -25,13 +26,18 @@ interface VariantData {
   product_image: string;
   product_name: string;
   product_desc?: string;
+  stock: number;
 }
 
 const Cart: React.FC = () => {
   const { t } = useTranslation();
   const { cartItems, updateQuantity, removeItem, clearCart, addToCart } = useCart();
+  const { error: toastError } = useToast();
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  
+  const [selectedItemKeys, setSelectedItemKeys] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [showCheckoutWarning, setShowCheckoutWarning] = useState(false);
   const [address, setAddress] = useState('');
@@ -53,6 +59,65 @@ const Cart: React.FC = () => {
 
   const [translatedCartItems, setTranslatedCartItems] = useState<any[]>([]);
   const [translatedVariantData, setTranslatedVariantData] = useState<VariantData | null>(null);
+
+  const handleIncreaseQuantity = async (item: any) => {
+    if (!item.variant_id) {
+      // Nếu không có variant_id (sản phẩm cũ chưa có), thì cho phép cộng bình thường
+      updateQuantity(getItemKey(item), item.quantity + 1);
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/user/variants/${item.variant_id}/stock`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === 'success') {
+          const stock = data.data.stock;
+          if (item.quantity + 1 > stock) {
+            toastError?.(t("Số lượng trong kho không đủ"));
+            return;
+          }
+        }
+      }
+      updateQuantity(getItemKey(item), item.quantity + 1);
+    } catch (err) {
+      console.error("Lỗi kiểm tra stock", err);
+      // Fallback
+      updateQuantity(getItemKey(item), item.quantity + 1);
+    }
+  };
+
+  const handleManualQuantityChange = async (item: any, val: string) => {
+    if (val === '') {
+      updateQuantity(getItemKey(item), '');
+      return;
+    }
+    
+    const parsed = parseInt(val);
+    if (isNaN(parsed)) return;
+    
+    let newQty = Math.max(1, parsed);
+
+    if (item.variant_id) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/user/variants/${item.variant_id}/stock`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'success') {
+            const stock = data.data.stock;
+            if (newQty > stock) {
+              toastError?.(t("Số lượng trong kho không đủ"));
+              newQty = stock; // revert to max available
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi kiểm tra stock", err);
+      }
+    }
+    updateQuantity(getItemKey(item), newQty);
+  };
+
   const [translatedColors, setTranslatedColors] = useState<ColorOption[]>([]);
   const [translatedSizes, setTranslatedSizes] = useState<SizeOption[]>([]);
   const [translatedSelectedItem, setTranslatedSelectedItem] = useState<any>(null);
@@ -349,18 +414,85 @@ const Cart: React.FC = () => {
     );
   };
 
-  const contactItems = cartItems.filter(needsContactForPrice);
-  const translatedContactItems = translatedCartItems.filter(needsContactForPrice);
+  const getItemKey = (item: any) => `${item.id}|${item.colorId || ''}|${item.sizeId || ''}`;
 
-  const handleCheckout = () => {
+  const toggleSelection = (item: any) => {
+    const key = getItemKey(item);
+    setSelectedItemKeys((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) newSet.delete(key);
+      else newSet.add(key);
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedItemKeys.size === cartItems.length) {
+      setSelectedItemKeys(new Set());
+    } else {
+      setSelectedItemKeys(new Set(cartItems.map(getItemKey)));
+    }
+  };
+
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(translatedCartItems.length / itemsPerPage);
+  const currentItems = translatedCartItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const contactItems = cartItems.filter(item => selectedItemKeys.has(getItemKey(item)) && needsContactForPrice(item));
+  const translatedContactItems = translatedCartItems.filter(item => selectedItemKeys.has(getItemKey(item)) && needsContactForPrice(item));
+
+  const handleCheckout = async () => {
+    if (selectedItemKeys.size === 0) {
+      toastError?.(t('Vui lòng chọn ít nhất 1 sản phẩm để thanh toán'));
+      return;
+    }
     if (contactItems.length > 0) {
       setShowCheckoutWarning(true);
+      return;
+    }
+    const selectedCartItems = cartItems.filter((item) => selectedItemKeys.has(getItemKey(item)));
+    
+    for (const item of selectedCartItems) {
+      if (item.variant_id) {
+        try {
+          const res = await fetch(`http://localhost:3000/api/user/variants/${item.variant_id}/stock`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'success') {
+              const stock = data.data.stock;
+              const qtyNum = Number(item.quantity) || 1;
+              if (qtyNum > stock) {
+                toastError?.(t(`Sản phẩm "${item.name}" không đủ số lượng trong kho để thanh toán`));
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Lỗi kiểm tra stock checkout", err);
+        }
+      }
+    }
+
+    localStorage.setItem('checkoutItems', JSON.stringify(selectedCartItems));
+    navigate('/checkout');
+  };
+
+  const handleClearSelected = () => {
+    if (selectedItemKeys.size === 0) {
+      clearCart();
+      setSelectedItemKeys(new Set());
+      setCurrentPage(1);
     } else {
-      navigate('/checkout');
+      selectedItemKeys.forEach(key => removeItem(key));
+      setSelectedItemKeys(new Set());
+      if (currentPage > Math.ceil((cartItems.length - selectedItemKeys.size) / itemsPerPage)) {
+        setCurrentPage(Math.max(1, Math.ceil((cartItems.length - selectedItemKeys.size) / itemsPerPage)));
+      }
     }
   };
 
   const subtotal = cartItems.reduce((sum, item) => {
+    if (!selectedItemKeys.has(getItemKey(item))) return sum;
     if (needsContactForPrice(item)) return sum;
     return sum + item.price * item.quantity;
   }, 0);
@@ -395,13 +527,30 @@ const Cart: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
             <div className="lg:col-span-2 space-y-5">
-              {translatedCartItems.map((item, index) => (
+              {cartItems.length > 0 && (
+                <div className="flex items-center gap-3 bg-secondary/50 rounded-xl border border-primary/20 p-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItemKeys.size === cartItems.length && cartItems.length > 0}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 cursor-pointer accent-black"
+                  />
+                  <span className="font-bold text-accent text-lg">{t('Chọn tất cả')} ({cartItems.length} {t('sản phẩm')})</span>
+                </div>
+              )}
+              {currentItems.map((item, index) => (
                 <div
                   key={item.id + (item.colorId || '') + (item.sizeId || '')}
                   className="bg-secondary/50 rounded-xl border border-primary/20 p-5 max-[499px]:p-4 flex items-center gap-6 max-[499px]:gap-4 max-[499px]:flex-wrap hover:border-primary/50 hover:shadow-lg transition-all duration-300"
                   data-aos="fade-up"
                   data-aos-delay={index * 100}
                 >
+                  <input
+                    type="checkbox"
+                    checked={selectedItemKeys.has(getItemKey(item))}
+                    onChange={() => toggleSelection(item)}
+                    className="w-4 h-4 cursor-pointer accent-black shrink-0"
+                  />
                   <img src={item.image || '/placeholder.jpg'} alt={item.name ? item.name : t('Sản phẩm')} className="w-24 h-24 max-[499px]:w-20 max-[499px]:h-20 max-[374px]:w-16 max-[374px]:h-16 object-cover rounded-lg border border-primary/10" loading="lazy" />
 
                   <div className="flex-1 min-w-0">
@@ -441,9 +590,20 @@ const Cart: React.FC = () => {
                   </div>
 
                   <div className="flex items-center border border-primary/30 rounded-lg bg-secondary/80">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-10 h-10 hover:bg-primary/20 transition text-lg">−</button>
-                    <span className="w-14 text-center font-bold text-base">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-10 h-10 hover:bg-primary/20 transition text-lg">+</button>
+                    <button onClick={() => updateQuantity(getItemKey(item), (Number(item.quantity) || 1) - 1)} className="w-10 h-10 hover:bg-primary/20 transition text-lg">−</button>
+                    <input 
+                      type="number"
+                      className="w-14 text-center font-bold text-base bg-transparent border-none focus:outline-none focus:ring-0 p-0 m-0 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                      value={item.quantity}
+                      onChange={(e) => handleManualQuantityChange(item, e.target.value)}
+                      onBlur={() => {
+                        if (item.quantity === '') {
+                          updateQuantity(getItemKey(item), 1);
+                        }
+                      }}
+                      min="1"
+                    />
+                    <button onClick={() => handleIncreaseQuantity(item)} className="w-10 h-10 hover:bg-primary/20 transition text-lg">+</button>
                   </div>
 
                   <div className="text-right max-[499px]:ml-auto">
@@ -451,7 +611,7 @@ const Cart: React.FC = () => {
                       {needsContactForPrice(item) ? (
                         <span className="text-orange-500 animate-pulse">{t('Liên hệ')}</span>
                       ) : (
-                        <span className="text-primary">{formatVND(item.price * item.quantity)}</span>
+                        <span className="text-primary">{formatVND(item.price * (Number(item.quantity) || 1))}</span>
                       )}
                     </div>
                   </div>
@@ -472,6 +632,28 @@ const Cart: React.FC = () => {
                   </button>
                 </div>
               ))}
+              
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-lg bg-secondary border border-primary/20 text-accent disabled:opacity-50 hover:bg-primary/20 transition font-bold"
+                  >
+                    {t('Trước')}
+                  </button>
+                  <span className="font-bold text-lg text-primary px-4">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 rounded-lg bg-secondary border border-primary/20 text-accent disabled:opacity-50 hover:bg-primary/20 transition font-bold"
+                  >
+                    {t('Sau')}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="lg:col-span-1">
@@ -507,8 +689,8 @@ const Cart: React.FC = () => {
                   {contactItems.length > 0 ? `${t('CÓ')} ${contactItems.length} ${t('SẢN PHẨM CẦN LIÊN HỆ')}` : t('TIẾN HÀNH THANH TOÁN')}
                 </button>
 
-                <button onClick={clearCart} className="w-full mt-4 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white font-orbitron font-bold text-lg py-4 rounded-xl transition-all duration-300">
-                  {t('XÓA TOÀN BỘ GIỎ HÀNG')}
+                <button onClick={handleClearSelected} className="w-full mt-4 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white font-orbitron font-bold text-lg py-4 rounded-xl transition-all duration-300">
+                  {selectedItemKeys.size > 0 ? t('XÓA CÁC SẢN PHẨM ĐÃ CHỌN') : t('XÓA TOÀN BỘ GIỎ HÀNG')}
                 </button>
               </div>
             </div>
@@ -593,10 +775,10 @@ const Cart: React.FC = () => {
 
                       <button
                         onClick={confirmColor}
-                        disabled={loadingVariant}
-                        className="w-full bg-primary/90 hover:bg-primary text-white font-bold text-lg py-4 rounded-xl transition shadow-lg hover:shadow-xl disabled:opacity-60"
+                        disabled={loadingVariant || variantData?.stock === 0}
+                        className={`w-full font-bold text-lg py-4 rounded-xl transition shadow-lg disabled:opacity-60 ${variantData?.stock === 0 ? 'bg-gray-600 text-gray-300 cursor-not-allowed' : 'bg-primary/90 hover:bg-primary text-white hover:shadow-xl'}`}
                       >
-                        {translatedSelectedItem.color ? t('CẬP NHẬT MÀU & GIÁ') : t('XÁC NHẬN CHỌN MÀU')}
+                        {variantData?.stock === 0 ? t('HẾT HÀNG') : (translatedSelectedItem.color ? t('CẬP NHẬT MÀU & GIÁ') : t('XÁC NHẬN CHỌN MÀU'))}
                       </button>
                     </>
                   ) : (
@@ -640,10 +822,10 @@ const Cart: React.FC = () => {
 
                       <button
                         onClick={confirmSize}
-                        disabled={loadingVariant}
-                        className="w-full bg-primary/90 hover:bg-primary text-white font-bold text-lg py-4 rounded-xl transition shadow-lg hover:shadow-xl disabled:opacity-60"
+                        disabled={loadingVariant || variantData?.stock === 0}
+                        className={`w-full font-bold text-lg py-4 rounded-xl transition shadow-lg disabled:opacity-60 ${variantData?.stock === 0 ? 'bg-gray-600 text-gray-300 cursor-not-allowed' : 'bg-primary/90 hover:bg-primary text-white hover:shadow-xl'}`}
                       >
-                        {translatedSelectedItem.size ? t('CẬP NHẬT SIZE & GIÁ') : t('XÁC NHẬN CHỌN SIZE')}
+                        {variantData?.stock === 0 ? t('HẾT HÀNG') : (translatedSelectedItem.size ? t('CẬP NHẬT SIZE & GIÁ') : t('XÁC NHẬN CHỌN SIZE'))}
                       </button>
                     </>
                   ) : (

@@ -199,7 +199,7 @@ const ProductDetail: React.FC = () => {
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [selectedSizeId, setSelectedSizeId] = useState<string>('TCG-SIZ-001');
   const [selectedColorId, setSelectedColorId] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number | string>(1);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'reviews'>('description');
   const [currentImage, setCurrentImage] = useState<string>('');
@@ -609,7 +609,30 @@ const ProductDetail: React.FC = () => {
     const colorName = isGear ? variants.find(v => v.color_id === selectedColorId)?.color_name : undefined;
     const sizeName = isJersey ? variants.find(v => v.size_id === selectedSizeId)?.size_name : undefined;
 
-    // ĐÃ SỬA: Đưa chính xác variant_id vào giỏ hàng để đồng bộ checkout
+    // Check if the current selectedVariant matches the selected size/color
+    // If it doesn't match yet, it means the API is still fetching. We should wait or prevent adding.
+    if (isGear && selectedVariant && selectedVariant.color_id !== selectedColorId) {
+       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+       return;
+    }
+    if (isJersey && selectedVariant && selectedVariant.size_id !== selectedSizeId) {
+       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+       return;
+    }
+
+    if (selectedVariant && selectedVariant.stock !== undefined) {
+      if (selectedVariant.stock === 0) {
+        error?.(t("Sản phẩm đã hết hàng"));
+        return;
+      }
+      const qtyNum = Number(quantity) || 1;
+      if (qtyNum > selectedVariant.stock) {
+        error?.(t("Số lượng trong kho không đủ"));
+        return;
+      }
+    }
+
+    const qtyNum = Number(quantity) || 1;
     addToCart({
       id: product.product_id,
       variant_id: selectedVariant?.variant_id || undefined,
@@ -622,13 +645,70 @@ const ProductDetail: React.FC = () => {
       size: sizeName,
       sizeId: selectedSizeId || undefined,
       description: current.product_desc || product.product_desc,
-    }, quantity);
+    }, qtyNum);
 
-    let detailMsg = `${quantity} x ${current.product_name || product.product_name}`;
+    let detailMsg = `${qtyNum} x ${current.product_name || product.product_name}`;
     if (isGear && colorName) detailMsg += ` Màu : ${colorName}`;
     if (isJersey && sizeName) detailMsg += ` Size : ${sizeName}`;
 
     success?.(t("Đã thêm vào giỏ!"), detailMsg);
+  };
+
+  const handleBuyNow = () => {
+    if (!product) return;
+    const isGear = product.cate_id === 'TCG-CAT-001';
+    const isJersey = product.cate_id === 'TCG-CAT-002';
+    if (isGear && !selectedColorId) {
+      error?.(t("Vui lòng chọn màu sắc"));
+      return;
+    }
+    if (isJersey && !selectedSizeId) {
+      error?.(t("Vui lòng chọn kích thước"));
+      return;
+    }
+    const current = selectedVariant || product;
+    const colorName = isGear ? variants.find(v => v.color_id === selectedColorId)?.color_name : undefined;
+    const sizeName = isJersey ? variants.find(v => v.size_id === selectedSizeId)?.size_name : undefined;
+
+    if (isGear && selectedVariant && selectedVariant.color_id !== selectedColorId) {
+       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+       return;
+    }
+    if (isJersey && selectedVariant && selectedVariant.size_id !== selectedSizeId) {
+       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+       return;
+    }
+
+    if (selectedVariant && selectedVariant.stock !== undefined) {
+      if (selectedVariant.stock === 0) {
+        error?.(t("Sản phẩm đã hết hàng"));
+        return;
+      }
+      const qtyNum = Number(quantity) || 1;
+      if (qtyNum > selectedVariant.stock) {
+        error?.(t("Số lượng trong kho không đủ"));
+        return;
+      }
+    }
+
+    const qtyNum = Number(quantity) || 1;
+    const buyNowItem = {
+      id: product.product_id,
+      variant_id: selectedVariant?.variant_id || undefined,
+      name: current.product_name || product.product_name,
+      price: current.price || product.product_price,
+      image: `/public/${current.product_image || product.product_image}`,
+      cate_id: product.cate_id,
+      color: colorName,
+      colorId: selectedColorId || undefined,
+      size: sizeName,
+      sizeId: selectedSizeId || undefined,
+      description: current.product_desc || product.product_desc,
+      quantity: qtyNum
+    };
+
+    localStorage.setItem('checkoutItems', JSON.stringify([buyNowItem]));
+    window.location.href = '/checkout';
   };
 
   const handleToggleWishlist = () => {
@@ -864,16 +944,48 @@ const ProductDetail: React.FC = () => {
                 </div>
               </div>
             )}
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-              <div className="quantity-selector">
-                <button className="quantity-btn" onClick={() => setQuantity(prev => Math.max(1, prev - 1))}>-</button>
-                <input type="number" className="quantity-input" value={quantity} onChange={(e) => setQuantity(Math.max(1, Math.min(99, parseInt(e.target.value) || 1)))} min="1" max="99" />
-                <button className="quantity-btn" onClick={() => setQuantity(prev => Math.min(99, prev + 1))}>+</button>
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="quantity-selector w-fit">
+                <button className="quantity-btn" onClick={() => setQuantity(prev => Math.max(1, (Number(prev) || 1) - 1))}>-</button>
+                <input 
+                  type="number" 
+                  className="quantity-input" 
+                  value={quantity} 
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setQuantity('');
+                    } else {
+                      const parsed = parseInt(val);
+                      if (!isNaN(parsed)) {
+                        setQuantity(Math.max(1, parsed));
+                      }
+                    }
+                  }} 
+                  onBlur={() => {
+                    if (quantity === '') setQuantity(1);
+                  }}
+                  min="1" 
+                />
+                <button className="quantity-btn" onClick={() => setQuantity(prev => (Number(prev) || 1) + 1)}>+</button>
               </div>
-              <button onClick={handleAddToCart} className="bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-3 rounded-md font-semibold transition flex items-center gap-2 w-full sm:w-auto font-orbitron add-to-cart">
-                <i data-feather="shopping-cart" className="h-5 w-5"></i>
-                {t("Thêm vào giỏ hàng")}
-              </button>
+              <div className="flex flex-row gap-4 w-full">
+                <button 
+                  onClick={handleAddToCart} 
+                  disabled={selectedVariant?.stock === 0}
+                  className={`flex-1 text-white px-4 sm:px-6 py-3 rounded-md font-semibold transition flex justify-center items-center gap-2 font-orbitron ${selectedVariant?.stock === 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-primary hover:bg-primary/90'}`}>
+                  <i data-feather="shopping-cart" className="h-5 w-5"></i>
+                  <span className="hidden sm:inline">{t("Thêm vào giỏ hàng")}</span>
+                  <span className="sm:hidden">{t("Thêm")}</span>
+                </button>
+                <button 
+                  onClick={handleBuyNow} 
+                  disabled={selectedVariant?.stock === 0}
+                  className={`flex-1 text-white px-4 sm:px-6 py-3 rounded-md font-semibold transition flex justify-center items-center gap-2 font-orbitron ${selectedVariant?.stock === 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-red-600 hover:bg-red-700'}`}>
+                  <i data-feather="credit-card" className="h-5 w-5"></i>
+                  {selectedVariant?.stock === 0 ? t("Hết hàng") : t("Mua ngay")}
+                </button>
+              </div>
             </div>
             <div className="border-t border-primary/20 pt-4">
               <div className="flex items-center gap-2 text-accent/70 mb-2 text-sm font-open-sans">

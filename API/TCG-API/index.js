@@ -12,6 +12,25 @@ const { OAuth2Client } = require("google-auth-library");
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const session = require('express-session');
+const qs = require('qs');
+const moment = require('moment');
+const crypto = require('crypto');
+
+function sortObject(obj) {
+  let sorted = {};
+  let str = [];
+  let key;
+  for (key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      str.push(encodeURIComponent(key));
+    }
+  }
+  str.sort();
+  for (key = 0; key < str.length; key++) {
+    sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+  }
+  return sorted;
+}
 
 const app = express();
 const port = 3000;
@@ -760,7 +779,7 @@ const removeTone = (str) =>
         }
         const user = rows[0];
         if (user.user_isActive !== 1) {
-          return res.status(403).json({ status: "error", message: "TĂ i khoáº£n cá»§a báº¡n Ä‘Ă£ bá»‹ khĂ³a" });
+          return res.status(403).json({ status: "error", message: "Tài khoản của bạn đã bị khóa" });
         }
         const isPasswordValid = await bcrypt.compare(password, user.user_password);
         if (!isPasswordValid) {
@@ -899,8 +918,8 @@ const removeTone = (str) =>
              ua.type, 
              ua.ref_id, 
              CASE 
-               WHEN ua.type = 'ORDER' THEN CONCAT('Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng: MĂ£ Ä‘Æ¡n hĂ ng ', ua.ref_id)
-               WHEN ua.type = 'COMMENT' THEN CONCAT('Báº¡n Ä‘Ă£ bĂ¬nh luáº­n á»Ÿ sáº£n pháº©m: ', IFNULL(p.product_name, 'Sáº£n pháº©m'))
+               WHEN ua.type = 'ORDER' THEN CONCAT('Bạn đã đặt đơn hàng thành công: Mã đơn hàng ', ua.ref_id)
+               WHEN ua.type = 'COMMENT' THEN CONCAT('Bạn đã bình luận ở sản phẩm: ', IFNULL(p.product_name, 'Sản phẩm'))
                ELSE ua.description 
              END AS description,
              ua.created_at AS time 
@@ -942,7 +961,7 @@ const removeTone = (str) =>
 
         await db.query('UPDATE users SET user_image = ? WHERE user_id = ?', [newImagePath, userId]);
         await db.query(
-          `INSERT INTO user_activities (user_id, type, description) VALUES (?, 'UPDATE_AVATAR', 'Báº¡n Ä‘Ă£ cáº­p nháº­t áº£nh Ä‘áº¡i diá»‡n')`,
+          `INSERT INTO user_activities (user_id, type, description) VALUES (?, 'UPDATE_AVATAR', 'Bạn đã cập nhật ảnh đại diện')`,
           [userId]
         );
 
@@ -972,9 +991,9 @@ const removeTone = (str) =>
         if (oldUser.user_email !== email) changes.push(`email thĂ nh "${email}"`);
         if ((oldUser.user_phone_number || '') !== (phone || '')) changes.push(`sá»‘ Ä‘iá»‡n thoáº¡i thĂ nh "${phone}"`);
 
-        let description = 'Báº¡n Ä‘Ă£ cáº­p nháº­t thĂ´ng tin cĂ¡ nhĂ¢n';
+        let description = 'Bạn đã cập nhật thông tin cá nhân';
         if (changes.length > 0) {
-          description = `Báº¡n vá»«a cáº­p nháº­t ${changes.join(' vĂ  ')}`;
+          description = `Bạn vừa cập nhật ${changes.join(' và ')}`;
         }
 
         await db.query(
@@ -1020,7 +1039,7 @@ const removeTone = (str) =>
         );
         await db.query(
           `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'ADDRESS', ?, ?)`,
-          [userId, addressId, `Báº¡n Ä‘Ă£ thĂªm Ä‘á»‹a chá»‰ má»›i`]
+          [userId, addressId, `Bạn đã thêm địa chỉ mới`]
         );
 
         res.json({
@@ -1176,7 +1195,7 @@ const removeTone = (str) =>
         if (userId) {
           await db.query(
             `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'COMMENT', ?, ?)`,
-            [userId, cmtId, `Báº¡n Ä‘Ă£ Ä‘Ă¡nh giĂ¡ sáº£n pháº©m`]
+            [userId, cmtId, `Bạn đã đánh giá sản phẩm`]
           );
         }
         res.json({ status: "success", data: { cmtId } });
@@ -1256,6 +1275,20 @@ const removeTone = (str) =>
     });
 
     // ======================= VARIANTS =======================
+    app.get("/api/user/variants/:variantId/stock", async (req, res) => {
+      try {
+        const { variantId } = req.params;
+        const [rows] = await db.query(`SELECT stock FROM variants WHERE variant_id = ?`, [variantId]);
+        if (rows.length === 0) {
+          return res.json({ status: "success", data: { stock: 0 } });
+        }
+        res.json({ status: "success", data: { stock: rows[0].stock } });
+      } catch (err) {
+        console.error("Lỗi lấy stock:", err);
+        res.status(500).json({ status: "error", message: "Server error" });
+      }
+    });
+
     app.get("/api/user/variants/products/gear/:productId/:colorId", async (req, res) => {
       const { productId, colorId } = req.params;
       const [rows] = await db.query(`
@@ -1550,9 +1583,13 @@ const removeTone = (str) =>
         const order_id = `TCG-ORD-${String(nextOrderNum).padStart(3, '0')}`;
 
         const now = new Date();
-        const localDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const order_date = clientDate || localDateStr;
-        const order_time = clientTime || now.toTimeString().split(' ')[0];
+        const order_date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const order_time = now.toTimeString().split(' ')[0];
+
+        let initialPaymentStatus = 'Chờ thanh toán';
+        if (payment_method === 'Thanh Toán VNPAY' || payment_method === 'Chuyển Khoản Ngân Hàng') {
+          initialPaymentStatus = 'Đã thanh toán';
+        }
 
         // 2. Insert order
         await db.query(
@@ -1563,7 +1600,7 @@ const removeTone = (str) =>
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             order_id, user_id, order_date, order_time, 'Chờ xác nhận',
-            'Chờ thanh toán', payment_method || 'Thanh Toán Khi Nhận Hàng', shipping_method || 'Giao Hàng Tiêu Chuẩn',
+            initialPaymentStatus, payment_method || 'Thanh Toán Khi Nhận Hàng', shipping_method || 'Giao Hàng Tiêu Chuẩn',
             recipient_name || '', recipient_phone || '', recipient_email || '',
             shipping_address, 'Chờ xử lý', note || '',
             (applied_vouchers && applied_vouchers.length > 0) ? applied_vouchers.join(',') : null
@@ -1574,9 +1611,21 @@ const removeTone = (str) =>
         const [[{ count: detailCount }]] = await db.query('SELECT COUNT(*) AS count FROM order_details');
         let nextDetailNum = detailCount + 1;
 
+        // Nhóm các items có cùng variant_id lại với nhau để tránh lưu nhiều dòng trùng lặp
+        const groupedItems = {};
         for (const item of items) {
+          const vId = item.variant_id || 'UNKNOWN';
+          if (groupedItems[vId]) {
+            groupedItems[vId].quantity += item.quantity;
+            groupedItems[vId].price += item.price * item.quantity; // Tổng tiền = quantity * unit_price
+          } else {
+            groupedItems[vId] = { ...item, price: item.price * item.quantity }; // Lưu tạm tổng tiền vào field price
+          }
+        }
+
+        for (const item of Object.values(groupedItems)) {
           const detail_id = `TCG-ODT-${String(nextDetailNum++).padStart(3, '0')}`;
-          const item_total = item.quantity * item.price;
+          const item_total = item.price; // Đã là tổng tiền ở bước group
           await db.query(
             `INSERT INTO order_details (detail_id, order_id, variant_id, quantity, total_amount) 
              VALUES (?, ?, ?, ?, ?)`,
@@ -1586,7 +1635,7 @@ const removeTone = (str) =>
 
         await db.query(
           `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'ORDER', ?, ?)`,
-          [user_id, order_id, `Báº¡n Ä‘Ă£ Ä‘áº·t Ä‘Æ¡n hĂ ng thĂ nh cĂ´ng`]
+          [user_id, order_id, `Bạn đã đặt đơn hàng thành công`]
         );
 
         // 4. Update voucher usage time
@@ -1643,12 +1692,83 @@ const removeTone = (str) =>
           }
         }
 
-        res.json({ status: "success", message: "Ä áº·t hĂ ng thĂ nh cĂ´ng", data: { order_id } });
+        // VNPAY url creation is moved to /api/payment/vnpay_create_url
+
+        res.json({ status: "success", message: "Đặt hàng thành công", data: { order_id } });
       } catch (err) {
         await db.rollback();
-        console.error("Lá»—i POST /api/orders:", err);
-        res.status(500).json({ status: "error", message: "Lá»—i táº¡o Ä‘Æ¡n hĂ ng" });
+        console.error("Lỗi POST /api/orders:", err);
+        res.status(500).json({ status: "error", message: "Lỗi tạo đơn hàng" });
       }
+    });
+
+    // ======================= VNPAY RETURN API =======================
+    app.get("/api/orders/vnpay_return", async (req, res) => {
+      let vnp_Params = req.query;
+      let secureHash = vnp_Params['vnp_SecureHash'];
+
+      delete vnp_Params['vnp_SecureHash'];
+      delete vnp_Params['vnp_SecureHashType'];
+
+      vnp_Params = sortObject(vnp_Params);
+      let secretKey = process.env.VNP_HASH_SECRET;
+
+      let signData = qs.stringify(vnp_Params, { encode: false });
+      let hmac = crypto.createHmac("sha512", secretKey);
+      let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
+
+      if (secureHash === signed) {
+        if (vnp_Params['vnp_ResponseCode'] === '00') {
+          // Checksum OK & Paid -> Redirect frontend to trigger order creation
+          res.redirect('http://localhost:5173/vnpay-return?status=success');
+        } else {
+          res.redirect('http://localhost:5173/vnpay-return?status=failed');
+        }
+      } else {
+        res.redirect('http://localhost:5173/vnpay-return?status=invalid_signature');
+      }
+    });
+
+    // ======================= VNPAY CREATE URL API =======================
+    app.post("/api/payment/vnpay_create_url", (req, res) => {
+      const { total_amount } = req.body;
+      if (!total_amount) return res.status(400).json({ status: "error", message: "Thiếu total_amount" });
+
+      let ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      let tmnCode = process.env.VNP_TMN_CODE;
+      let secretKey = process.env.VNP_HASH_SECRET;
+      let vnpUrl = process.env.VNP_URL;
+      let returnUrl = process.env.VNP_RETURN_URL;
+
+      let date = new Date();
+      let createDate = moment(date).format('YYYYMMDDHHmmss');
+      let amount = total_amount * 100;
+      let txnRef = 'VNP-' + moment(date).format('YYYYMMDDHHmmss') + '-' + Math.floor(Math.random() * 10000);
+      let orderInfo = 'Thanh toan VNPAY don hang ' + txnRef;
+
+      let vnp_Params = {};
+      vnp_Params['vnp_Version'] = '2.1.0';
+      vnp_Params['vnp_Command'] = 'pay';
+      vnp_Params['vnp_TmnCode'] = tmnCode;
+      vnp_Params['vnp_Locale'] = 'vn';
+      vnp_Params['vnp_CurrCode'] = 'VND';
+      vnp_Params['vnp_TxnRef'] = txnRef;
+      vnp_Params['vnp_OrderInfo'] = orderInfo;
+      vnp_Params['vnp_OrderType'] = 'other';
+      vnp_Params['vnp_Amount'] = amount;
+      vnp_Params['vnp_ReturnUrl'] = returnUrl;
+      vnp_Params['vnp_IpAddr'] = ipAddr;
+      vnp_Params['vnp_CreateDate'] = createDate;
+
+      vnp_Params = sortObject(vnp_Params);
+
+      let signData = qs.stringify(vnp_Params, { encode: false });
+      let hmac = crypto.createHmac("sha512", secretKey);
+      let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
+      vnp_Params['vnp_SecureHash'] = signed;
+      vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false });
+
+      res.json({ status: "success", paymentUrl: vnpUrl });
     });
 
     app.put("/api/orders/:orderId/confirm-email", async (req, res) => {
