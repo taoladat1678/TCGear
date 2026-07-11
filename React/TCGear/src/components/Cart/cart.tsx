@@ -21,7 +21,7 @@ interface SizeOption {
 }
 
 interface VariantData {
-  variant_id: string; // Thêm trường này vào interface để bóc tách từ API
+  variant_id: string;
   price: number;
   product_image: string;
   product_name: string;
@@ -35,7 +35,7 @@ const Cart: React.FC = () => {
   const { error: toastError } = useToast();
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  
+
   const [selectedItemKeys, setSelectedItemKeys] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -60,13 +60,13 @@ const Cart: React.FC = () => {
   const [translatedCartItems, setTranslatedCartItems] = useState<any[]>([]);
   const [translatedVariantData, setTranslatedVariantData] = useState<VariantData | null>(null);
 
-  const handleIncreaseQuantity = async (item: any) => {
-    if (!item.variant_id) {
-      // Nếu không có variant_id (sản phẩm cũ chưa có), thì cho phép cộng bình thường
-      updateQuantity(getItemKey(item), item.quantity + 1);
-      return;
-    }
+  const [translatedColors, setTranslatedColors] = useState<ColorOption[]>([]);
+  const [translatedSizes, setTranslatedSizes] = useState<SizeOption[]>([]);
+  const [translatedSelectedItem, setTranslatedSelectedItem] = useState<any>(null);
 
+  const getItemKey = (item: any) => `${item.id}|${item.colorId || ''}|${item.sizeId || ''}`;
+
+  const handleIncreaseQuantity = async (item: any) => {
     try {
       const res = await fetch(`http://localhost:3000/api/user/variants/${item.variant_id}/stock`);
       if (res.ok) {
@@ -82,62 +82,39 @@ const Cart: React.FC = () => {
       updateQuantity(getItemKey(item), item.quantity + 1);
     } catch (err) {
       console.error("Lỗi kiểm tra stock", err);
-      // Fallback
       updateQuantity(getItemKey(item), item.quantity + 1);
     }
   };
 
-  const handleManualQuantityChange = async (item: any, val: string) => {
+  const handleManualQuantityChange = (item: any, val: string) => {
     if (val === '') {
       updateQuantity(getItemKey(item), '');
       return;
     }
-    
+
     const parsed = parseInt(val);
     if (isNaN(parsed)) return;
-    
-    let newQty = Math.max(1, parsed);
 
-    if (item.variant_id) {
-      try {
-        const res = await fetch(`http://localhost:3000/api/user/variants/${item.variant_id}/stock`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.status === 'success') {
-            const stock = data.data.stock;
-            if (newQty > stock) {
-              toastError?.(t("Số lượng trong kho không đủ"));
-              newQty = stock; // revert to max available
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Lỗi kiểm tra stock", err);
-      }
-    }
+    const newQty = Math.max(1, parsed);
     updateQuantity(getItemKey(item), newQty);
   };
 
-  const [translatedColors, setTranslatedColors] = useState<ColorOption[]>([]);
-  const [translatedSizes, setTranslatedSizes] = useState<SizeOption[]>([]);
-  const [translatedSelectedItem, setTranslatedSelectedItem] = useState<any>(null);
-
   useEffect(() => {
     const translateItems = async () => {
-      if (currentLang !== 'en') {
+      if (currentLang === 'en') {
+        const translated = await Promise.all(
+          cartItems.map(async (item) => ({
+            ...item,
+            name: item.name ? await autoTranslate(item.name) : undefined,
+            description: item.description ? await autoTranslate(item.description) : undefined,
+            color: item.color ? await autoTranslate(item.color) : undefined,
+            size: item.size ? await autoTranslate(item.size) : undefined,
+          }))
+        );
+        setTranslatedCartItems(translated);
+      } else {
         setTranslatedCartItems(cartItems);
-        return;
       }
-      const translated = await Promise.all(
-        cartItems.map(async (item) => ({
-          ...item,
-          name: item.name ? await autoTranslate(item.name) : undefined,
-          description: item.description ? await autoTranslate(item.description) : undefined,
-          color: item.color ? await autoTranslate(item.color) : undefined,
-          size: item.size ? await autoTranslate(item.size) : undefined,
-        }))
-      );
-      setTranslatedCartItems(translated);
     };
     translateItems();
   }, [cartItems, currentLang]);
@@ -148,34 +125,34 @@ const Cart: React.FC = () => {
         setTranslatedVariantData(null);
         return;
       }
-      if (currentLang !== 'en') {
+      if (currentLang === 'en') {
+        setTranslatedVariantData({
+          ...variantData,
+          product_name: await autoTranslate(variantData.product_name),
+          product_desc: variantData.product_desc ? await autoTranslate(variantData.product_desc) : undefined,
+        });
+      } else {
         setTranslatedVariantData(variantData);
-        return;
       }
-      setTranslatedVariantData({
-        ...variantData,
-        product_name: await autoTranslate(variantData.product_name),
-        product_desc: variantData.product_desc ? await autoTranslate(variantData.product_desc) : undefined,
-      });
     };
     translateVariant();
   }, [variantData, currentLang]);
 
   useEffect(() => {
     const translateOptions = async () => {
-      if (currentLang !== 'en') {
+      if (currentLang === 'en') {
+        const tc = await Promise.all(
+          colors.map(async c => ({ ...c, color_name: await autoTranslate(c.color_name) }))
+        );
+        setTranslatedColors(tc);
+        const ts = await Promise.all(
+          sizes.map(async s => ({ ...s, size_name: await autoTranslate(s.size_name) }))
+        );
+        setTranslatedSizes(ts);
+      } else {
         setTranslatedColors(colors);
         setTranslatedSizes(sizes);
-        return;
       }
-      const tc = await Promise.all(
-        colors.map(async c => ({ ...c, color_name: await autoTranslate(c.color_name) }))
-      );
-      setTranslatedColors(tc);
-      const ts = await Promise.all(
-        sizes.map(async s => ({ ...s, size_name: await autoTranslate(s.size_name) }))
-      );
-      setTranslatedSizes(ts);
     };
     translateOptions();
   }, [colors, sizes, currentLang]);
@@ -186,17 +163,17 @@ const Cart: React.FC = () => {
         setTranslatedSelectedItem(null);
         return;
       }
-      if (currentLang !== 'en') {
+      if (currentLang === 'en') {
+        setTranslatedSelectedItem({
+          ...selectedItem,
+          name: selectedItem.name ? await autoTranslate(selectedItem.name) : undefined,
+          description: selectedItem.description ? await autoTranslate(selectedItem.description) : undefined,
+          color: selectedItem.color ? await autoTranslate(selectedItem.color) : undefined,
+          size: selectedItem.size ? await autoTranslate(selectedItem.size) : undefined,
+        });
+      } else {
         setTranslatedSelectedItem(selectedItem);
-        return;
       }
-      setTranslatedSelectedItem({
-        ...selectedItem,
-        name: selectedItem.name ? await autoTranslate(selectedItem.name) : undefined,
-        description: selectedItem.description ? await autoTranslate(selectedItem.description) : undefined,
-        color: selectedItem.color ? await autoTranslate(selectedItem.color) : undefined,
-        size: selectedItem.size ? await autoTranslate(selectedItem.size) : undefined,
-      });
     };
     translateSelected();
   }, [selectedItem, currentLang]);
@@ -270,6 +247,7 @@ const Cart: React.FC = () => {
         fetchVariant('jersey', selectedItem.id, selectedItem.sizeId);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem]);
 
   useEffect(() => {
@@ -281,6 +259,7 @@ const Cart: React.FC = () => {
     if (selectedItem.cate_id === 'TCG-CAT-002' && selectedSizeId) {
       fetchVariant('jersey', selectedItem.id, selectedSizeId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColorId, selectedSizeId, selectedItem]);
 
   const fetchColors = async () => {
@@ -337,7 +316,6 @@ const Cart: React.FC = () => {
     const chosen = colors.find(c => c.color_id === selectedColorId);
     if (!chosen) return;
 
-    // ĐÃ SỬA: Đồng bộ bổ sung variant_id vào giỏ hàng
     const newItem = variantData
       ? {
         ...selectedItem,
@@ -352,6 +330,7 @@ const Cart: React.FC = () => {
       }
       : {
         ...selectedItem,
+        variant_id: undefined,
         color: chosen.color_name,
         colorId: chosen.color_id,
         price: 0,
@@ -369,7 +348,6 @@ const Cart: React.FC = () => {
     const chosen = sizes.find(s => s.size_id === selectedSizeId);
     if (!chosen) return;
 
-    // ĐÃ SỬA: Đồng bộ bổ sung variant_id vào giỏ hàng
     const newItem = variantData
       ? {
         ...selectedItem,
@@ -384,6 +362,7 @@ const Cart: React.FC = () => {
       }
       : {
         ...selectedItem,
+        variant_id: undefined,
         size: chosen.size_name,
         sizeId: chosen.size_id,
         price: 0,
@@ -413,8 +392,6 @@ const Cart: React.FC = () => {
       )
     );
   };
-
-  const getItemKey = (item: any) => `${item.id}|${item.colorId || ''}|${item.sizeId || ''}`;
 
   const toggleSelection = (item: any) => {
     const key = getItemKey(item);
@@ -451,7 +428,7 @@ const Cart: React.FC = () => {
       return;
     }
     const selectedCartItems = cartItems.filter((item) => selectedItemKeys.has(getItemKey(item)));
-    
+
     for (const item of selectedCartItems) {
       if (item.variant_id) {
         try {
@@ -591,7 +568,7 @@ const Cart: React.FC = () => {
 
                   <div className="flex items-center border border-primary/30 rounded-lg bg-secondary/80">
                     <button onClick={() => updateQuantity(getItemKey(item), (Number(item.quantity) || 1) - 1)} className="w-10 h-10 hover:bg-primary/20 transition text-lg">−</button>
-                    <input 
+                    <input
                       type="number"
                       className="w-14 text-center font-bold text-base bg-transparent border-none focus:outline-none focus:ring-0 p-0 m-0 [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                       value={item.quantity}
@@ -632,7 +609,7 @@ const Cart: React.FC = () => {
                   </button>
                 </div>
               ))}
-              
+
               {totalPages > 1 && (
                 <div className="flex justify-center items-center gap-2 mt-8">
                   <button
@@ -734,17 +711,17 @@ const Cart: React.FC = () => {
                   <i data-feather="alert-triangle" className="w-6 h-6 flex-shrink-0 mt-0.5"></i>
                   <div className="text-sm md:text-base leading-relaxed">
                     <strong>{t('Lưu ý:')}</strong> {t('Giá có thể thay đổi tùy theo')}{' '}
-                    {translatedSelectedItem.cate_id === 'TCG-CAT-001' ? t('màu sắc') : t('kích cỡ')}.
+                    {selectedItem.cate_id === 'TCG-CAT-001' ? t('màu sắc') : t('kích cỡ')}.
                   </div>
                 </div>
               )}
 
-              {translatedSelectedItem.cate_id === 'TCG-CAT-001' && (
+              {selectedItem.cate_id === 'TCG-CAT-001' && (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold text-accent flex items-center gap-3">
                       <i data-feather="palette" className="w-7 h-7"></i>
-                      {translatedSelectedItem.color ? t('Thay đổi màu sắc') : t('Chọn màu sắc')}
+                      {selectedItem.color ? t('Thay đổi màu sắc') : t('Chọn màu sắc')}
                     </h3>
                   </div>
 
@@ -778,7 +755,7 @@ const Cart: React.FC = () => {
                         disabled={loadingVariant || variantData?.stock === 0}
                         className={`w-full font-bold text-lg py-4 rounded-xl transition shadow-lg disabled:opacity-60 ${variantData?.stock === 0 ? 'bg-gray-600 text-gray-300 cursor-not-allowed' : 'bg-primary/90 hover:bg-primary text-white hover:shadow-xl'}`}
                       >
-                        {variantData?.stock === 0 ? t('HẾT HÀNG') : (translatedSelectedItem.color ? t('CẬP NHẬT MÀU & GIÁ') : t('XÁC NHẬN CHỌN MÀU'))}
+                        {variantData?.stock === 0 ? t('HẾT HÀNG') : (selectedItem.color ? t('CẬP NHẬT MÀU & GIÁ') : t('XÁC NHẬN CHỌN MÀU'))}
                       </button>
                     </>
                   ) : (
@@ -787,12 +764,12 @@ const Cart: React.FC = () => {
                 </div>
               )}
 
-              {translatedSelectedItem.cate_id === 'TCG-CAT-002' && (
+              {selectedItem.cate_id === 'TCG-CAT-002' && (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl font-bold text-accent flex items-center gap-3">
                       <i data-feather="ruler" className="w-7 h-7"></i>
-                      {translatedSelectedItem.size ? t('Thay đổi kích cỡ') : t('Chọn kích cỡ (Size)')}
+                      {selectedItem.size ? t('Thay đổi kích cỡ') : t('Chọn kích cỡ (Size)')}
                     </h3>
                   </div>
 
@@ -825,7 +802,7 @@ const Cart: React.FC = () => {
                         disabled={loadingVariant || variantData?.stock === 0}
                         className={`w-full font-bold text-lg py-4 rounded-xl transition shadow-lg disabled:opacity-60 ${variantData?.stock === 0 ? 'bg-gray-600 text-gray-300 cursor-not-allowed' : 'bg-primary/90 hover:bg-primary text-white hover:shadow-xl'}`}
                       >
-                        {variantData?.stock === 0 ? t('HẾT HÀNG') : (translatedSelectedItem.size ? t('CẬP NHẬT SIZE & GIÁ') : t('XÁC NHẬN CHỌN SIZE'))}
+                        {variantData?.stock === 0 ? t('HẾT HÀNG') : (selectedItem.size ? t('CẬP NHẬT SIZE & GIÁ') : t('XÁC NHẬN CHỌN SIZE'))}
                       </button>
                     </>
                   ) : (

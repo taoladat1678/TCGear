@@ -1655,6 +1655,44 @@ const removeTone = (str) =>
         // 5. Gửi email xác nhận đơn hàng
         if (recipient_email) {
           const confirmLink = `http://localhost:5173/order-confirm?orderId=${order_id}`;
+
+          const [products] = await db.query(
+            `SELECT 
+               od.quantity, od.total_amount,
+               p.product_name as name, p.product_image as image,
+               COALESCE(v.variant_id, p.product_id) as sku,
+               s.size_name as size,
+               c.color_name as color
+             FROM order_details od
+             LEFT JOIN variants v ON od.variant_id = v.variant_id
+             JOIN products p ON (v.product_id = p.product_id OR od.variant_id = p.product_id)
+             LEFT JOIN sizes s ON v.size_id = s.size_id
+             LEFT JOIN colors c ON v.color_id = c.color_id
+             WHERE od.order_id = ?`,
+            [order_id]
+          );
+
+          let productsHtml = '';
+          for (const p of products) {
+            const variant = (p.size && p.color) ? `${p.color}/${p.size}` : (p.size || p.color || '');
+            const unitPrice = p.total_amount / p.quantity;
+            productsHtml += `
+              <table style="width: 100%; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; border-collapse: collapse;">
+                <tr>
+                  <td style="width: 70px; vertical-align: top;">
+                    <img src="${p.image}" alt="${p.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;" />
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h4 style="margin: 0; color: #fff; font-size: 16px;">${p.name}</h4>
+                    ${variant ? `<p style="margin: 4px 0 0; color: #aaa; font-size: 14px;">Phân loại: ${variant}</p>` : ''}
+                    <p style="margin: 4px 0 0; color: #ddd; font-size: 14px;">Số lượng: ${p.quantity} | Đơn giá: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(unitPrice)}</p>
+                    <p style="margin: 4px 0 0; color: #e11d48; font-size: 14px; font-weight: bold;">Tổng cộng: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.total_amount)}</p>
+                  </td>
+                </tr>
+              </table>
+            `;
+          }
+
           const mailOptions = {
             from: `"TCGear Orders" <${process.env.EMAIL_USER || "orders@tcgear.com"}>`,
             to: recipient_email,
@@ -1666,18 +1704,41 @@ const removeTone = (str) =>
               <div style="padding: 30px;">
                 <h2 style="color: #e11d48; margin-top: 0;">Cảm ơn bạn đã đặt hàng, ${recipient_name}!</h2>
                 <p style="color: #ddd;">Đơn hàng <strong>${order_id}</strong> của bạn đã được ghi nhận. Vui lòng nhấn vào nút bên dưới để xác nhận đơn hàng và để chúng tôi bắt đầu quá trình xử lý.</p>
+                
+                <div style="margin: 25px 0; padding: 20px; background-color: #1a1a1a; border-radius: 6px; border: 1px solid #333;">
+                  <h3 style="color: #fff; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;">Chi Tiết Đơn Hàng</h3>
+                  
+                  <div style="margin-bottom: 20px;">
+                    <h4 style="color: #ddd; margin: 0 0 5px 0; font-size: 14px;">Địa chỉ giao hàng</h4>
+                    <p style="color: #aaa; margin: 0; font-size: 14px; line-height: 1.5;">
+                      ${recipient_name}<br>
+                      ${shipping_address}<br>
+                      SĐT: ${recipient_phone}<br>
+                      Email: ${recipient_email}
+                    </p>
+                  </div>
+                  
+                  <div style="margin-bottom: 20px;">
+                    <h4 style="color: #ddd; margin: 0 0 5px 0; font-size: 14px;">Phương thức thanh toán</h4>
+                    <p style="color: #aaa; margin: 0; font-size: 14px;">
+                      ${payment_method || 'Thanh Toán Khi Nhận Hàng'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 style="color: #ddd; margin: 0 0 15px 0; font-size: 14px; border-bottom: 1px solid #333; padding-bottom: 5px;">Sản phẩm</h4>
+                    ${productsHtml}
+                  </div>
+                  
+                  <div style="margin-top: 20px; text-align: right; border-top: 1px solid #333; padding-top: 15px;">
+                    <strong style="color: #fff; font-size: 18px;">Tổng đơn hàng: ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total_amount)}</strong>
+                  </div>
+                </div>
+
                 <div style="text-align: center; margin: 30px 0;">
                   <a href="${confirmLink}" style="background-color: #e11d48; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Xác Nhận Đơn Hàng</a>
                 </div>
-                <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;" />
-                <p style="color: #444; font-size: 12px; margin: 0;">Mã thư gửi: ${Date.now()}-${Math.random().toString(36).substring(7)}</p>
               </div>
-            </div>
-            <!-- Anti-trimming spacer -->
-            <div style="display:none; white-space:nowrap; font:15px courier; line-height:0;">
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-              &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             </div>`
           };
 
@@ -1692,11 +1753,7 @@ const removeTone = (str) =>
           }
         }
 
-<<<<<<< HEAD
         // VNPAY url creation is moved to /api/payment/vnpay_create_url
-
-=======
->>>>>>> d613fa14215970feb3314328c0c5b5360c146ad7
         res.json({ status: "success", message: "Đặt hàng thành công", data: { order_id } });
       } catch (err) {
         await db.rollback();

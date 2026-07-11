@@ -71,6 +71,10 @@ const Checkout: React.FC = () => {
   const [freeshipError, setFreeshipError] = useState<string | null>(null);
   const [freeshipSuccess, setFreeshipSuccess] = useState<string | null>(null);
 
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [pendingPayload, setPendingPayload] = useState<any>(null);
+  const [transactionImage, setTransactionImage] = useState<File | null>(null);
+
   const translateText = useCallback(
     async (text: string, targetLang: string = currentLang): Promise<string> => {
       if (!text || targetLang === 'vi') return text;
@@ -103,7 +107,7 @@ const Checkout: React.FC = () => {
       const storedCheckout = localStorage.getItem('checkoutItems');
       const storedCart = localStorage.getItem('cartItems');
       const cartData = storedCheckout || storedCart;
-      
+
       if (cartData) {
         const parsedCart = JSON.parse(cartData);
         if (Array.isArray(parsedCart) && parsedCart.length > 0) {
@@ -399,6 +403,49 @@ const Checkout: React.FC = () => {
     setFreeshipError(null);
   };
 
+  const submitOrder = async (payload: any) => {
+    setIsProcessing(true);
+    try {
+      const res = await fetch('http://localhost:3000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        success?.(t("Đặt hàng thành công!"), t("Cảm ơn bạn đã mua hàng tại TCGear."));
+        const storedCheckout = localStorage.getItem('checkoutItems');
+        if (storedCheckout) {
+          try {
+            const checkoutItems = JSON.parse(storedCheckout);
+            const storedCart = localStorage.getItem('cartItems');
+            if (storedCart) {
+              const cartList = JSON.parse(storedCart);
+              const remaining = cartList.filter((cItem: any) =>
+                !checkoutItems.some((chk: any) =>
+                  chk.id === cItem.id && chk.colorId === cItem.colorId && chk.sizeId === cItem.sizeId
+                )
+              );
+              localStorage.setItem('cartItems', JSON.stringify(remaining));
+            }
+          } catch (e) { }
+          localStorage.removeItem('checkoutItems');
+        } else {
+          localStorage.removeItem('cartItems');
+        }
+        sessionStorage.removeItem('checkoutState');
+        window.location.href = '/order-success';
+      } else {
+        toastError?.(data.message || t("Có lỗi xảy ra khi đặt hàng"));
+      }
+    } catch (err) {
+      console.error(err);
+      toastError?.(t("Lỗi kết nối khi đặt hàng"));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -469,48 +516,21 @@ const Checkout: React.FC = () => {
       }
 
       if (paymentMethod === 'Chuyển Khoản Ngân Hàng') {
+        setPendingPayload(payload);
+        setShowBankModal(true);
+        setIsProcessing(false);
+        return;
+      }
+
+      if (paymentMethod === 'Thanh Toán MoMo') {
         // Giả lập delay 3 giây
         await new Promise(resolve => setTimeout(resolve, 3000));
       }
 
-      // Xử lý tạo đơn hàng (Cho COD hoặc sau khi giả lập Chuyển Khoản Ngân Hàng)
-      const res = await fetch('http://localhost:3000/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-
-      if (data.status === 'success') {
-        success?.(t("Đặt hàng thành công!"), t("Cảm ơn bạn đã mua hàng tại TCGear."));
-        const storedCheckout = localStorage.getItem('checkoutItems');
-        if (storedCheckout) {
-          try {
-            const checkoutItems = JSON.parse(storedCheckout);
-            const storedCart = localStorage.getItem('cartItems');
-            if (storedCart) {
-              const cartList = JSON.parse(storedCart);
-              const remaining = cartList.filter((cItem: any) => 
-                !checkoutItems.some((chk: any) => 
-                  chk.id === cItem.id && chk.colorId === cItem.colorId && chk.sizeId === cItem.sizeId
-                )
-              );
-              localStorage.setItem('cartItems', JSON.stringify(remaining));
-            }
-          } catch(e){}
-          localStorage.removeItem('checkoutItems');
-        } else {
-          localStorage.removeItem('cartItems');
-        }
-        sessionStorage.removeItem('checkoutState');
-        window.location.href = '/order-success';
-      } else {
-        toastError?.(data.message || t("Có lỗi xảy ra khi đặt hàng"));
-      }
+      await submitOrder(payload);
     } catch (err) {
       console.error(err);
       toastError?.(t("Lỗi kết nối khi đặt hàng"));
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -519,376 +539,467 @@ const Checkout: React.FC = () => {
     <>
       <Preloader visible={isProcessing} />
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-accent">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Form giao hàng */}
-        <div className="lg:col-span-2">
-          <h2 className="text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-6 font-orbitron" data-aos="fade-up">
-            {t("Thông Tin Giao Hàng")}
-          </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Form giao hàng */}
+          <div className="lg:col-span-2">
+            <h2 className="text-2xl max-[499px]:text-xl max-[374px]:text-lg font-bold mb-6 font-orbitron" data-aos="fade-up">
+              {t("Thông Tin Giao Hàng")}
+            </h2>
 
-          <form id="shipping-form" className="space-y-6" data-aos="fade-up" data-aos-delay="100" onSubmit={handleCheckoutSubmit}>
-            <div>
-              <label htmlFor="first-name" className="block text-sm font-medium mb-1 font-open-sans">
-                {isLoggedIn ? t("Tên người nhận") : t("Tên")}
-              </label>
-              <input
-                type="text"
-                id="first-name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1 font-open-sans">
-                {t("Địa Chỉ Email")}
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium mb-1 font-open-sans">
-                {t("Số Điện Thoại")}
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium mb-1 font-open-sans">
-                {t("Địa Chỉ")}
-              </label>
-              <input
-                type="text"
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
-                required
-              />
-            </div>
-
-            {!isLoggedIn && (
+            <form id="shipping-form" className="space-y-6" data-aos="fade-up" data-aos-delay="100" onSubmit={handleCheckoutSubmit}>
               <div>
-                <label htmlFor="city" className="block text-sm font-medium mb-1 font-open-sans">
-                  {t("Thành Phố")}
+                <label htmlFor="first-name" className="block text-sm font-medium mb-1 font-open-sans">
+                  {isLoggedIn ? t("Tên người nhận") : t("Tên")}
                 </label>
                 <input
                   type="text"
-                  id="city"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  id="first-name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
                   required
                 />
               </div>
-            )}
 
-            <div>
-              <label htmlFor="order-notes" className="block text-sm font-medium mb-1 font-open-sans">
-                {t("Ghi chú đơn hàng (Tùy chọn)")}
-              </label>
-              <textarea
-                id="order-notes"
-                value={orderNotes}
-                onChange={(e) => setOrderNotes(e.target.value)}
-                placeholder={t("Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.")}
-                className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans min-h-[100px] resize-y"
-              />
-            </div>
-
-            <div className="pt-4">
-              <h3 className="text-lg font-semibold mb-4 font-orbitron">{t("Phương Thức Giao Hàng")}</h3>
-              <div className="space-y-3">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="Giao Hàng Tiêu Chuẩn"
-                    className="h-4 w-4 text-primary focus:ring-primary"
-                    checked={shippingMethod === 'Giao Hàng Tiêu Chuẩn'}
-                    onChange={(e) => setShippingMethod(e.target.value)}
-                  />
-                  <span className="flex-1 font-open-sans">
-                    <span className="block">{t("Giao Hàng Tiêu Chuẩn")}</span>
-                    <span className="block text-sm text-accent/70">{t("3-5 ngày làm việc - Miễn phí")}</span>
-                  </span>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium mb-1 font-open-sans">
+                  {t("Địa Chỉ Email")}
                 </label>
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="Giao Hàng Nhanh"
-                    className="h-4 w-4 text-primary focus:ring-primary"
-                    checked={shippingMethod === 'Giao Hàng Nhanh'}
-                    onChange={(e) => setShippingMethod(e.target.value)}
-                  />
-                  <span className="flex-1 font-open-sans">
-                    <span className="block">{t("Giao Hàng Nhanh")}</span>
-                    <span className="block text-sm text-accent/70">{t("1-2 ngày làm việc - 50.000 ₫")}</span>
-                  </span>
-                </label>
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="shipping"
-                    value="Giao Hàng Hỏa Tốc"
-                    className="h-4 w-4 text-primary focus:ring-primary"
-                    checked={shippingMethod === 'Giao Hàng Hỏa Tốc'}
-                    onChange={(e) => setShippingMethod(e.target.value)}
-                  />
-                  <span className="flex-1 font-open-sans">
-                    <span className="block">{t("Giao Hàng Hỏa Tốc")}</span>
-                    <span className="block text-sm text-accent/70">{t("Trong ngày - 100.000 ₫")}</span>
-                  </span>
-                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
+                  required
+                />
               </div>
-            </div>
 
-            {shippingMethod !== 'Giao Hàng Tiêu Chuẩn' && (
-              <div className="pt-6 mt-4 border-t border-primary/10">
-                <h3 className="text-md font-semibold mb-3 font-orbitron">{t(" Bạn có voucher Free Ship? Áp dụng ngay")}</h3>
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium mb-1 font-open-sans">
+                  {t("Số Điện Thoại")}
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium mb-1 font-open-sans">
+                  {t("Địa Chỉ")}
+                </label>
+                <input
+                  type="text"
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
+                  required
+                />
+              </div>
+
+              {!isLoggedIn && (
+                <div>
+                  <label htmlFor="city" className="block text-sm font-medium mb-1 font-open-sans">
+                    {t("Thành Phố")}
+                  </label>
+                  <input
+                    type="text"
+                    id="city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="order-notes" className="block text-sm font-medium mb-1 font-open-sans">
+                  {t("Ghi chú đơn hàng (Tùy chọn)")}
+                </label>
+                <textarea
+                  id="order-notes"
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  placeholder={t("Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.")}
+                  className="w-full px-4 py-3 rounded-md bg-secondary input-field font-open-sans min-h-[100px] resize-y"
+                />
+              </div>
+
+              <div className="pt-4">
+                <h3 className="text-lg font-semibold mb-4 font-orbitron">{t("Phương Thức Giao Hàng")}</h3>
+                <div className="space-y-3">
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="shipping"
+                      value="Giao Hàng Tiêu Chuẩn"
+                      className="h-4 w-4 text-primary focus:ring-primary"
+                      checked={shippingMethod === 'Giao Hàng Tiêu Chuẩn'}
+                      onChange={(e) => setShippingMethod(e.target.value)}
+                    />
+                    <span className="flex-1 font-open-sans">
+                      <span className="block">{t("Giao Hàng Tiêu Chuẩn")}</span>
+                      <span className="block text-sm text-accent/70">{t("3-5 ngày làm việc - Miễn phí")}</span>
+                    </span>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="shipping"
+                      value="Giao Hàng Nhanh"
+                      className="h-4 w-4 text-primary focus:ring-primary"
+                      checked={shippingMethod === 'Giao Hàng Nhanh'}
+                      onChange={(e) => setShippingMethod(e.target.value)}
+                    />
+                    <span className="flex-1 font-open-sans">
+                      <span className="block">{t("Giao Hàng Nhanh")}</span>
+                      <span className="block text-sm text-accent/70">{t("1-2 ngày làm việc - 50.000 ₫")}</span>
+                    </span>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="shipping"
+                      value="Giao Hàng Hỏa Tốc"
+                      className="h-4 w-4 text-primary focus:ring-primary"
+                      checked={shippingMethod === 'Giao Hàng Hỏa Tốc'}
+                      onChange={(e) => setShippingMethod(e.target.value)}
+                    />
+                    <span className="flex-1 font-open-sans">
+                      <span className="block">{t("Giao Hàng Hỏa Tốc")}</span>
+                      <span className="block text-sm text-accent/70">{t("Trong ngày - 100.000 ₫")}</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {shippingMethod !== 'Giao Hàng Tiêu Chuẩn' && (
+                <div className="pt-6 mt-4 border-t border-primary/10">
+                  <h3 className="text-md font-semibold mb-3 font-orbitron">{t(" Bạn có voucher Free Ship? Áp dụng ngay")}</h3>
+                  <div className="flex items-center space-x-3 relative">
+                    <input
+                      type="text"
+                      value={freeshipCodeInput}
+                      onChange={(e) => setFreeshipCodeInput(e.target.value)}
+                      placeholder={t("Nhập mã voucher freeship")}
+                      className="w-full px-4 py-3 max-[499px]:py-2 max-[499px]:px-3 rounded-md bg-secondary input-field font-open-sans"
+                      disabled={!!appliedFreeshipVoucher}
+                    />
+                    {!appliedFreeshipVoucher ? (
+                      <button
+                        onClick={handleApplyFreeshipVoucher}
+                        className="bg-primary hover:bg-primary/90 text-white px-4 py-3 max-[499px]:px-3 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron whitespace-nowrap"
+                      >
+                        {t("Áp dụng")}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleRemoveFreeshipVoucher}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 max-[499px]:px-3 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron whitespace-nowrap"
+                      >
+                        {t("Hủy bỏ")}
+                      </button>
+                    )}
+                  </div>
+                  {freeshipError && <p className="text-red-500 text-sm mt-2 font-open-sans">{freeshipError}</p>}
+                  {freeshipSuccess && <p className="text-green-500 text-sm mt-2 font-open-sans flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> {freeshipSuccess}</p>}
+                </div>
+              )}
+
+              <div className="pt-4">
+                <h3 className="text-lg font-semibold mb-4 font-orbitron">{t("Phương Thức Thanh Toán")}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-[499px]:gap-3">
+                  <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Thanh Toán Khi Nhận Hàng' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Thanh Toán Khi Nhận Hàng')}>
+                    <div className="flex items-center space-x-3">
+                      <input type="radio" name="payment" value="Thanh Toán Khi Nhận Hàng" className="h-4 w-4 text-primary focus:ring-primary" checked={paymentMethod === 'Thanh Toán Khi Nhận Hàng'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                      <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="1" y="3" width="15" height="13"></rect>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                      </svg>
+                      <span className="font-open-sans">{t("Thanh Toán Khi Nhận Hàng")}</span>
+                    </div>
+                  </div>
+                  <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Thanh Toán VNPAY' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Thanh Toán VNPAY')}>
+                    <div className="flex items-center space-x-3">
+                      <input type="radio" name="payment" value="Thanh Toán VNPAY" className="h-4 w-4 text-primary focus:ring-primary" checked={paymentMethod === 'Thanh Toán VNPAY'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                      <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="14" y1="9" x2="14.01" y2="9"></line>
+                        <line x1="14" y1="14" x2="14.01" y2="14"></line>
+                        <line x1="9" y1="14" x2="9.01" y2="14"></line>
+                      </svg>
+                      <span className="font-open-sans">{t("Thanh Toán VNPAY")}</span>
+                    </div>
+                  </div>
+                  <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Chuyển Khoản Ngân Hàng' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Chuyển Khoản Ngân Hàng')}>
+                    <div className="flex items-center space-x-3">
+                      <input type="radio" name="payment" value="Chuyển Khoản Ngân Hàng" className="h-4 w-4 text-primary focus:ring-primary" checked={paymentMethod === 'Chuyển Khoản Ngân Hàng'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                      <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="12 2 2 7 22 7 12 2"></polygon>
+                        <polyline points="2 17 22 17"></polyline>
+                        <polyline points="2 22 22 22"></polyline>
+                        <line x1="4" y1="17" x2="4" y2="7"></line>
+                        <line x1="8" y1="17" x2="8" y2="7"></line>
+                        <line x1="12" y1="17" x2="12" y2="7"></line>
+                        <line x1="16" y1="17" x2="16" y2="7"></line>
+                        <line x1="20" y1="17" x2="20" y2="7"></line>
+                      </svg>
+                      <span className="font-open-sans">{t("Chuyển Khoản Ngân Hàng")}</span>
+                    </div>
+                  </div>
+                  <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Thanh Toán MoMo' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Thanh Toán MoMo')}>
+                    <div className="flex items-center space-x-3">
+                      <input type="radio" name="payment" value="Thanh Toán MoMo" className="h-4 w-4 text-[#A50064] focus:ring-[#A50064]" checked={paymentMethod === 'Thanh Toán MoMo'} onChange={(e) => setPaymentMethod(e.target.value)} />
+                      <svg className="h-5 w-5 text-[#A50064]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                      </svg>
+                      <span className="font-open-sans">{t("Thanh Toán MoMo")}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-6">
+                <button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 max-[499px]:w-full max-[499px]:justify-center max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center font-orbitron">
+                  {isProcessing ? t("Đang xử lý...") : t("Mua Ngay")}
+                  <i data-feather="arrow-right" className="ml-2 h-5 w-5"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Tóm tắt đơn hàng */}
+          <div className="lg:col-span-1" data-aos="fade-up" data-aos-delay="200">
+            <div className="bg-secondary/50 border border-primary/20 rounded-lg p-6 sticky top-6">
+              <h2 className="text-xl max-[499px]:text-lg max-[374px]:text-base font-bold mb-6 font-orbitron">{t("Tóm Tắt Đơn Hàng")}</h2>
+
+              <div className="space-y-4 mb-6">
+                {cartItems.map((item, index) => (
+                  <div key={item.variant_id || item.id || index} className="cart-item flex items-start space-x-4 pb-4 border-b border-primary/10 relative group">
+                    <img
+                      src={item.image}
+                      alt={item.translatedName}
+                      className="w-16 h-16 object-cover rounded-md"
+                      loading="lazy"
+                    />
+                    <div className="flex-1 pr-8">
+                      <h3 className="font-medium font-open-sans">{item.translatedName}</h3>
+
+                      {item.cate_id === "TCG-CAT-001" && item.color && (
+                        <p className="text-sm text-accent/70 font-open-sans mt-[4px]">
+                          {t("Màu")}: {item.translatedColor || item.color}
+                        </p>
+                      )}
+                      {item.cate_id === "TCG-CAT-002" && item.size && (
+                        <p className="text-sm text-accent/70 font-open-sans mt-[4px]">
+                          {t("Size")}: {item.translatedSize || item.size}
+                        </p>
+                      )}
+
+                      {!item.cate_id && item.translatedVariant && (
+                        <p className="text-sm text-accent/70 font-open-sans mt-[4px]">
+                          {item.translatedVariantPrefix ? `${item.translatedVariantPrefix}: ` : ''}{item.translatedVariant}
+                        </p>
+                      )}
+
+                      <div className="flex justify-between items-end mt-1">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-open-sans">{t("Giá")}: <span className="text-red-500 font-semibold">{formatPrice(item.price)}</span></span>
+                          <span className="text-sm font-open-sans">{t("Số lượng")}: {item.quantity}</span>
+                        </div>
+                        <span className="text-red-500 font-bold font-open-sans">
+                          {formatPrice(item.price * item.quantity)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleRemoveItem(index)}
+                      className="absolute right-0 top-0 text-accent/50 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-full transition-all"
+                      title={t("Xóa sản phẩm")}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="voucher-section mb-6">
+                <h3 className="text-lg font-semibold mb-4 font-orbitron">{t("Mã Voucher")}</h3>
                 <div className="flex items-center space-x-3 relative">
                   <input
                     type="text"
-                    value={freeshipCodeInput}
-                    onChange={(e) => setFreeshipCodeInput(e.target.value)}
-                    placeholder={t("Nhập mã voucher freeship")}
+                    id="voucher-code"
+                    value={voucherCodeInput}
+                    onChange={(e) => setVoucherCodeInput(e.target.value)}
+                    placeholder={t("Nhập mã voucher")}
                     className="w-full px-4 py-3 max-[499px]:py-2 max-[499px]:px-3 rounded-md bg-secondary input-field font-open-sans"
-                    disabled={!!appliedFreeshipVoucher}
+                    disabled={!!appliedVoucher}
                   />
-                  {!appliedFreeshipVoucher ? (
+                  {!appliedVoucher ? (
                     <button
-                      onClick={handleApplyFreeshipVoucher}
+                      id="apply-voucher"
+                      onClick={handleApplyVoucher}
                       className="bg-primary hover:bg-primary/90 text-white px-4 py-3 max-[499px]:px-3 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron whitespace-nowrap"
                     >
                       {t("Áp dụng")}
                     </button>
                   ) : (
                     <button
-                      onClick={handleRemoveFreeshipVoucher}
+                      onClick={handleRemoveVoucher}
                       className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 max-[499px]:px-3 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron whitespace-nowrap"
                     >
                       {t("Hủy bỏ")}
                     </button>
                   )}
                 </div>
-                {freeshipError && <p className="text-red-500 text-sm mt-2 font-open-sans">{freeshipError}</p>}
-                {freeshipSuccess && <p className="text-green-500 text-sm mt-2 font-open-sans flex items-center"><svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> {freeshipSuccess}</p>}
-              </div>
-            )}
+                {voucherError && <p className="text-red-500 text-sm mt-2 font-open-sans">{voucherError}</p>}
+                {voucherSuccess && <p className="text-green-500 text-sm mt-2 font-open-sans">{voucherSuccess}</p>}
 
-            <div className="pt-4">
-              <h3 className="text-lg font-semibold mb-4 font-orbitron">{t("Phương Thức Thanh Toán")}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-[499px]:gap-3">
-                <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Thanh Toán Khi Nhận Hàng' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Thanh Toán Khi Nhận Hàng')}>
-                  <div className="flex items-center space-x-3">
-                    <input type="radio" name="payment" value="Thanh Toán Khi Nhận Hàng" className="h-4 w-4 text-primary focus:ring-primary" checked={paymentMethod === 'Thanh Toán Khi Nhận Hàng'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                    <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="1" y="3" width="15" height="13"></rect>
-                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                      <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                      <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                    </svg>
-                    <span className="font-open-sans">{t("Thanh Toán Khi Nhận Hàng")}</span>
-                  </div>
-                </div>
-                <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Thanh Toán VNPAY' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Thanh Toán VNPAY')}>
-                  <div className="flex items-center space-x-3">
-                    <input type="radio" name="payment" value="Thanh Toán VNPAY" className="h-4 w-4 text-primary focus:ring-primary" checked={paymentMethod === 'Thanh Toán VNPAY'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                    <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="14" width="7" height="7"></rect>
-                      <rect x="3" y="14" width="7" height="7"></rect>
-                      <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                      <line x1="14" y1="9" x2="14.01" y2="9"></line>
-                      <line x1="14" y1="14" x2="14.01" y2="14"></line>
-                      <line x1="9" y1="14" x2="9.01" y2="14"></line>
-                    </svg>
-                    <span className="font-open-sans">{t("Thanh Toán VNPAY")}</span>
-                  </div>
-                </div>
-                <div className={`payment-method p-4 rounded-md cursor-pointer ${paymentMethod === 'Chuyển Khoản Ngân Hàng' ? 'selected border-primary' : 'border border-primary/20'}`} onClick={() => setPaymentMethod('Chuyển Khoản Ngân Hàng')}>
-                  <div className="flex items-center space-x-3">
-                    <input type="radio" name="payment" value="Chuyển Khoản Ngân Hàng" className="h-4 w-4 text-primary focus:ring-primary" checked={paymentMethod === 'Chuyển Khoản Ngân Hàng'} onChange={(e) => setPaymentMethod(e.target.value)} />
-                    <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 2 7 22 7 12 2"></polygon>
-                      <polyline points="2 17 22 17"></polyline>
-                      <polyline points="2 22 22 22"></polyline>
-                      <line x1="4" y1="17" x2="4" y2="7"></line>
-                      <line x1="8" y1="17" x2="8" y2="7"></line>
-                      <line x1="12" y1="17" x2="12" y2="7"></line>
-                      <line x1="16" y1="17" x2="16" y2="7"></line>
-                      <line x1="20" y1="17" x2="20" y2="7"></line>
-                    </svg>
-                    <span className="font-open-sans">{t("Chuyển Khoản Ngân Hàng")}</span>
-                  </div>
+                <p className="text-center text-accent/70 my-4 font-open-sans">{t("hoặc")}</p>
+                <div className="flex justify-center">
+                  <Link to="/vouchers" className="bg-secondary border border-primary/20 hover:bg-primary/90 hover:text-white px-6 py-3 max-[499px]:px-4 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron">
+                    {t("Chọn voucher ở đây")}
+                  </Link>
                 </div>
               </div>
-            </div>
 
-            <div className="flex justify-end pt-6">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 max-[499px]:w-full max-[499px]:justify-center max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition flex items-center font-orbitron">
-                {isProcessing ? t("Đang xử lý...") : t("Mua Ngay")}
-                <i data-feather="arrow-right" className="ml-2 h-5 w-5"></i>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Tóm tắt đơn hàng */}
-        <div className="lg:col-span-1" data-aos="fade-up" data-aos-delay="200">
-          <div className="bg-secondary/50 border border-primary/20 rounded-lg p-6 sticky top-6">
-            <h2 className="text-xl max-[499px]:text-lg max-[374px]:text-base font-bold mb-6 font-orbitron">{t("Tóm Tắt Đơn Hàng")}</h2>
-
-            <div className="space-y-4 mb-6">
-              {cartItems.map((item, index) => (
-                <div key={item.variant_id || item.id || index} className="cart-item flex items-start space-x-4 pb-4 border-b border-primary/10 relative group">
-                  <img
-                    src={item.image}
-                    alt={item.translatedName}
-                    className="w-16 h-16 object-cover rounded-md"
-                    loading="lazy"
-                  />
-                  <div className="flex-1 pr-8">
-                    <h3 className="font-medium font-open-sans">{item.translatedName}</h3>
-
-                    {item.cate_id === "TCG-CAT-001" && item.color && (
-                      <p className="text-sm text-accent/70 font-open-sans mt-[4px]">
-                        {t("Màu")}: {item.translatedColor || item.color}
-                      </p>
-                    )}
-                    {item.cate_id === "TCG-CAT-002" && item.size && (
-                      <p className="text-sm text-accent/70 font-open-sans mt-[4px]">
-                        {t("Size")}: {item.translatedSize || item.size}
-                      </p>
-                    )}
-
-                    {!item.cate_id && item.translatedVariant && (
-                      <p className="text-sm text-accent/70 font-open-sans mt-[4px]">
-                        {item.translatedVariantPrefix ? `${item.translatedVariantPrefix}: ` : ''}{item.translatedVariant}
-                      </p>
-                    )}
-
-                    <div className="flex justify-between items-end mt-1">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-open-sans">{t("Giá")}: <span className="text-red-500 font-semibold">{formatPrice(item.price)}</span></span>
-                        <span className="text-sm font-open-sans">{t("Số lượng")}: {item.quantity}</span>
-                      </div>
-                      <span className="text-red-500 font-bold font-open-sans">
-                        {formatPrice(item.price * item.quantity)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleRemoveItem(index)}
-                    className="absolute right-0 top-0 text-accent/50 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-full transition-all"
-                    title={t("Xóa sản phẩm")}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between font-open-sans">
+                  <span>{t("Tổng phụ")}</span>
+                  <span id="subtotal" className="text-red-500 font-semibold">{formatPrice(subtotal)}</span>
                 </div>
-              ))}
-            </div>
-
-            <div className="voucher-section mb-6">
-              <h3 className="text-lg font-semibold mb-4 font-orbitron">{t("Mã Voucher")}</h3>
-              <div className="flex items-center space-x-3 relative">
-                <input
-                  type="text"
-                  id="voucher-code"
-                  value={voucherCodeInput}
-                  onChange={(e) => setVoucherCodeInput(e.target.value)}
-                  placeholder={t("Nhập mã voucher")}
-                  className="w-full px-4 py-3 max-[499px]:py-2 max-[499px]:px-3 rounded-md bg-secondary input-field font-open-sans"
-                  disabled={!!appliedVoucher}
-                />
-                {!appliedVoucher ? (
-                  <button
-                    id="apply-voucher"
-                    onClick={handleApplyVoucher}
-                    className="bg-primary hover:bg-primary/90 text-white px-4 py-3 max-[499px]:px-3 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron whitespace-nowrap"
-                  >
-                    {t("Áp dụng")}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleRemoveVoucher}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 max-[499px]:px-3 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron whitespace-nowrap"
-                  >
-                    {t("Hủy bỏ")}
-                  </button>
+                <div className="flex justify-between font-open-sans">
+                  <span>{t("Phí giao hàng")}</span>
+                  <span id="shipping-fee" className="text-red-500 font-semibold text-right">
+                    {isFreeshipActive ? (
+                      <>
+                        <span className="line-through text-accent/50 mr-2 text-sm">{formatPrice(baseShippingFee)}</span>
+                        {formatPrice(0)}
+                      </>
+                    ) : (
+                      formatPrice(shippingFee)
+                    )}
+                  </span>
+                </div>
+                {appliedVoucher && (
+                  <div className="flex justify-between font-open-sans text-green-500">
+                    <span>{t("Giảm giá")}</span>
+                    <span>-{formatPrice(discountAmount)}</span>
+                  </div>
                 )}
-              </div>
-              {voucherError && <p className="text-red-500 text-sm mt-2 font-open-sans">{voucherError}</p>}
-              {voucherSuccess && <p className="text-green-500 text-sm mt-2 font-open-sans">{voucherSuccess}</p>}
-
-              <p className="text-center text-accent/70 my-4 font-open-sans">{t("hoặc")}</p>
-              <div className="flex justify-center">
-                <Link to="/vouchers" className="bg-secondary border border-primary/20 hover:bg-primary/90 hover:text-white px-6 py-3 max-[499px]:px-4 max-[499px]:py-2 max-[374px]:text-sm rounded-md font-semibold transition font-orbitron">
-                  {t("Chọn voucher ở đây")}
-                </Link>
-              </div>
-            </div>
-
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between font-open-sans">
-                <span>{t("Tổng phụ")}</span>
-                <span id="subtotal" className="text-red-500 font-semibold">{formatPrice(subtotal)}</span>
-              </div>
-              <div className="flex justify-between font-open-sans">
-                <span>{t("Phí giao hàng")}</span>
-                <span id="shipping-fee" className="text-red-500 font-semibold text-right">
-                  {isFreeshipActive ? (
-                    <>
-                      <span className="line-through text-accent/50 mr-2 text-sm">{formatPrice(baseShippingFee)}</span>
-                      {formatPrice(0)}
-                    </>
-                  ) : (
-                    formatPrice(shippingFee)
-                  )}
-                </span>
-              </div>
-              {appliedVoucher && (
-                <div className="flex justify-between font-open-sans text-green-500">
-                  <span>{t("Giảm giá")}</span>
-                  <span>-{formatPrice(discountAmount)}</span>
+                <div className="flex justify-between font-bold text-lg pt-2 border-t border-primary/10 font-open-sans">
+                  <span>{t("Tổng cộng")}</span>
+                  <span id="total" className="text-red-500">{formatPrice(total)}</span>
                 </div>
-              )}
-              <div className="flex justify-between font-bold text-lg pt-2 border-t border-primary/10 font-open-sans">
-                <span>{t("Tổng cộng")}</span>
-                <span id="total" className="text-red-500">{formatPrice(total)}</span>
               </div>
-            </div>
 
-            <div className="text-sm text-accent/70 font-open-sans">
-              <p>
-                {t("Cần trợ giúp?")} <a href="contact" className="text-primary hover:underline">{t("Liên hệ hỗ trợ của chúng tôi")}</a>
-              </p>
+              <div className="text-sm text-accent/70 font-open-sans">
+                <p>
+                  {t("Cần trợ giúp?")} <a href="contact" className="text-primary hover:underline">{t("Liên hệ hỗ trợ của chúng tôi")}</a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      {showBankModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-secondary p-6 md:p-8 rounded-xl max-w-md w-full border border-primary/20 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onClick={() => setShowBankModal(false)} className="absolute top-4 right-4 text-accent/50 hover:text-accent">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 className="text-2xl font-bold font-orbitron mb-4 text-center text-primary">{t("Thanh Toán Chuyển Khoản")}</h3>
+            <p className="text-center font-open-sans mb-4 text-accent/80">
+              {t("Vui lòng quét mã QR dưới đây để thanh toán hoặc chuyển khoản theo thông tin bên dưới.")}
+            </p>
+            <div className="bg-white p-4 rounded-lg mb-6 flex justify-center items-center">
+              <img src="https://img.vietqr.io/image/TPB-00001087221-compact.png" alt="QR Code TPBank" className="w-64 h-64 object-contain" />
+            </div>
+            <div className="space-y-2 mb-6 font-open-sans text-sm">
+              <div className="flex justify-between border-b border-primary/10 pb-2">
+                <span className="text-accent/60">{t("Ngân hàng")}:</span>
+                <span className="font-semibold">TPBank</span>
+              </div>
+              <div className="flex justify-between border-b border-primary/10 pb-2">
+                <span className="text-accent/60">{t("Số tài khoản")}:</span>
+                <span className="font-semibold">00001087221</span>
+              </div>
+              <div className="flex justify-between border-b border-primary/10 pb-2">
+                <span className="text-accent/60">{t("Chủ tài khoản")}:</span>
+                <span className="font-semibold">DANG NGUYEN TIEN DAT</span>
+              </div>
+              <div className="flex justify-between pb-2">
+                <span className="text-accent/60">{t("Số tiền")}:</span>
+                <span className="font-semibold text-primary">{formatPrice(total)}</span>
+              </div>
+              <div className="flex justify-between pb-2">
+                <span className="text-accent/60">{t("Nội dung")}:</span>
+                <span className="font-semibold text-primary">{pendingPayload?.recipient_phone}</span>
+              </div>
+            </div>
+
+            {/* Thêm phần upload ảnh giao dịch */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-2 font-open-sans">
+                {t("Tải lên ảnh giao dịch thành công (Bắt buộc)")}
+              </label>
+              <div className="border-2 border-dashed border-primary/30 rounded-lg p-4 text-center hover:bg-primary/5 transition cursor-pointer relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      setTransactionImage(e.target.files[0]);
+                    }
+                  }}
+                />
+                {transactionImage ? (
+                  <div className="text-green-500 font-semibold font-open-sans">
+                    <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                    {transactionImage.name}
+                  </div>
+                ) : (
+                  <div className="text-accent/60 font-open-sans text-sm">
+                    <svg className="w-8 h-8 mx-auto mb-2 text-primary/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    {t("Nhấn vào đây hoặc kéo thả ảnh")}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowBankModal(false);
+                if (pendingPayload) submitOrder(pendingPayload);
+              }}
+              disabled={!transactionImage}
+              className={`w-full py-3 rounded-lg font-bold font-orbitron transition shadow-lg ${transactionImage ? 'bg-primary hover:bg-primary/90 text-white' : 'bg-gray-500 text-gray-300 cursor-not-allowed opacity-50'
+                }`}
+            >
+              {t("Tôi Đã Chuyển Khoản")}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

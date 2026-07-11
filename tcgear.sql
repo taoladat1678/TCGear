@@ -3,11 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
-<<<<<<< HEAD
--- Thời gian đã tạo: Th7 10, 2026 lúc 04:03 PM
-=======
--- Thời gian đã tạo: Th7 10, 2026 lúc 03:43 PM
->>>>>>> d613fa14215970feb3314328c0c5b5360c146ad7
+-- Thời gian đã tạo: Th7 11, 2026 lúc 01:02 PM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.2.4
 
@@ -313,7 +309,11 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `order_time`, `order_
 ('TCG-ORD-030', 'TCG-USR-013', '2026-07-10', '19:45:50', 'Đã giao', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', '', 'Đã nhận hàng', NULL),
 ('TCG-ORD-031', 'TCG-USR-013', '2026-07-10', '19:51:11', 'Đã giao', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', '', 'Đã nhận hàng', NULL),
 ('TCG-ORD-032', 'TCG-USR-013', '2026-07-10', '20:29:30', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
-('TCG-ORD-033', 'TCG-USR-013', '2026-07-10', '20:42:16', 'Chờ xác nhận', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL);
+('TCG-ORD-033', 'TCG-USR-013', '2026-07-10', '20:42:16', 'Chờ xác nhận', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
+('TCG-ORD-034', 'TCG-USR-013', '2026-07-11', '17:03:06', 'Chờ xử lý', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'ASADA', 'Chưa nhận hàng', NULL),
+('TCG-ORD-035', 'TCG-USR-013', '2026-07-11', '17:38:55', 'Chờ xác nhận', 'Đã thanh toán', 'Chuyển Khoản Ngân Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'sadadsdasd', 'Chưa nhận hàng', NULL),
+('TCG-ORD-036', 'TCG-USR-013', '2026-07-11', '17:51:58', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
+('TCG-ORD-037', 'TCG-USR-013', '2026-07-11', '17:54:39', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL);
 
 -- --------------------------------------------------------
 
@@ -343,7 +343,11 @@ INSERT INTO `order_details` (`detail_id`, `order_id`, `variant_id`, `quantity`, 
 ('TCG-ODT-007', 'TCG-ORD-031', 'TCG-VAR-017', 1, 900000),
 ('TCG-ODT-008', 'TCG-ORD-032', 'TCG-VAR-019', 899, 1123750000),
 ('TCG-ODT-009', 'TCG-ORD-033', 'TCG-VAR-019', 1, 1250000),
-('TCG-ODT-010', 'TCG-ORD-033', 'TCG-VAR-004', 1, 1600000);
+('TCG-ODT-010', 'TCG-ORD-033', 'TCG-VAR-004', 1, 1600000),
+('TCG-ODT-011', 'TCG-ORD-034', 'TCG-VAR-013', 1, 800000),
+('TCG-ODT-012', 'TCG-ORD-035', 'TCG-VAR-011', 1, 10000),
+('TCG-ODT-013', 'TCG-ORD-036', 'TCG-VAR-011', 1, 10000),
+('TCG-ODT-014', 'TCG-ORD-037', 'TCG-VAR-011', 1, 10000);
 
 -- --------------------------------------------------------
 
@@ -680,7 +684,11 @@ INSERT INTO `user_activities` (`id`, `user_id`, `type`, `ref_id`, `description`,
 (64, 'TCG-USR-013', 'ORDER', 'TCG-ORD-031', 'Bạn đã đặt đơn hàng thành công', '2026-07-10 19:51:11'),
 (65, 'TCG-USR-013', 'ORDER', 'TCG-ORD-032', 'Bạn đã đặt đơn hàng thành công', '2026-07-10 20:29:30'),
 (66, 'TCG-USR-013', 'ADDRESS', 'ADDR-1783690888363-420', 'Bạn đã thêm địa chỉ mới', '2026-07-10 20:41:28'),
-(67, 'TCG-USR-013', 'ORDER', 'TCG-ORD-033', 'Bạn đã đặt đơn hàng thành công', '2026-07-10 20:42:16');
+(67, 'TCG-USR-013', 'ORDER', 'TCG-ORD-033', 'Bạn đã đặt đơn hàng thành công', '2026-07-10 20:42:16'),
+(68, 'TCG-USR-013', 'ORDER', 'TCG-ORD-034', 'Bạn đã đặt đơn hàng thành công', '2026-07-11 17:03:06'),
+(69, 'TCG-USR-013', 'ORDER', 'TCG-ORD-035', 'Bạn đã đặt đơn hàng thành công', '2026-07-11 17:38:55'),
+(70, 'TCG-USR-013', 'ORDER', 'TCG-ORD-036', 'Bạn đã đặt đơn hàng thành công', '2026-07-11 17:51:58'),
+(71, 'TCG-USR-013', 'ORDER', 'TCG-ORD-037', 'Bạn đã đặt đơn hàng thành công', '2026-07-11 17:54:39');
 
 -- --------------------------------------------------------
 
@@ -764,7 +772,7 @@ INSERT INTO `variants` (`variant_id`, `product_id`, `size_id`, `color_id`, `pric
 ('TCG-VAR-008', 'TCG-PRO-004', NULL, 'TCG-COL-003', 2500000, 80, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
 ('TCG-VAR-009', 'TCG-PRO-004', NULL, 'TCG-COL-004', 2550000, 50, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
 ('TCG-VAR-010', 'TCG-PRO-004', NULL, 'TCG-COL-001', 2600000, 30, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
-('TCG-VAR-011', 'TCG-PRO-003', 'TCG-SIZ-001', NULL, 620000, 58, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
+('TCG-VAR-011', 'TCG-PRO-003', 'TCG-SIZ-001', NULL, 10000, 58, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-012', 'TCG-PRO-003', 'TCG-SIZ-002', NULL, 780000, 197, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-013', 'TCG-PRO-003', 'TCG-SIZ-003', NULL, 800000, 250, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-014', 'TCG-PRO-003', 'TCG-SIZ-004', NULL, 820000, 120, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
@@ -962,7 +970,7 @@ ALTER TABLE `vouchers`
 -- AUTO_INCREMENT cho bảng `user_activities`
 --
 ALTER TABLE `user_activities`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
