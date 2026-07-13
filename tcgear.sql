@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th7 11, 2026 lúc 01:02 PM
+-- Thời gian đã tạo: Th7 13, 2026 lúc 01:09 PM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.2.4
 
@@ -313,7 +313,8 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `order_time`, `order_
 ('TCG-ORD-034', 'TCG-USR-013', '2026-07-11', '17:03:06', 'Chờ xử lý', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'ASADA', 'Chưa nhận hàng', NULL),
 ('TCG-ORD-035', 'TCG-USR-013', '2026-07-11', '17:38:55', 'Chờ xác nhận', 'Đã thanh toán', 'Chuyển Khoản Ngân Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'sadadsdasd', 'Chưa nhận hàng', NULL),
 ('TCG-ORD-036', 'TCG-USR-013', '2026-07-11', '17:51:58', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
-('TCG-ORD-037', 'TCG-USR-013', '2026-07-11', '17:54:39', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL);
+('TCG-ORD-037', 'TCG-USR-013', '2026-07-11', '17:54:39', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
+('TCG-ORD-038', 'TCG-USR-013', '2026-07-13', '18:00:55', 'Hoàn trả', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Hoàn trả', 'sadasdasdad', 'Đã hoàn trả', NULL);
 
 -- --------------------------------------------------------
 
@@ -347,7 +348,8 @@ INSERT INTO `order_details` (`detail_id`, `order_id`, `variant_id`, `quantity`, 
 ('TCG-ODT-011', 'TCG-ORD-034', 'TCG-VAR-013', 1, 800000),
 ('TCG-ODT-012', 'TCG-ORD-035', 'TCG-VAR-011', 1, 10000),
 ('TCG-ODT-013', 'TCG-ORD-036', 'TCG-VAR-011', 1, 10000),
-('TCG-ODT-014', 'TCG-ORD-037', 'TCG-VAR-011', 1, 10000);
+('TCG-ODT-014', 'TCG-ORD-037', 'TCG-VAR-011', 1, 10000),
+('TCG-ODT-015', 'TCG-ORD-038', 'TCG-VAR-021', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -383,7 +385,7 @@ INSERT INTO `products` (`product_id`, `product_name`, `product_desc`, `cate_id`,
 ('TCG-PRO-003', 'Áo đấu T1 LoL 2025 Jacket\r\n', 'Áo thi đấu chính hãng T1 League of Legends mùa giải 2025, chất liệu thoáng khí, in logo và tên người chơi.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-001', 'img/jersey_t1_lol_2025.jpg', '2025-10-03 12:00:00', '2025-10-17 12:00:00', 200, 4.8, 100, 'img/jersey_t1_lol_2025_2.jpg', 'img/jersey_t1_lol_2025_3.jpg'),
 ('TCG-PRO-004', 'Tai nghe Corsair Void', 'Tai nghe gaming không dây với âm thanh vòm 7.1, mic rõ nét.', 'TCG-CAT-001', 'TCG-BRN-004', 'TCG-SUB-005', NULL, 'img/headset_corsair.jpg', '2025-10-04 12:00:00', '2025-10-18 12:00:00', 50, 4.2, 20, 'img/headset_corsair_2.jpg', 'img/headset_corsair_3.jpg'),
 ('TCG-PRO-005', 'Áo đấu T1 Worlds 2025 Jersey', 'Áo thi đấu chính hãng T1 Worlds 2025, thiết kế hiện đại, chất liệu cao cấp.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-002', 'img/jersey_t1_worlds_2025.jpg', '2025-10-05 12:00:00', '2025-10-19 12:00:00', 150, 4.6, 40, 'img/jersey_t1_worlds_2025_2.jpg', 'img/jersey_t1_worlds_2025_3.jpg'),
-('TCG-PRO-010', 'Áo đấu T1 PUBG 2025 Jersey', 'Áo thi đấu chính hãng T1 PUBG Mobile/PUBG PC 2025, chất liệu thoáng khí, in logo T1.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-003', 'img/jersey_t1_pubg_2025.jpg', '2025-12-01 10:00:00', '2025-12-01 10:00:00', 120, 4.7, 85, NULL, NULL);
+('TCG-PRO-010', 'Jacket T1 Valorant 2025 - VCT Champions Paris', 'Áo thi đấu chính hãng T1 Valorant 2025.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-003', 'img/jersey_t1_valorant_2025.jpg', '2025-12-01 10:00:00', '2025-12-01 10:00:00', 120, 4.7, 85, 'img/jersey_t1_valorant_2025_2.jpg', 'img/jersey_t1_valorant_2025_3.jpg');
 
 -- --------------------------------------------------------
 
@@ -781,7 +783,8 @@ INSERT INTO `variants` (`variant_id`, `product_id`, `size_id`, `color_id`, `pric
 ('TCG-VAR-017', 'TCG-PRO-005', 'TCG-SIZ-002', NULL, 900000, 178, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
 ('TCG-VAR-018', 'TCG-PRO-005', 'TCG-SIZ-003', NULL, 1200000, 220, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
 ('TCG-VAR-019', 'TCG-PRO-005', 'TCG-SIZ-004', NULL, 1250000, 90, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
-('TCG-VAR-020', 'TCG-PRO-005', 'TCG-SIZ-005', NULL, 1300000, 0, '2025-10-05 13:00:00', '2025-10-05 13:00:00');
+('TCG-VAR-020', 'TCG-PRO-005', 'TCG-SIZ-005', NULL, 1300000, 0, '2025-10-05 13:00:00', '2025-10-05 13:00:00'),
+('TCG-VAR-021', 'TCG-PRO-010', 'TCG-SIZ-002', NULL, 850000, 100, '2026-07-13 17:00:00', '2026-07-13 17:00:00');
 
 -- --------------------------------------------------------
 

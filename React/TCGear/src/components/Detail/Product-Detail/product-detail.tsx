@@ -612,12 +612,12 @@ const ProductDetail: React.FC = () => {
     // Check if the current selectedVariant matches the selected size/color
     // If it doesn't match yet, it means the API is still fetching. We should wait or prevent adding.
     if (isGear && selectedVariant && selectedVariant.color_id !== selectedColorId) {
-       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
-       return;
+      error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+      return;
     }
     if (isJersey && selectedVariant && selectedVariant.size_id !== selectedSizeId) {
-       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
-       return;
+      error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+      return;
     }
 
     if (selectedVariant && selectedVariant.stock !== undefined) {
@@ -671,12 +671,12 @@ const ProductDetail: React.FC = () => {
     const sizeName = isJersey ? variants.find(v => v.size_id === selectedSizeId)?.size_name : undefined;
 
     if (isGear && selectedVariant && selectedVariant.color_id !== selectedColorId) {
-       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
-       return;
+      error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+      return;
     }
     if (isJersey && selectedVariant && selectedVariant.size_id !== selectedSizeId) {
-       error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
-       return;
+      error?.(t("Đang cập nhật thông tin sản phẩm, vui lòng thử lại"));
+      return;
     }
 
     if (selectedVariant && selectedVariant.stock !== undefined) {
@@ -838,6 +838,7 @@ const ProductDetail: React.FC = () => {
   const currentFeatures = featuresData[product.cate_id] || featuresData['TCG-CAT-001'];
   const inWishlist = isInWishlist(product.product_id);
   const ratingCount = currentProduct.product_rating_count || product.product_rating_count || 0;
+  const rating = currentProduct.product_rating || product.product_rating || 0;
   const hasRating = ratingCount > 0;
 
   return (
@@ -871,8 +872,8 @@ const ProductDetail: React.FC = () => {
                     key={index}
                     onClick={() => setCurrentImage(img)}
                     className={`flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden border-4 transition-all duration-300 ${currentImage === img
-                        ? 'border-primary ring-4 ring-primary/40 shadow-xl scale-105'
-                        : 'border-transparent opacity-70 hover:opacity-100 hover:border-primary/50 hover:scale-105'
+                      ? 'border-primary ring-4 ring-primary/40 shadow-xl scale-105'
+                      : 'border-transparent opacity-70 hover:opacity-100 hover:border-primary/50 hover:scale-105'
                       }`}
                   >
                     <img
@@ -893,7 +894,7 @@ const ProductDetail: React.FC = () => {
               {hasRating ? (
                 <>
                   <StarRating rating={currentProduct.product_rating || product.product_rating || 0} />
-                  <span className="text-accent/70 text-sm font-open-sans ml-2">({ratingCount})</span>
+                  <span className="text-accent/70 text-sm font-open-sans ml-2">({rating})</span>
                 </>
               ) : (
                 <span className="text-accent/70 text-sm font-open-sans">Chưa có đánh giá</span>
@@ -947,10 +948,10 @@ const ProductDetail: React.FC = () => {
             <div className="flex flex-col gap-4 mb-6">
               <div className="quantity-selector w-fit">
                 <button className="quantity-btn" onClick={() => setQuantity(prev => Math.max(1, (Number(prev) || 1) - 1))}>-</button>
-                <input 
-                  type="number" 
-                  className="quantity-input" 
-                  value={quantity} 
+                <input
+                  type="number"
+                  className="quantity-input"
+                  value={quantity}
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === '') {
@@ -961,25 +962,25 @@ const ProductDetail: React.FC = () => {
                         setQuantity(Math.max(1, parsed));
                       }
                     }
-                  }} 
+                  }}
                   onBlur={() => {
                     if (quantity === '') setQuantity(1);
                   }}
-                  min="1" 
+                  min="1"
                 />
                 <button className="quantity-btn" onClick={() => setQuantity(prev => (Number(prev) || 1) + 1)}>+</button>
               </div>
               <div className="flex flex-row gap-4 w-full">
-                <button 
-                  onClick={handleAddToCart} 
+                <button
+                  onClick={handleAddToCart}
                   disabled={selectedVariant?.stock === 0}
                   className={`flex-1 text-white px-4 sm:px-6 py-3 rounded-md font-semibold transition flex justify-center items-center gap-2 font-orbitron ${selectedVariant?.stock === 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-primary hover:bg-primary/90'}`}>
                   <i data-feather="shopping-cart" className="h-5 w-5"></i>
                   <span className="hidden sm:inline">{t("Thêm vào giỏ hàng")}</span>
                   <span className="sm:hidden">{t("Thêm")}</span>
                 </button>
-                <button 
-                  onClick={handleBuyNow} 
+                <button
+                  onClick={handleBuyNow}
                   disabled={selectedVariant?.stock === 0}
                   className={`flex-1 text-white px-4 sm:px-6 py-3 rounded-md font-semibold transition flex justify-center items-center gap-2 font-orbitron ${selectedVariant?.stock === 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-red-600 hover:bg-red-700'}`}>
                   <i data-feather="credit-card" className="h-5 w-5"></i>
@@ -1182,7 +1183,7 @@ const ProductDetail: React.FC = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <StarRating rating={relProduct.product_rating || 0} />
                         <span className="text-sm text-red-500 font-semibold">
-                          ({relProduct.product_rating_count || 0})
+                          ({relProduct.product_rating || 0})
                         </span>
                       </div>
                       <h3 className="font-semibold text-white -ml-4 pl-4 mb-2 font-open-sans line-clamp-2">
@@ -1249,8 +1250,8 @@ const ProductDetail: React.FC = () => {
                             }
                           }}
                           className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${inWishlistRel
-                              ? 'bg-red-600/20 text-red-600'
-                              : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
+                            ? 'bg-red-600/20 text-red-600'
+                            : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
                             }`}
                         >
                           <i

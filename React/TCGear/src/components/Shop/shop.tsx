@@ -61,6 +61,7 @@ interface Product {
   product_image: string;
   product_price: number;
   product_rating: number;
+  product_rating_count: number;
   product_buying: number;
   create_at: string;
   update_at: string;
@@ -528,9 +529,8 @@ const Shop: React.FC = () => {
                             wishlistAdd?.(t("Đã thêm vào danh sách yêu thích"), product.product_name);
                           }
                         }}
-                        className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${
-                          inWishlist ? 'bg-red-600/20 text-red-600' : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
-                        }`}
+                        className={`px-3 py-1 rounded text-sm transition-all duration-300 font-orbitron flex items-center justify-center ${inWishlist ? 'bg-red-600/20 text-red-600' : 'bg-accent/10 hover:bg-red-600/20 text-primary hover:text-red-600'
+                          }`}
                       >
                         <i data-feather="heart" className={`h-4 w-4 transition-all duration-300 ${inWishlist ? 'fill-red-600 text-red-600 animate-heartbeat' : ''}`} />
                       </button>
@@ -886,12 +886,12 @@ const Shop: React.FC = () => {
                     {loading
                       ? t("Đang tải...")
                       : t("Hiển thị {{start}}-{{end}} trong tổng {{total}} sản phẩm", {
-                          start: startItem,
-                          end: endItem,
-                          total: filteredAndSortedProducts.length,
-                        })}
+                        start: startItem,
+                        end: endItem,
+                        total: filteredAndSortedProducts.length,
+                      })}
                   </p>
-                  <button 
+                  <button
                     onClick={openFilter}
                     className="mobile-filter-btn bg-primary text-white px-4 py-2 rounded-md font-semibold transition flex items-center gap-2 font-orbitron"
                   >
@@ -1051,7 +1051,7 @@ const Shop: React.FC = () => {
                         className={`px-5 py-3 rounded font-open-sans transition ${currentPage === num
                           ? 'bg-primary text-white shadow-lg scale-110'
                           : 'border border-primary/30 hover:bg-primary hover:text-white'
-                        }`}
+                          }`}
                       >
                         {num}
                       </button>
@@ -1073,8 +1073,8 @@ const Shop: React.FC = () => {
         </div>
       </section>
 
-      <div 
-        className={`overlay ${isFilterOpen ? 'open' : ''}`} 
+      <div
+        className={`overlay ${isFilterOpen ? 'open' : ''}`}
         id="filter-overlay"
         onClick={closeFilter}
       ></div>

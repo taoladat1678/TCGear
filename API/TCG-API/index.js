@@ -1626,17 +1626,22 @@ const removeTone = (str) =>
         for (const item of Object.values(groupedItems)) {
           const detail_id = `TCG-ODT-${String(nextDetailNum++).padStart(3, '0')}`;
           const item_total = item.price; // Đã là tổng tiền ở bước group
+
+          // Thêm order_details
           await db.query(
             `INSERT INTO order_details (detail_id, order_id, variant_id, quantity, total_amount) 
              VALUES (?, ?, ?, ?, ?)`,
             [detail_id, order_id, item.variant_id, item.quantity, item_total]
           );
-        }
 
-        await db.query(
-          `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'ORDER', ?, ?)`,
-          [user_id, order_id, `Bạn đã đặt đơn hàng thành công`]
-        );
+          // 🔥 THÊM MỚI: Cộng lượt mua vào bảng products dựa qua variant_id
+          await db.query(`
+            UPDATE products p
+            JOIN variants v ON p.product_id = v.product_id
+            SET p.product_buying = p.product_buying + ?
+            WHERE v.variant_id = ?
+          `, [item.quantity, item.variant_id]);
+        }
 
         // 4. Update voucher usage time
         if (applied_vouchers && Array.isArray(applied_vouchers)) {
@@ -1950,6 +1955,14 @@ const removeTone = (str) =>
               // 2. Trừ quantity và total_amount trong đơn hàng
               await db.query(`UPDATE order_details SET quantity = quantity - ?, total_amount = total_amount - ? WHERE detail_id = ?`,
                 [returnQty, refundAmount, detail.detail_id]);
+
+              // 🔥 THÊM MỚI: Trừ lượt mua trong bảng products (Dùng GREATEST để tránh bị âm)
+              await db.query(`
+                UPDATE products p
+                JOIN variants v ON p.product_id = v.product_id
+                SET p.product_buying = GREATEST(0, p.product_buying - ?)
+                WHERE v.variant_id = ?
+              `, [returnQty, detail.variant_id]);
             }
           }
         }

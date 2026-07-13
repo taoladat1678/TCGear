@@ -89,7 +89,7 @@
   border: 1px solid #e11d48;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 767px) {
   .timeline::after {
     left: 31px;
   }
@@ -100,9 +100,9 @@
     padding-right: 25px;
   }
 
-  .timeline-item::before {
+  .left::before, .right::before {
     left: 60px;
-    border: medium solid #e11d48;
+    right: auto;
     border-width: 10px 10px 10px 0;
     border-color: transparent #e11d48 transparent transparent;
   }
@@ -113,6 +113,52 @@
 
   .right {
     left: 0%;
+  }
+}
+
+@media screen and (max-width: 499px) {
+  .timeline::after {
+    left: 20px;
+  }
+
+  .timeline-item {
+    padding-left: 50px;
+    padding-right: 15px;
+  }
+
+  .left::before, .right::before {
+    left: 40px;
+  }
+
+  .left::after, .right::after {
+    left: 7.5px;
+  }
+
+  .timeline-content {
+    padding: 15px 20px;
+  }
+}
+
+@media screen and (max-width: 374px) {
+  .timeline::after {
+    left: 15px;
+  }
+
+  .timeline-item {
+    padding-left: 40px;
+    padding-right: 10px;
+  }
+
+  .left::before, .right::before {
+    left: 30px;
+  }
+
+  .left::after, .right::after {
+    left: 2.5px;
+  }
+
+  .timeline-content {
+    padding: 12px 15px;
   }
 }
 
