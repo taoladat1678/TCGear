@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th7 13, 2026 lúc 01:09 PM
+-- Thời gian đã tạo: Th7 18, 2026 lúc 12:01 PM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.2.4
 
@@ -172,9 +172,19 @@ INSERT INTO `comments` (`cmt_id`, `cmt_content`, `user_id`, `product_id`, `guest
 ('TCG-CMT-004', 'Tai nghe âm thanh rõ, nhưng pin hơi yếu.', NULL, 'TCG-PRO-004', 'Khách C', 3, '2025-10-18 13:00:00', '2026-01-02 00:31:42', '2026-01-02 00:31:42'),
 ('TCG-CMT-005', 'Áo custom đẹp, size vừa vặn, hài lòng.', 'TCG-USR-003', 'TCG-PRO-005', 'Trần Thị Bình', 4, '2025-10-19 14:00:00', '2026-01-02 00:31:42', '2026-01-02 00:31:42'),
 ('TCG-CMT-056432e2', 'sản phẩm như đống cứt', NULL, 'TCG-PRO-004', 'sanr', 1, NULL, '2026-01-15 23:34:22', '2026-01-15 23:34:22'),
+('TCG-CMT-07730966', 'NÀ NÁ NÂN', 'TCG-USR-013', 'TCG-PRO-003', 'tày tày', 4, NULL, '2026-07-18 16:56:00', '2026-07-18 16:56:00'),
+('TCG-CMT-185d99a3', 'NAH', NULL, 'TCG-PRO-001', 'tày tày', 5, NULL, '2026-07-16 17:26:18', '2026-07-16 17:26:18'),
+('TCG-CMT-1afa2b7c', NULL, NULL, 'TCG-PRO-001', 'tày tày', 5, NULL, '2026-07-15 17:49:14', '2026-07-15 17:49:14'),
+('TCG-CMT-1c29270b', 'SẢN PHẨM TUYỆT VỜI', 'TCG-USR-013', 'TCG-PRO-003', 'tày tày', 2, NULL, '2026-07-18 16:55:04', '2026-07-18 16:55:04'),
+('TCG-CMT-2a24d1c6', 'ok đó', NULL, 'TCG-PRO-001', 'tày tày', 5, NULL, '2026-07-16 17:20:06', '2026-07-16 17:20:06'),
+('TCG-CMT-47e53ae5', 'lmao', NULL, 'TCG-PRO-001', 'tày tày', 3, NULL, '2026-07-15 17:47:29', '2026-07-15 17:47:29'),
+('TCG-CMT-5386ee00', NULL, NULL, 'TCG-PRO-001', 'tày tày', 5, NULL, '2026-07-15 17:34:17', '2026-07-15 17:34:17'),
 ('TCG-CMT-56fbd386', 'CŨNG ĐẲNG CẤP', NULL, 'TCG-PRO-005', 'Fan T1 1580', 5, NULL, '2026-01-18 00:19:27', '2026-01-18 00:19:27'),
+('TCG-CMT-721bd9ba', 'nahhh', 'TCG-USR-013', 'TCG-PRO-003', 'tày tày', 3, NULL, '2026-07-18 16:50:43', '2026-07-18 16:50:43'),
 ('TCG-CMT-7878b5ff', 'sản phẩm ko dc dởm cho mấy', NULL, 'TCG-PRO-005', 'T1 Faker', 5, NULL, '2026-01-12 01:18:18', '2026-01-12 01:18:18'),
 ('TCG-CMT-c11decdf', 'OK', NULL, 'TCG-PRO-003', 'TÀY', NULL, NULL, '2026-07-06 18:10:24', '2026-07-06 18:10:24'),
+('TCG-CMT-c6c1d128', 'ádadasd', NULL, 'TCG-PRO-001', 'tày tày', 5, NULL, '2026-07-15 18:00:28', '2026-07-15 18:00:28'),
+('TCG-CMT-f21ca760', 'cũng ok', NULL, 'TCG-PRO-001', 'tày tày', 4, NULL, '2026-07-15 17:35:35', '2026-07-15 17:35:35'),
 ('TCG-CMT-f8ae584e', 'đánh giá 4 sao để có gì mai +1', NULL, 'TCG-PRO-005', 'Fan T1 2725', 4, NULL, '2026-01-12 01:49:57', '2026-01-12 01:49:57');
 
 -- --------------------------------------------------------
@@ -313,8 +323,8 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `order_time`, `order_
 ('TCG-ORD-034', 'TCG-USR-013', '2026-07-11', '17:03:06', 'Chờ xử lý', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'ASADA', 'Chưa nhận hàng', NULL),
 ('TCG-ORD-035', 'TCG-USR-013', '2026-07-11', '17:38:55', 'Chờ xác nhận', 'Đã thanh toán', 'Chuyển Khoản Ngân Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', 'sadadsdasd', 'Chưa nhận hàng', NULL),
 ('TCG-ORD-036', 'TCG-USR-013', '2026-07-11', '17:51:58', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
-('TCG-ORD-037', 'TCG-USR-013', '2026-07-11', '17:54:39', 'Chờ xác nhận', 'Chờ thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Chờ xử lý', '', 'Chưa nhận hàng', NULL),
-('TCG-ORD-038', 'TCG-USR-013', '2026-07-13', '18:00:55', 'Hoàn trả', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Hoàn trả', 'sadasdasdad', 'Đã hoàn trả', NULL);
+('TCG-ORD-037', 'TCG-USR-013', '2026-07-11', '17:54:39', 'Đã giao', 'Đã thanh toán', 'Thanh Toán Khi Nhận Hàng', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', '', 'Đã nhận hàng', NULL),
+('TCG-ORD-038', 'TCG-USR-013', '2026-07-13', '18:00:55', 'Đã giao', 'Đã thanh toán', 'Thanh Toán VNPAY', 'Giao Hàng Tiêu Chuẩn', 'tày tày', '0809069032', 'datdark0412@gmail.com', '120 yên lãng, Xã Đông Thạnh, Huyện Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam', 'Đã giao', 'sadasdasdad', 'Chưa nhận hàng', NULL);
 
 -- --------------------------------------------------------
 
@@ -380,9 +390,9 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `product_name`, `product_desc`, `cate_id`, `brand_id`, `sc_id`, `team_id`, `product_image`, `create_at`, `update_at`, `product_buying`, `product_rating`, `product_rating_count`, `product_image_2`, `product_image_3`) VALUES
-('TCG-PRO-001', 'Chuột gaming Razer DeathAdder', 'Chuột gaming chuyên nghiệp với cảm biến chính xác cao, phù hợp cho game thủ FPS.', 'TCG-CAT-001', 'TCG-BRN-001', 'TCG-SUB-001', NULL, 'img/mouse_razer.jpg', '2025-10-01 12:00:00', '2025-10-15 12:00:00', 100, 4.5, 50, 'img/mouse_razer_2.jpg', 'img/mouse_razer_3.jpg'),
+('TCG-PRO-001', 'Chuột gaming Razer DeathAdder', 'Chuột gaming chuyên nghiệp với cảm biến chính xác cao, phù hợp cho game thủ FPS.', 'TCG-CAT-001', 'TCG-BRN-001', 'TCG-SUB-001', NULL, 'img/mouse_razer.jpg', '2025-10-01 12:00:00', '2025-10-15 12:00:00', 100, 4.63, 8, 'img/mouse_razer_2.jpg', 'img/mouse_razer_3.jpg'),
 ('TCG-PRO-002', 'Bàn phím Logitech G Pro', 'Bàn phím cơ gaming với switch quang học, đèn RGB tùy chỉnh.', 'TCG-CAT-001', 'TCG-BRN-002', 'TCG-SUB-002', NULL, 'img/keyboard_logi.jpg', '2025-10-02 12:00:00', '2025-10-16 12:00:00', 80, 5, 30, 'img/keyboard_logi_2.jpg', 'img/keyboard_logi_3.jpg'),
-('TCG-PRO-003', 'Áo đấu T1 LoL 2025 Jacket\r\n', 'Áo thi đấu chính hãng T1 League of Legends mùa giải 2025, chất liệu thoáng khí, in logo và tên người chơi.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-001', 'img/jersey_t1_lol_2025.jpg', '2025-10-03 12:00:00', '2025-10-17 12:00:00', 200, 4.8, 100, 'img/jersey_t1_lol_2025_2.jpg', 'img/jersey_t1_lol_2025_3.jpg'),
+('TCG-PRO-003', 'Áo đấu T1 LoL 2025 Jacket\r\n', 'Áo thi đấu chính hãng T1 League of Legends mùa giải 2025, chất liệu thoáng khí, in logo và tên người chơi.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-001', 'img/jersey_t1_lol_2025.jpg', '2025-10-03 12:00:00', '2025-10-17 12:00:00', 200, 3.5, 4, 'img/jersey_t1_lol_2025_2.jpg', 'img/jersey_t1_lol_2025_3.jpg'),
 ('TCG-PRO-004', 'Tai nghe Corsair Void', 'Tai nghe gaming không dây với âm thanh vòm 7.1, mic rõ nét.', 'TCG-CAT-001', 'TCG-BRN-004', 'TCG-SUB-005', NULL, 'img/headset_corsair.jpg', '2025-10-04 12:00:00', '2025-10-18 12:00:00', 50, 4.2, 20, 'img/headset_corsair_2.jpg', 'img/headset_corsair_3.jpg'),
 ('TCG-PRO-005', 'Áo đấu T1 Worlds 2025 Jersey', 'Áo thi đấu chính hãng T1 Worlds 2025, thiết kế hiện đại, chất liệu cao cấp.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-002', 'img/jersey_t1_worlds_2025.jpg', '2025-10-05 12:00:00', '2025-10-19 12:00:00', 150, 4.6, 40, 'img/jersey_t1_worlds_2025_2.jpg', 'img/jersey_t1_worlds_2025_3.jpg'),
 ('TCG-PRO-010', 'Jacket T1 Valorant 2025 - VCT Champions Paris', 'Áo thi đấu chính hãng T1 Valorant 2025.', 'TCG-CAT-002', 'TCG-BRN-006', 'TCG-SUB-003', 'TCG-TM-003', 'img/jersey_t1_valorant_2025.jpg', '2025-12-01 10:00:00', '2025-12-01 10:00:00', 120, 4.7, 85, 'img/jersey_t1_valorant_2025_2.jpg', 'img/jersey_t1_valorant_2025_3.jpg');
@@ -442,10 +452,14 @@ CREATE TABLE `site_ratings` (
 
 INSERT INTO `site_ratings` (`rating_id`, `user_id`, `guest_name`, `rating`, `comment`, `create_at`, `guest_email`) VALUES
 ('TCG-SRT-001', 'TCG-USR-001', 'Nguyễn Văn An', 5, 'Website dễ sử dụng, sản phẩm chất lượng cao.', '2025-10-20 10:00:00', 'an@example.com'),
-('TCG-SRT-002', NULL, 'Khách B', 4, 'Giao hàng nhanh, nhưng hỗ trợ khách hàng cần cải thiện.', '2025-10-21 10:00:00', 'khachb@example.com'),
 ('TCG-SRT-003', 'TCG-USR-002', 'Trần Thị Bình', 5, 'Rất hài lòng với đa dạng gaming gear và jerseys.', '2025-10-22 10:00:00', 'binh@example.com'),
 ('TCG-SRT-004', NULL, 'Khách C', 3, 'Giá hơi cao so với thị trường.', '2025-10-23 10:00:00', 'khachc@example.com'),
-('TCG-SRT-005', 'TCG-USR-003', 'Lê Văn Cường', 4, 'Tốt, sẽ mua lại.', '2025-10-24 10:00:00', 'cuong@example.com');
+('TCG-SRT-005', 'TCG-USR-003', 'Lê Văn Cường', 4, 'Tốt, sẽ mua lại.', '2025-10-24 10:00:00', 'cuong@example.com'),
+('TCG-SRT-387316', 'TCG-USR-013', 'tày tày', 5, 'ewrwrewrw', '2026-07-14 18:43:07', 'datdark0412@gmail.com'),
+('TCG-SRT-726912', 'TCG-USR-013', 'tày tày', 5, 'mày tày rồi', '2026-07-14 18:48:46', 'datdark0412@gmail.com'),
+('TCG-SRT-901', 'TCG-USR-901', 'Faker', 5, 'Áo đấu và phụ kiện của TCGear mang lại lợi thế tôi cần trong mỗi trận đấu.', '2026-07-14 17:40:01', 'faker@t1.gg'),
+('TCG-SRT-902', 'TCG-USR-902', 'Gumayusi', 5, 'Sự thoải mái và chất lượng của áo đấu TCGear là không thể sánh bằng trong các phiên chơi game dài.', '2026-07-14 17:40:01', 'gumayusi@t1.gg'),
+('TCG-SRT-903', 'TCG-USR-903', 'Caps', 5, 'Thiết bị của TCGear giúp tôi tập trung và thể hiện tốt nhất.', '2026-07-14 17:40:01', 'caps@g2.com');
 
 -- --------------------------------------------------------
 
@@ -579,26 +593,30 @@ CREATE TABLE `users` (
   `verification_token` varchar(100) DEFAULT NULL,
   `token_expires_at` datetime DEFAULT NULL,
   `reset_password_token` varchar(100) DEFAULT NULL,
-  `reset_token_expires_at` datetime DEFAULT NULL
+  `reset_token_expires_at` datetime DEFAULT NULL,
+  `is_gamer` tinyint(4) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`user_id`, `user_fullname`, `user_username`, `user_password`, `user_email`, `user_phone_number`, `user_isActive`, `user_image`, `user_isAdmin`, `google_id`, `facebook_id`, `created_at`, `updated_at`, `is_confirmed`, `verification_token`, `token_expires_at`, `reset_password_token`, `reset_token_expires_at`) VALUES
-('TCG-USR-001', 'Nguyễn Văn An', 'nguyenvanan', 'hashedpass1', 'an@gmail.com', '0123456789', 1, 'img/user1.jpg', 1, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-002', 'Trần Thị Bình', 'tranthibinh', 'hashedpass2', 'binh@example.com', '0987654321', 1, 'img/user2.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-003', 'Lê Văn Cường', 'levancuong', 'hashedpass3', 'cuong@example.com', '0111222333', 1, 'img/user3.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-004', 'Phạm Thị Dung', 'phamthidung', 'hashedpass4', 'dung@example.com', '0444555666', 1, 'img/user4.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-005', 'Hoàng Văn Em', 'hoangvanem', 'hashedpass5', 'em@example.com', '0777888999', 1, 'img/user5.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-006', 'Đặng Đặng', 'dangdang', '$2b$10$WkidTZ99460tXD43C/HyWOWGPHPltxIpvPihY35Mu1UhgiMYcWB4m', 'knight@gmail.com', '+84364655292', 1, 'img/users/1769869084411-530112317-faker.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-008', 'Bruh Văn', 'bruhvan', '$2b$10$PLG1ZXbxRj8EW5nqXUgV.O/v9kJVJU2Oz0jYBxd1pLTuUeDWzwVma', 'hba87738@gmail.com', '01823644255', 1, 'img/1769869642315-710987545-fakerW24.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-009', 'Lee Sang Hiếc', 'leesanghiec', '$2b$10$TOOQAEMl65Q4H9hdF.46j.vCBj05aHddl.K7Xx0Eel.jWy.I.g/fy', 'abc@gmail.com', '0907080907', 1, 'img/1771603512146-202307366-faker2025.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-010', 'Tiến Đạt Đặng Đặng', 'tiendatdangnguyen', '', 'siuu@gmail.com', '0908090908', 1, 'img/1783419585603-833601717-maxresdefault.jpg', 0, NULL, '122109074865227856', '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-011', 'Đặng Đạt', 'dangdat', '', 'datd9079@gmail.com', '0809060409', 1, 'img/1783418533623-453621022-avatar-google.jpg', 0, '104143569109046861426', NULL, '2026-02-25 21:30:20', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-012', 'T1 Keria', 'hunter2facehugging', '', 'facehugging845@gmail.com', '0908090908', 1, 'img/1783424760130-926208256-avatar-google.jpg', 0, '112761235228829734678', NULL, '2026-07-07 17:57:24', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL),
-('TCG-USR-013', 'tày tày', 'taytay', '$2b$10$V.KwOXSATfu/E58KK0.PmOqsFMXKuc6dxuwZstJk5DvejmvLVcAe2', 'datdark0412@gmail.com', '0809069032', 1, 'img/1783613032050-751188259-maxresdefault.jpg', 0, NULL, NULL, '2026-07-09 23:03:52', '2026-07-09 23:09:25', 'Đã xác thực', NULL, NULL, NULL, NULL);
+INSERT INTO `users` (`user_id`, `user_fullname`, `user_username`, `user_password`, `user_email`, `user_phone_number`, `user_isActive`, `user_image`, `user_isAdmin`, `google_id`, `facebook_id`, `created_at`, `updated_at`, `is_confirmed`, `verification_token`, `token_expires_at`, `reset_password_token`, `reset_token_expires_at`, `is_gamer`) VALUES
+('TCG-USR-001', 'Nguyễn Văn An', 'nguyenvanan', 'hashedpass1', 'an@gmail.com', '0123456789', 1, 'img/user1.jpg', 1, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-002', 'Trần Thị Bình', 'tranthibinh', 'hashedpass2', 'binh@example.com', '0987654321', 1, 'img/user2.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-003', 'Lê Văn Cường', 'levancuong', 'hashedpass3', 'cuong@example.com', '0111222333', 1, 'img/user3.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-004', 'Phạm Thị Dung', 'phamthidung', 'hashedpass4', 'dung@example.com', '0444555666', 1, 'img/user4.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-005', 'Hoàng Văn Em', 'hoangvanem', 'hashedpass5', 'em@example.com', '0777888999', 1, 'img/user5.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-006', 'Đặng Đặng', 'dangdang', '$2b$10$WkidTZ99460tXD43C/HyWOWGPHPltxIpvPihY35Mu1UhgiMYcWB4m', 'knight@gmail.com', '+84364655292', 1, 'img/users/1769869084411-530112317-faker.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-008', 'Bruh Văn', 'bruhvan', '$2b$10$PLG1ZXbxRj8EW5nqXUgV.O/v9kJVJU2Oz0jYBxd1pLTuUeDWzwVma', 'hba87738@gmail.com', '01823644255', 1, 'img/1769869642315-710987545-fakerW24.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-009', 'Lee Sang Hiếc', 'leesanghiec', '$2b$10$TOOQAEMl65Q4H9hdF.46j.vCBj05aHddl.K7Xx0Eel.jWy.I.g/fy', 'abc@gmail.com', '0907080907', 1, 'img/1771603512146-202307366-faker2025.jpg', 0, NULL, NULL, '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-010', 'Tiến Đạt Đặng Đặng', 'tiendatdangnguyen', '', 'siuu@gmail.com', '0908090908', 1, 'img/1783419585603-833601717-maxresdefault.jpg', 0, NULL, '122109074865227856', '2026-02-25 21:29:54', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-011', 'Đặng Đạt', 'dangdat', '', 'datd9079@gmail.com', '0809060409', 1, 'img/1783418533623-453621022-avatar-google.jpg', 0, '104143569109046861426', NULL, '2026-02-25 21:30:20', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-012', 'T1 Keria', 'hunter2facehugging', '', 'facehugging845@gmail.com', '0908090908', 1, 'img/1783424760130-926208256-avatar-google.jpg', 0, '112761235228829734678', NULL, '2026-07-07 17:57:24', '2026-07-09 17:37:02', 'ĐÃ XÁC THỰC', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-013', 'tày tày', 'taytay', '$2b$10$V.KwOXSATfu/E58KK0.PmOqsFMXKuc6dxuwZstJk5DvejmvLVcAe2', 'datdark0412@gmail.com', '0809069032', 1, 'img/1783613032050-751188259-maxresdefault.jpg', 0, NULL, NULL, '2026-07-09 23:03:52', '2026-07-09 23:09:25', 'Đã xác thực', NULL, NULL, NULL, NULL, 0),
+('TCG-USR-901', 'T1 Faker', 'faker', '', 'faker@t1.gg', NULL, 1, 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Faker_2020_interview.jpg', 0, NULL, NULL, '2026-07-14 17:40:01', '2026-07-14 17:45:19', 'CHƯA XÁC THỰC', NULL, NULL, NULL, NULL, 1),
+('TCG-USR-902', 'T1 Peyz', 'peyz', '', 'peyz@t1.gg', NULL, 1, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTptp8Thxd_-kVnRgKO3fMlZ_fgCzWMx11cqolny7mju7Mm_LeNgCzXf0Q&s=10', 0, NULL, NULL, '2026-07-14 17:40:01', '2026-07-14 17:46:31', 'CHƯA XÁC THỰC', NULL, NULL, NULL, NULL, 1),
+('TCG-USR-903', 'Caps', 'caps', '', 'caps@g2.com', NULL, 1, 'https://esports-news.co.uk/wp-content/uploads/2023/04/caps-g2-msi-2023-interview.jpg', 0, NULL, NULL, '2026-07-14 17:40:01', '2026-07-14 17:40:01', 'CHƯA XÁC THỰC', NULL, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -740,7 +758,7 @@ CREATE TABLE `user_eco_infos` (
 --
 
 INSERT INTO `user_eco_infos` (`eco_info_id`, `eco_total`, `eco_orders_total`, `user_id`) VALUES
-('TCG-UEC-013', 4840000, 2, 'TCG-USR-013');
+('TCG-UEC-013', 4850000, 3, 'TCG-USR-013');
 
 -- --------------------------------------------------------
 
@@ -774,7 +792,7 @@ INSERT INTO `variants` (`variant_id`, `product_id`, `size_id`, `color_id`, `pric
 ('TCG-VAR-008', 'TCG-PRO-004', NULL, 'TCG-COL-003', 2500000, 80, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
 ('TCG-VAR-009', 'TCG-PRO-004', NULL, 'TCG-COL-004', 2550000, 50, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
 ('TCG-VAR-010', 'TCG-PRO-004', NULL, 'TCG-COL-001', 2600000, 30, '2025-10-04 13:00:00', '2025-10-04 13:00:00'),
-('TCG-VAR-011', 'TCG-PRO-003', 'TCG-SIZ-001', NULL, 10000, 58, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
+('TCG-VAR-011', 'TCG-PRO-003', 'TCG-SIZ-001', NULL, 10000, 54, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-012', 'TCG-PRO-003', 'TCG-SIZ-002', NULL, 780000, 197, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-013', 'TCG-PRO-003', 'TCG-SIZ-003', NULL, 800000, 250, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),
 ('TCG-VAR-014', 'TCG-PRO-003', 'TCG-SIZ-004', NULL, 820000, 120, '2025-10-03 13:00:00', '2025-10-03 13:00:00'),

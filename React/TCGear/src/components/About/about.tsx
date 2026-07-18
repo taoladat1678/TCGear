@@ -1,16 +1,42 @@
-// FILE 1: src/pages/About.tsx - FULL CODE KHÔNG TÓM TẮT, KHÔNG THIẾU DÒNG NÀO
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import feather from 'feather-icons';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
 import './about.css';
 
 const About: React.FC = () => {
   const { t } = useTranslation();
+  const [siteRatings, setSiteRatings] = useState<any[]>([]);
 
   useEffect(() => {
+    // Fetch site ratings
+    const fetchRatings = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/api/ratings/customers');
+        const data = await res.json();
+        if (data.status === 'success') {
+          const normalized = data.data.map((r: any) => ({
+            id: r.rating_id,
+            rating: r.rating,
+            content: r.comment,
+            created_at: r.create_at,
+            user_name: r.name,
+            user_image: r.avatar,
+          }));
+          setSiteRatings(normalized);
+        }
+      } catch (err) {
+        console.error('Error fetching site ratings:', err);
+      }
+    };
+    fetchRatings();
+
     AOS.init({
       duration: 800,
       easing: 'ease-in-out',
@@ -238,6 +264,104 @@ const About: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Customer Reviews Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+        <div className="text-center mb-12" data-aos="fade-up">
+          <h2 className="text-3xl md:text-4xl max-[767px]:text-3xl max-[499px]:text-2xl max-[374px]:text-xl font-bold mb-4 font-orbitron text-accent">
+            ĐÁNH GIÁ TỪ KHÁCH HÀNG
+          </h2>
+          <p className="text-accent/70 max-w-2xl mx-auto font-open-sans">
+            Những trải nghiệm mua sắm thực tế từ cộng đồng TCGear
+          </p>
+        </div>
+
+        {siteRatings.length > 0 ? (
+          <div data-aos="fade-up">
+            <Swiper
+              modules={[Autoplay, Pagination]}
+              spaceBetween={24}
+              slidesPerView={1}
+              loop={true}
+              autoplay={{
+                delay: 4000,
+                disableOnInteraction: false,
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              breakpoints={{
+                768: {
+                  slidesPerView: 2,
+                },
+                1024: {
+                  slidesPerView: 3,
+                },
+              }}
+              className="pb-12"
+            >
+              {siteRatings.map((rating) => (
+                <SwiperSlide key={rating.id} className="h-auto">
+                  <div className="bg-secondary/50 rounded-lg p-6 border border-primary/20 shadow-lg flex flex-col items-center text-center h-full">
+
+                    {/* Avatar & Info */}
+                    <div className="flex flex-col items-center mb-4">
+                      {/* ĐÃ CHỈNH SỬA ĐƯỜNG DẪN ẢNH VÀ SỰ KIỆN LỖI Ở ĐÂY */}
+                      <img
+                        src={rating.user_image ? rating.user_image : '/img/fanT1.jpg'}
+                        alt={rating.user_name}
+                        className="w-16 h-16 rounded-full object-cover border-2 border-primary/40 mb-3"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null; // Tránh lặp vô hạn nếu ảnh mặc định cũng lỗi
+                          target.src = '/img/fanT1.jpg'; // Load từ thư mục public/img/
+                        }}
+                      />
+                      <h4 className="font-semibold text-accent font-orbitron">{rating.user_name}</h4>
+                      <p className="text-xs text-accent/50 font-open-sans mt-1">
+                        {new Date(rating.created_at).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    </div>
+
+                    {/* Stars using explicit SVGs to ensure standard compatibility in Swiper */}
+                    <div className="flex justify-center gap-1 mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill={star <= rating.rating ? '#ef4444' : 'none'}
+                          stroke={star <= rating.rating ? '#ef4444' : '#6b7280'}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="transition-colors duration-200"
+                        >
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      ))}
+                    </div>
+
+                    {/* Comment */}
+                    <div className="flex-1 w-full">
+                      <p className="text-accent/80 font-open-sans not-italic text-sm line-clamp-4 leading-relaxed text-center">
+                        {rating.content}
+                      </p>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        ) : (
+          <div className="text-center text-accent/50 not-italic font-open-sans" data-aos="fade-up">
+            Chưa có đánh giá nào.
+          </div>
+        )}
       </section>
     </>
   );

@@ -17,6 +17,19 @@
   font-family: "Open Sans", sans-serif;
 }
 
+.star {
+  font-size: 24px;
+  color: #ccc;
+  /* Màu xám mặc định */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star.active {
+  color: #FF0000;
+  /* Màu đỏ khi được chọn */
+}
+
 .status-delivered {
   background-color: #10b981;
   color: white;
@@ -126,19 +139,57 @@
 }
 
 /* Tailwind overrides for custom colors (assuming Tailwind is used) */
-.bg-secondary { background-color: #000000; }
-.text-accent { color: #ffffff; }
-.text-primary { color: #e11d48; }
-.text-accent\/70 { color: rgba(255, 255, 255, 0.7); }
-.border-primary\/20 { border-color: rgba(225, 29, 72, 0.2); }
-.bg-secondary\/50 { background-color: rgba(0, 0, 0, 0.5); }
-.bg-black { background-color: #000000; }
-.bg-primary { background-color: #e11d48; }
-.bg-primary\/90 { background-color: rgba(225, 29, 72, 0.9); }
-.border-primary { border-color: #e11d48; }
-.hover\:bg-primary\/90:hover { background-color: rgba(225, 29, 72, 0.9); }
-.font-open-sans { font-family: "Open Sans", sans-serif; }
-.font-orbitron { font-family: "Orbitron", sans-serif; }
+.bg-secondary {
+  background-color: #000000;
+}
+
+.text-accent {
+  color: #ffffff;
+}
+
+.text-primary {
+  color: #e11d48;
+}
+
+.text-accent\/70 {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.border-primary\/20 {
+  border-color: rgba(225, 29, 72, 0.2);
+}
+
+.bg-secondary\/50 {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bg-black {
+  background-color: #000000;
+}
+
+.bg-primary {
+  background-color: #e11d48;
+}
+
+.bg-primary\/90 {
+  background-color: rgba(225, 29, 72, 0.9);
+}
+
+.border-primary {
+  border-color: #e11d48;
+}
+
+.hover\:bg-primary\/90:hover {
+  background-color: rgba(225, 29, 72, 0.9);
+}
+
+.font-open-sans {
+  font-family: "Open Sans", sans-serif;
+}
+
+.font-orbitron {
+  font-family: "Orbitron", sans-serif;
+}
 
 @media (max-width: 640px) {
   .product-grid {
@@ -150,7 +201,7 @@
   .tracking-progress {
     display: none;
   }
-  
+
   .tracking-step-container {
     flex-direction: column;
     gap: 1.5rem;

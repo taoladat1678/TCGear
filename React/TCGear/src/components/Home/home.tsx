@@ -680,31 +680,38 @@ const PartnersSection: React.FC = () => {
 
 const ReviewsSection: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const [reviews, setReviews] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/ratings/gamers");
+        const json = await res.json();
+        if (json.status === "success") {
+          let processed = json.data;
+          // Áp dụng dịch tự động nếu đổi sang tiếng Anh
+          if (i18n.language === 'en') {
+            processed = await Promise.all(
+              json.data.map(async (r: any) => ({
+                ...r,
+                comment: await autoTranslate(r.comment)
+              }))
+            );
+          }
+          setReviews(processed);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchReviews();
+  }, [i18n.language]); // Gọi lại khi đổi ngôn ngữ để autoTranslate chạy
 
   React.useLayoutEffect(() => {
     feather.replace();
-  }, []);
+  }, [reviews]);
 
-  const reviews = [
-    {
-      name: "Faker",
-      avatar: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Faker_2020_interview.jpg",
-      quoteVi: "Áo đấu và phụ kiện của TCGear mang lại lợi thế tôi cần trong mỗi trận đấu.",
-      quoteEn: "TCGear jerseys and gear give me the edge I need in every match."
-    },
-    {
-      name: "Gumayusi",
-      avatar: "https://cdn-media.sforum.vn/storage/app/media/been/lmht-ceo-t1-chinh-thuc-len-tieng-ve-tuong-lai-cua-gumayusi-3.jpg",
-      quoteVi: "Sự thoải mái và chất lượng của áo đấu TCGear là không thể sánh bằng trong các phiên chơi game dài.",
-      quoteEn: "The comfort and quality of TCGear jerseys are unmatched during long gaming sessions."
-    },
-    {
-      name: "Caps",
-      avatar: "https://esports-news.co.uk/wp-content/uploads/2023/04/caps-g2-msi-2023-interview.jpg",
-      quoteVi: "Thiết bị của TCGear giúp tôi tập trung và thể hiện tốt nhất.",
-      quoteEn: "TCGear equipment helps me stay focused and perform at my best."
-    }
-  ];
+  if (reviews.length === 0) return null;
 
   return (
     <section className="py-16 bg-black px-4 sm:px-6 lg:px-8">
@@ -719,15 +726,15 @@ const ReviewsSection: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-[499px]:gap-6 max-[374px]:gap-4">
-          {reviews.map((review, index) => (
+          {reviews.slice(0, 3).map((review, index) => (
             <div
-              key={index}
+              key={review.rating_id}
               className="bg-secondary/50 rounded-lg overflow-hidden border border-primary/20"
               data-aos={index === 0 ? "fade-right" : index === 1 ? "fade-up" : "fade-left"}
             >
               <div className="h-24 bg-gray-800 flex items-center justify-center">
                 <img
-                  src={review.avatar}
+                  src={review.avatar || 'img/fanT1.jpg'}
                   alt={review.name}
                   className="w-24 h-24 rounded-full object-cover mx-auto"
                   loading="lazy"
@@ -736,13 +743,11 @@ const ReviewsSection: React.FC = () => {
               <div className="p-4 text-center">
                 <h3 className="font-semibold text-lg mb-2 font-open-sans">{review.name}</h3>
                 <div className="flex justify-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
+                  {[...Array(review.rating || 5)].map((_, i) => (
                     <i key={i} data-feather="star" className="h-5 w-5 text-red-500 fill-current"></i>
                   ))}
                 </div>
-                <p className="text-accent/70 font-open-sans">
-                  "{i18n.language === 'vi' ? review.quoteVi : review.quoteEn}"
-                </p>
+                <p className="text-accent/70 font-open-sans">"{review.comment}"</p>
               </div>
             </div>
           ))}

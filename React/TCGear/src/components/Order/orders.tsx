@@ -13,6 +13,34 @@ AOS.init({
   once: true,
 });
 
+// Hàm xây dựng payload cho API đánh giá (rating)
+// Hỗ trợ cả người dùng đã đăng nhập (user_id) và khách vãng lai (guest_name/guest_email)
+const getRatingPayload = (ratingValue: number, commentText: string) => {
+  const token = localStorage.getItem('token');
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+
+  // Cấu trúc dữ liệu cơ bản
+  const payload: any = {
+    rating: ratingValue,
+    comment: commentText,
+    create_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    // Mặc định cho khách vãng lai
+    user_id: null,
+    guest_name: (document.getElementById('guest_name') as HTMLInputElement | null)?.value || 'Guest',
+    guest_email: (document.getElementById('guest_email') as HTMLInputElement | null)?.value || ''
+  };
+
+  // Nếu có token và thông tin user, ghi đè thông tin người dùng
+  if (token && user) {
+    payload.user_id = user.user_id;
+    payload.guest_name = user.fullname;
+    payload.guest_email = user.email;
+  }
+
+  return payload;
+};
+
 const Orders: React.FC = () => {
   const { t } = useTranslation();
   const { success, error } = useToast();
@@ -21,10 +49,18 @@ const Orders: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [ratingModalOrder, setRatingModalOrder] = useState<string | null>(null);
+  const [ratingValue, setRatingValue] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [ratingContent, setRatingContent] = useState<string>('');
 
   // States quản lý Popup Hoàn Trả
   const [returnModalOrder, setReturnModalOrder] = useState<any>(null);
   const [returnQuantities, setReturnQuantities] = useState<{ [key: string]: number }>({});
+
+  useEffect(() => {
+    feather.replace();
+  }, [orders, expandedOrders, activeFilter, currentPage, returnModalOrder, ratingModalOrder, hoverRating, ratingValue]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -86,7 +122,7 @@ const Orders: React.FC = () => {
             if (groupedProducts[groupKey]) {
               groupedProducts[groupKey].quantity += p.quantity;
               groupedProducts[groupKey].price += p.price; // price here is actually total_amount from DB
-              
+
               if (!groupedProducts[groupKey].skus) {
                 groupedProducts[groupKey].skus = [groupedProducts[groupKey].sku];
               }
@@ -95,7 +131,7 @@ const Orders: React.FC = () => {
               }
               // Lưu trữ danh sách các item gốc để phục vụ việc hoàn trả
               if (!groupedProducts[groupKey].originalItems) {
-                groupedProducts[groupKey].originalItems = [{...groupedProducts[groupKey]}];
+                groupedProducts[groupKey].originalItems = [{ ...groupedProducts[groupKey] }];
                 // Xóa originalItems khỏi bản sao đầu tiên để tránh đệ quy vòng
                 delete groupedProducts[groupKey].originalItems[0].originalItems;
               }
@@ -163,32 +199,74 @@ const Orders: React.FC = () => {
     });
   };
 
-  const handleConfirmReceived = async (orderId: string) => {
+  // 1. Hàm Update đơn hàng thành "Hoàn thành" (Cần gọi trước)
+  const processReceiveOrder = async (orderId: string): Promise<boolean> => {
     try {
       const res = await fetch(`http://localhost:3000/api/orders/${orderId}/receive`, {
         method: 'PUT'
       });
       const data = await res.json();
+
       if (data.status === 'success') {
         success?.("Thành công", "Đã xác nhận nhận hàng");
         setOrders(prev => prev.map(o => o.id === orderId ? { ...o, isReceived: 'Đã nhận hàng', status: 'completed', statusText: 'Hoàn thành' } : o));
-        
-        // Gọi API sync-eco để cập nhật ECO_TOTAL và ECO_ORDER_TOTAL
+
+        // Gọi sync-eco nếu cần
         try {
           const userStr = localStorage.getItem('user');
           const currentUser = userStr ? JSON.parse(userStr) : null;
           if (currentUser && currentUser.user_id) {
             await fetch(`http://localhost:3000/api/user/${currentUser.user_id}/sync-eco`, { method: 'POST' });
           }
-        } catch (e) {
-          console.error("Lỗi khi gọi sync-eco", e);
-        }
+        } catch (e) { }
+
+        return true; // Trả về true để biết đã update thành công
       } else {
         error?.("Lỗi", data.message || "Không thể xác nhận");
+        return false;
       }
     } catch (err) {
-      console.error(err);
       error?.("Lỗi", "Lỗi kết nối máy chủ");
+      return false;
+    }
+  };
+
+  // 2. Khi bấm nút "Đã nhận hàng"
+  const handleConfirmReceived = async (orderId: string) => {
+    const isSuccess = await processReceiveOrder(orderId);
+    if (isSuccess) {
+      // Chỉ mở modal ĐÁNH GIÁ khi đơn đã update thành công
+      setRatingModalOrder(orderId);
+      setRatingValue(0);
+      setRatingContent('');
+    }
+  };
+
+  // 3. Khi bấm nút "Gửi đánh giá"
+  const handleSubmitRating = async () => {
+    if (ratingValue === 0) { error?.("Lỗi", "Vui lòng chọn số sao"); return; }
+    if (!ratingContent.trim()) { error?.("Lỗi", "Nội dung trống"); return; }
+
+    try {
+      const payload = getRatingPayload(ratingValue, ratingContent);
+
+      const res = await fetch("http://localhost:3000/api/ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (data.status === "success") {
+        success?.("Thành công", "Cảm ơn bạn!");
+        setRatingModalOrder(null); // Đóng modal
+        setRatingValue(0);
+        setRatingContent('');
+      } else {
+        error?.("Lỗi", data.message || "Không thể gửi đánh giá");
+      }
+    } catch (err) {
+      error?.("Lỗi", "Lỗi kết nối");
     }
   };
 
@@ -215,7 +293,7 @@ const Orders: React.FC = () => {
 
   const submitReturn = async () => {
     const itemsToReturn: any[] = [];
-    
+
     // Phân bổ số lượng hoàn trả vào các SKU thực tế của sản phẩm
     Object.entries(returnQuantities).forEach(([name, returnQty]) => {
       let remainingQtyToReturn = returnQty as number;
@@ -223,12 +301,12 @@ const Orders: React.FC = () => {
 
       // Tìm sản phẩm đã gom nhóm
       const groupedProduct = returnModalOrder.products.find((p: any) => p.name === name);
-      
+
       if (groupedProduct && groupedProduct.originalItems) {
         for (const p of groupedProduct.originalItems) {
           if (remainingQtyToReturn <= 0) break;
           const qtyToTake = Math.min(p.quantity, remainingQtyToReturn);
-          
+
           itemsToReturn.push({ variant_id: p.sku, return_quantity: qtyToTake });
           remainingQtyToReturn -= qtyToTake;
         }
@@ -633,41 +711,42 @@ const Orders: React.FC = () => {
                 const unitPrice = p.price / p.quantity;
                 const unitPriceString = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(unitPrice);
                 return (
-                <div key={p.name} className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg border border-primary/10">
-                  <input
-                    type="checkbox"
-                    checked={(returnQuantities[p.name] || 0) > 0}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        handleQuantityChange(p.name, p.quantity, p.quantity);
-                      } else {
-                        handleQuantityChange(p.name, 0, p.quantity);
-                      }
-                    }}
-                    className="w-5 h-5 cursor-pointer accent-red-500 shrink-0"
-                  />
-                  <img src={p.image} alt={p.name} className="w-16 h-16 object-cover rounded-md" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold font-open-sans line-clamp-1">{p.name}</h3>
-                    <p className="text-sm text-accent/60">Đã mua: {p.quantity} x {unitPriceString}</p>
-                  </div>
+                  <div key={p.name} className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg border border-primary/10">
+                    <input
+                      type="checkbox"
+                      checked={(returnQuantities[p.name] || 0) > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          handleQuantityChange(p.name, p.quantity, p.quantity);
+                        } else {
+                          handleQuantityChange(p.name, 0, p.quantity);
+                        }
+                      }}
+                      className="w-5 h-5 cursor-pointer accent-red-500 shrink-0"
+                    />
+                    <img src={p.image} alt={p.name} className="w-16 h-16 object-cover rounded-md" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold font-open-sans line-clamp-1">{p.name}</h3>
+                      <p className="text-sm text-accent/60">Đã mua: {p.quantity} x {unitPriceString}</p>
+                    </div>
 
-                  {/* Cụm tăng giảm số lượng */}
-                  <div className="flex items-center border border-primary/30 rounded-lg bg-black/50">
-                    <button
-                      onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) - 1, p.quantity)}
-                      className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
-                    >−</button>
-                    <span className="w-12 text-center font-bold font-open-sans text-primary">
-                      {returnQuantities[p.name] || 0}
-                    </span>
-                    <button
-                      onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) + 1, p.quantity)}
-                      className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
-                    >+</button>
+                    {/* Cụm tăng giảm số lượng */}
+                    <div className="flex items-center border border-primary/30 rounded-lg bg-black/50">
+                      <button
+                        onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) - 1, p.quantity)}
+                        className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
+                      >−</button>
+                      <span className="w-12 text-center font-bold font-open-sans text-primary">
+                        {returnQuantities[p.name] || 0}
+                      </span>
+                      <button
+                        onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) + 1, p.quantity)}
+                        className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
+                      >+</button>
+                    </div>
                   </div>
-                </div>
-              )})}
+                )
+              })}
             </div>
 
             {(() => {
@@ -697,6 +776,112 @@ const Orders: React.FC = () => {
                 className="px-6 py-2.5 rounded font-open-sans bg-red-600 hover:bg-red-700 text-white transition font-semibold shadow-[0_0_15px_rgba(220,38,38,0.5)]"
               >
                 Xác nhận Hoàn Trả
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL ĐÁNH GIÁ TRẢI NGHIỆM --- */}
+      {ratingModalOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#111111] border border-primary/40 rounded-xl max-w-lg w-full shadow-2xl p-6" data-aos="zoom-in" data-aos-duration="300">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold font-orbitron text-white mb-2">
+                Đánh giá trải nghiệm mua hàng của bạn tại TCGear
+              </h2>
+              <p className="text-accent/60 font-open-sans text-sm">
+                Đơn hàng #{ratingModalOrder}
+              </p>
+            </div>
+
+            {/*
+              Rating sao: chọn số sao bằng cách click. Toàn bộ logic tô màu
+              (từ sao 1 đến sao được click) được xử lý qua state React
+              (ratingValue) thay vì thao tác DOM trực tiếp bằng
+              document.querySelectorAll, vì:
+              - feather.replace() thay <i> bằng <svg> mỗi lần re-render,
+                nên listener gắn thủ công vào DOM sẽ bị mất.
+              - React re-render lại toàn bộ modal mỗi khi state đổi, nên
+                cần để React quyết định class nào được áp dụng.
+              Class "star" và "active" được thêm vào để bạn có thể tùy biến
+              thêm CSS trong orders.css nếu cần, màu đỏ được set trực tiếp
+              qua className bên dưới.
+            */}
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => {
+                const isActive = (hoverRating || ratingValue) >= star;
+                return (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRatingValue(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="transition-transform hover:scale-125 focus:outline-none"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="w-10 h-10 transition-colors duration-200"
+                      fill={isActive ? '#FF0000' : 'none'}
+                      stroke={isActive ? '#FF0000' : '#4B5563'}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Nếu chưa đăng nhập (không có token), hiển thị ô nhập thông tin khách vãng lai
+                để getRatingPayload() có dữ liệu guest_name / guest_email */}
+            {!localStorage.getItem('token') && (
+              <div className="mb-4 space-y-3">
+                <input
+                  id="guest_name"
+                  type="text"
+                  placeholder="Họ tên của bạn"
+                  className="w-full bg-black/50 border border-primary/20 rounded-lg p-3 text-white focus:outline-none focus:border-primary transition-colors font-open-sans"
+                />
+                <input
+                  id="guest_email"
+                  type="email"
+                  placeholder="Email của bạn"
+                  className="w-full bg-black/50 border border-primary/20 rounded-lg p-3 text-white focus:outline-none focus:border-primary transition-colors font-open-sans"
+                />
+              </div>
+            )}
+
+            <div className="mb-6">
+              <textarea
+                value={ratingContent}
+                onChange={(e) => setRatingContent(e.target.value)}
+                placeholder="Nhập nội dung đánh giá của bạn (bắt buộc)..."
+                className="w-full bg-black/50 border border-primary/20 rounded-lg p-4 text-white focus:outline-none focus:border-primary transition-colors resize-none font-open-sans h-32"
+                required
+              />
+            </div>
+
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={() => setRatingModalOrder(null)}
+                className="px-6 py-2.5 rounded font-open-sans bg-gray-600 hover:bg-gray-700 text-white transition"
+              >
+                Bỏ qua
+              </button>
+              <button
+                onClick={handleSubmitRating}
+                disabled={ratingValue === 0 || !ratingContent.trim()}
+                className={`px-6 py-2.5 rounded font-open-sans text-white transition font-semibold shadow-[0_0_15px_rgba(220,38,38,0.3)] ${ratingValue === 0 || !ratingContent.trim()
+                  ? 'bg-primary/50 cursor-not-allowed'
+                  : 'bg-primary hover:bg-primary/90'
+                  }`}
+              >
+                Gửi đánh giá
               </button>
             </div>
           </div>

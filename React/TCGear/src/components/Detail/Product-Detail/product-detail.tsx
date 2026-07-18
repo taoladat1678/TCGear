@@ -106,7 +106,8 @@ const ReplyForm: React.FC<{
   onCancel: () => void;
   onSubmit: (text: string, displayName: string) => Promise<void>;
   isSubmitting: boolean;
-}> = ({ onCancel, onSubmit, isSubmitting }) => {
+  currentUserImage?: string | null;
+}> = ({ onCancel, onSubmit, isSubmitting, currentUserImage }) => {
   const [localText, setLocalText] = useState<string>('');
   const [displayName, setDisplayName] = useState<string>('');
   useEffect(() => {
@@ -122,7 +123,7 @@ const ReplyForm: React.FC<{
   return (
     <div className="mt-6 border-l-4 border-primary/40 pl-8 py-4 bg-primary/10 rounded-r-lg flex gap-4">
       <img
-        src="/public/img/fanT1.jpg"
+        src={currentUserImage ? (currentUserImage.startsWith('/') ? currentUserImage : `/${currentUserImage}`) : "/public/img/fanT1.jpg"}
         alt="Guest"
         className="w-10 h-10 rounded-full object-cover flex-shrink-0"
         onError={(e) => (e.currentTarget.src = '/public/img/fanT1.jpg')}
@@ -212,6 +213,7 @@ const ProductDetail: React.FC = () => {
   const [guestName, setGuestName] = useState<string>('');
   const [isLoggedInWithFullname, setIsLoggedInWithFullname] = useState<boolean>(false);
   const [commentText, setCommentText] = useState<string>('');
+  const [currentUserImage, setCurrentUserImage] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -225,6 +227,11 @@ const ProductDetail: React.FC = () => {
         } else if (parsedUser.user_fullname) {
           setGuestName(parsedUser.user_fullname);
           setIsLoggedInWithFullname(true);
+        }
+        if (parsedUser.image) {
+          setCurrentUserImage(parsedUser.image);
+        } else if (parsedUser.user_image) {
+          setCurrentUserImage(parsedUser.user_image);
         }
       }
     } catch (error) {
@@ -295,7 +302,7 @@ const ProductDetail: React.FC = () => {
 
   const getDisplayImage = (item: any) => {
     if (item.user_image) {
-      return `/public/${item.user_image}`;
+      return item.user_image.startsWith('/') ? item.user_image : `/${item.user_image}`;
     }
     return '/public/img/fanT1.jpg';
   };
@@ -362,10 +369,20 @@ const ProductDetail: React.FC = () => {
   const handleReplySubmit = async (text: string, displayName: string, parentId: string) => {
     setReplySubmitting(true);
     try {
+      const storedUser = localStorage.getItem('user');
+      let userId = null;
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          userId = parsedUser.user_id || parsedUser.id;
+        } catch (e) { }
+      }
+
       const isComment = parentId.startsWith('TCG-CMT-');
       const body: any = {
         productId: id,
         responseText: text,
+        userId: userId,
       };
       if (isComment) {
         body.cmtId = parentId;
@@ -419,6 +436,7 @@ const ProductDetail: React.FC = () => {
               onCancel={() => setReplyingTo(null)}
               onSubmit={(text, name) => handleReplySubmit(text, name, reply.id)}
               isSubmitting={replySubmitting}
+              currentUserImage={currentUserImage}
             />
           )}
           {reply.replies.map((child) => (
@@ -460,6 +478,7 @@ const ProductDetail: React.FC = () => {
           onCancel={() => setReplyingTo(null)}
           onSubmit={(text, name) => handleReplySubmit(text, name, review.id)}
           isSubmitting={replySubmitting}
+          currentUserImage={currentUserImage}
         />
       )}
       {review.replies.map((reply) => (
@@ -754,48 +773,65 @@ const ProductDetail: React.FC = () => {
     }
   };
 
+
+  // Trong ProductDetail component, thay đổi hàm handleSubmitComment
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRating && !commentText.trim()) {
-      error?.(t("Vui lòng chọn điểm đánh giá hoặc nhập bình luận"));
+    if (!selectedRating) {
+      error?.(t("Vui lòng chọn số sao!"));
       return;
     }
-    if (!guestName.trim()) {
-      error?.(t("Vui lòng nhập tên của bạn"));
-      return;
-    }
-    setSubmitting(true);
+
     try {
+      setSubmitting(true);
+      const storedUser = localStorage.getItem('user');
+      let userId = null;
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          userId = parsedUser.user_id || parsedUser.id;
+        } catch (e) { }
+      }
+
+      let token = localStorage.getItem('token');
+      if (token && token.startsWith('"') && token.endsWith('"')) {
+        token = token.slice(1, -1);
+      }
+
       const res = await fetch('http://localhost:3000/api/user/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           productId: id,
-          rating: selectedRating || null,
-          commentText: commentText.trim() || null,
-          guestName: guestName.trim(),
+          rating: selectedRating,
+          commentText: commentText,
+          guestName: guestName,
+          userId: userId,
         }),
       });
+
       const data = await res.json();
       if (data.status === 'success') {
-        success?.(t("Gửi đánh giá thành công!"));
-        fetchReviews();
-        setSelectedRating(0);
-        setHoveredRating(0);
-        if (!isLoggedInWithFullname) {
-          setGuestName('');
-        }
-        setCommentText('');
+        success?.(t("Gửi đánh giá thành công!"), t("Cảm ơn bạn đã đánh giá sản phẩm"));
+        // Đợi Toast hiển thị rồi reload
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
         error?.(data.message || t("Gửi đánh giá thất bại"));
       }
     } catch (err) {
       console.error(err);
-      error?.(t("Lỗi kết nối server"));
+      error?.(t("Lỗi server, vui lòng thử lại sau"));
     } finally {
       setSubmitting(false);
     }
   };
+
 
   if (loading) {
     return (

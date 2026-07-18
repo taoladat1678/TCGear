@@ -1171,37 +1171,54 @@ const removeTone = (str) =>
     // ======================= API POST COMMENTS =========================
     app.post("/api/user/comments", async (req, res) => {
       try {
-        const { userId, productId, rating, commentText, guestName } = req.body;
-        if (!productId) {
-          return res.status(400).json({ status: "error", message: "Product is required" });
+        // 1. Lấy token từ header để xác định user
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        let userId = null;
+
+        if (token) {
+          jwt.verify(token, JWT_SECRET, (err, decoded) => {
+            if (!err) userId = decoded.user_id;
+          });
         }
-        if (!rating && !commentText) {
-          return res.status(400).json({ status: "error", message: "Rating or comment is required" });
+
+        const { productId, rating, commentText, guestName, userId: bodyUserId } = req.body;
+        
+        if (!userId && bodyUserId) {
+          userId = bodyUserId;
         }
+
+        if (!productId || !rating) {
+          return res.status(400).json({ status: "error", message: "Thiếu dữ liệu bắt buộc" });
+        }
+
         const cmtId = `TCG-CMT-${randomUUID().split("-")[0]}`;
+
+        // Lưu đánh giá (dù có userId hay không)
         await db.query(
-          `INSERT INTO comments
-          (cmt_id, user_id, product_id, rating, cmt_content, guest_name, created_at)
-          VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-          [
-            cmtId,
-            userId || null,
-            productId,
-            rating || null,
-            commentText || null,
-            guestName || null
-          ]
+          `INSERT INTO comments (cmt_id, user_id, product_id, rating, cmt_content, guest_name, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+          [cmtId, userId, productId, rating, commentText || null, guestName || null]
         );
-        if (userId) {
-          await db.query(
-            `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'COMMENT', ?, ?)`,
-            [userId, cmtId, `Bạn đã đánh giá sản phẩm`]
-          );
-        }
-        res.json({ status: "success", data: { cmtId } });
+
+        // Tính toán lại rating trung bình và count
+        const [stats] = await db.query(
+          `SELECT AVG(rating) as avgRating, COUNT(rating) as totalCount FROM comments WHERE product_id = ?`,
+          [productId]
+        );
+
+        const avgRating = stats[0].avgRating ? parseFloat(stats[0].avgRating).toFixed(2) : 0;
+        const totalCount = stats[0].totalCount || 0;
+
+        await db.query(`UPDATE products SET product_rating = ?, product_rating_count = ? WHERE product_id = ?`,
+          [avgRating, totalCount, productId]
+        );
+
+        res.json({
+          status: "success",
+          data: { product_rating: parseFloat(avgRating), product_rating_count: totalCount }
+        });
       } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: "error", message: "Server error" });
+        res.status(500).json({ status: "error", message: "Lỗi hệ thống" });
       }
     });
 
@@ -2077,6 +2094,114 @@ const removeTone = (str) =>
         console.error("Lỗi khi đồng bộ user_eco_infos:", error);
       }
     }
+
+    // ======================= SITE RATINGS APIs =======================
+
+    // 1. Lưu đánh giá (Khi bấm hoàn thành đơn hàng)
+    app.post("/api/ratings", async (req, res) => {
+      try {
+        const { user_id, guest_name, rating, comment, guest_email } = req.body;
+        const rating_id = `TCG-SRT-${Date.now().toString().slice(-6)}`; // Tạo ID ngẫu nhiên
+
+        await db.query(
+          `INSERT INTO site_ratings (rating_id, user_id, guest_name, rating, comment, create_at, guest_email) 
+       VALUES (?, ?, ?, ?, ?, NOW(), ?)`,
+          [rating_id, user_id || null, guest_name, rating, comment, guest_email]
+        );
+        res.json({ status: "success", message: "Cảm ơn bạn đã đánh giá!" });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: "error", message: "Lỗi lưu đánh giá" });
+      }
+    });
+
+    // 2. Fetch đánh giá của GAME THỦ (Dành cho Home)
+    app.get("/api/ratings/gamers", async (req, res) => {
+      try {
+        const [rows] = await db.query(`
+      SELECT r.rating_id, r.rating, r.comment, u.user_fullname as name, u.user_image as avatar
+      FROM site_ratings r
+      INNER JOIN users u ON r.user_id = u.user_id
+      WHERE u.is_gamer = 1
+      ORDER BY r.create_at DESC
+    `);
+        res.json({ status: "success", data: rows });
+      } catch (err) {
+        res.status(500).json({ status: "error" });
+      }
+    });
+
+    // 3. Fetch đánh giá của NGƯỜI THƯỜNG (Dành cho About) - Dùng LEFT JOIN để không sót Guest
+    app.get("/api/ratings/customers", async (req, res) => {
+      try {
+        const [rows] = await db.query(`
+      SELECT r.rating_id, r.rating, r.comment, r.create_at,
+             COALESCE(u.user_fullname, r.guest_name) as name, 
+             u.user_image as avatar
+      FROM site_ratings r
+      LEFT JOIN users u ON r.user_id = u.user_id
+      WHERE u.is_gamer = 0 OR r.user_id IS NULL
+      ORDER BY r.create_at DESC
+    `);
+        res.json({ status: "success", data: rows });
+      } catch (err) {
+        res.status(500).json({ status: "error" });
+      }
+    });
+    // ======================= SITE RATING API =======================
+    // app.post("/api/site-rating", async (req, res) => {
+    //   try {
+    //     const { user_id, rating, content } = req.body;
+    //     if (!user_id || !rating || !content) {
+    //       return res.status(400).json({ status: "error", message: "Vui lòng nhập đủ thông tin (user_id, rating, content)" });
+    //     }
+    //     if (rating < 1 || rating > 5) {
+    //       return res.status(400).json({ status: "error", message: "Rating phải từ 1-5" });
+    //     }
+
+    //     // Lấy thông tin user
+    //     const [users] = await db.query("SELECT user_fullname, user_username, user_email FROM users WHERE user_id = ?", [user_id]);
+    //     if (users.length === 0) {
+    //       return res.status(404).json({ status: "error", message: "Không tìm thấy người dùng" });
+    //     }
+
+    //     const user = users[0];
+    //     const userName = user.user_fullname || user.user_username || "Unknown";
+    //     const email = user.user_email || "";
+
+    //     // ID generator
+    //     const ratingId = `TCG-SR-${Date.now()}`;
+
+    //     await db.query(
+    //       "INSERT INTO site_rating (id, user_id, user_name, email, rating, content, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())",
+    //       [ratingId, user_id, userName, email, rating, content]
+    //     );
+
+    //     res.json({ status: "success", message: "Đánh giá thành công" });
+    //   } catch (err) {
+    //     console.error("Lỗi khi thêm site rating:", err);
+    //     res.status(500).json({ status: "error", message: "Lỗi server" });
+    //   }
+    // });
+
+    // app.get("/api/site-ratings", async (req, res) => {
+    //   try {
+    //     // Chỉ lấy những đánh giá của user thường (không phải admin).
+    //     // Ta JOIN với users và check user_isAdmin = 0
+    //     const [rows] = await db.query(`
+    //       SELECT sr.*, u.user_image 
+    //       FROM site_rating sr
+    //       JOIN users u ON sr.user_id = u.user_id
+    //       WHERE u.user_isAdmin = 0
+    //       ORDER BY sr.created_at DESC
+    //     `);
+    //     res.json({ status: "success", data: rows });
+    //   } catch (err) {
+    //     console.error("Lỗi khi lấy site ratings:", err);
+    //     res.status(500).json({ status: "error", message: "Lỗi server" });
+    //   }
+    // });
+
 
     // ======================= SYNC ECO INFO API =======================
     app.post("/api/user/:userId/sync-eco", async (req, res) => {
