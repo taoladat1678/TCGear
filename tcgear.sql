@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th7 18, 2026 lúc 12:01 PM
+-- Thời gian đã tạo: Th7 21, 2026 lúc 01:01 PM
 -- Phiên bản máy phục vụ: 10.4.28-MariaDB
 -- Phiên bản PHP: 8.2.4
 
@@ -182,6 +182,7 @@ INSERT INTO `comments` (`cmt_id`, `cmt_content`, `user_id`, `product_id`, `guest
 ('TCG-CMT-56fbd386', 'CŨNG ĐẲNG CẤP', NULL, 'TCG-PRO-005', 'Fan T1 1580', 5, NULL, '2026-01-18 00:19:27', '2026-01-18 00:19:27'),
 ('TCG-CMT-721bd9ba', 'nahhh', 'TCG-USR-013', 'TCG-PRO-003', 'tày tày', 3, NULL, '2026-07-18 16:50:43', '2026-07-18 16:50:43'),
 ('TCG-CMT-7878b5ff', 'sản phẩm ko dc dởm cho mấy', NULL, 'TCG-PRO-005', 'T1 Faker', 5, NULL, '2026-01-12 01:18:18', '2026-01-12 01:18:18'),
+('TCG-CMT-a1c831d3', 'tày', 'TCG-USR-013', 'TCG-PRO-003', 'tày tày', 0, NULL, '2026-07-21 17:08:40', '2026-07-21 17:08:40'),
 ('TCG-CMT-c11decdf', 'OK', NULL, 'TCG-PRO-003', 'TÀY', NULL, NULL, '2026-07-06 18:10:24', '2026-07-06 18:10:24'),
 ('TCG-CMT-c6c1d128', 'ádadasd', NULL, 'TCG-PRO-001', 'tày tày', 5, NULL, '2026-07-15 18:00:28', '2026-07-15 18:00:28'),
 ('TCG-CMT-f21ca760', 'cũng ok', NULL, 'TCG-PRO-001', 'tày tày', 4, NULL, '2026-07-15 17:35:35', '2026-07-15 17:35:35'),
@@ -229,6 +230,25 @@ INSERT INTO `messages` (`message_id`, `user_id`, `guest_name`, `message_text`, `
 ('TCG-MSG-017', 'TCG-USR-011', 'Đặng Đạt', 'ádasdad', '0000-00-00 00:00:00', 'datd9079@gmail.com', 'ádasdad'),
 ('TCG-MSG-018', NULL, 'Nguyễn Minh Sóc', 'tại sao thua ?', '0000-00-00 00:00:00', 'datdark0412@gmail.com', 't1 thua'),
 ('TCG-MSG-019', NULL, 'ttttt', 'adsadssd', '0000-00-00 00:00:00', 'datdark0412@gmail.com', 'ádasd');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `newletters`
+--
+
+CREATE TABLE `newletters` (
+  `id` varchar(20) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `create_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `newletters`
+--
+
+INSERT INTO `newletters` (`id`, `email`, `create_at`) VALUES
+('TCG-NLT-14fb1de1', 'datdDNTD@gmail.com', '2026-07-21 17:59:27');
 
 -- --------------------------------------------------------
 
@@ -835,7 +855,8 @@ INSERT INTO `vouchers` (`voucher_id`, `voucher_code`, `voucher_type`, `voucher_v
 ('TCG-VCH-004', 'T1FAN2025', 'Cố định', 150000, 800000, NULL, 29, '2025-10-04 00:00:00', '2026-12-31 23:59:59', '2025-10-04 14:00:00', '2025-10-04 14:00:00'),
 ('TCG-VCH-005', 'GEAR300K', 'Cố định', 300000, 2000000, NULL, 20, '2025-10-05 00:00:00', '2025-11-15 23:59:59', '2025-10-05 14:00:00', '2025-10-05 14:00:00'),
 ('TCG-VCH-006', 'FREESHIPMAX', 'Miễn phí vận chuyển', 100, 500000, 50000, 85, '2026-07-05 00:00:00', '2026-12-31 23:59:59', '2026-07-05 18:56:30', '2026-07-05 18:56:30'),
-('TCG-VCH-007', 'GIAMSHIP15K', 'Giảm phí vận chuyển', 15000, 200000, NULL, 200, '2026-07-05 00:00:00', '2026-12-31 23:59:59', '2026-07-05 18:56:30', '2026-07-05 18:56:30');
+('TCG-VCH-007', 'GIAMSHIP15K', 'Giảm phí vận chuyển', 15000, 200000, NULL, 200, '2026-07-05 00:00:00', '2026-12-31 23:59:59', '2026-07-05 18:56:30', '2026-07-05 18:56:30'),
+('TCG-VCH-008', 'WELCOME10', 'Phần trăm', 10, 0, NULL, 9999, '2026-07-21 00:00:00', '2027-12-31 23:59:59', '2026-07-21 17:44:57', '2026-07-21 17:44:57');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -882,6 +903,13 @@ ALTER TABLE `comments`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`message_id`);
+
+--
+-- Chỉ mục cho bảng `newletters`
+--
+ALTER TABLE `newletters`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Chỉ mục cho bảng `notifications`

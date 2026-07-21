@@ -8,11 +8,13 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
+import { autoTranslate } from '../../utils/autoTranslate';
 import './about.css';
 
 const About: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [siteRatings, setSiteRatings] = useState<any[]>([]);
+  const [originalRatings, setOriginalRatings] = useState<any[]>([]);
 
   useEffect(() => {
     // Fetch site ratings
@@ -29,7 +31,7 @@ const About: React.FC = () => {
             user_name: r.name,
             user_image: r.avatar,
           }));
-          setSiteRatings(normalized);
+          setOriginalRatings(normalized);
         }
       } catch (err) {
         console.error('Error fetching site ratings:', err);
@@ -46,6 +48,24 @@ const About: React.FC = () => {
     feather.replace({ width: '24', height: '24' });
     AOS.refresh();
   }, []);
+
+  useEffect(() => {
+    const translateRatings = async () => {
+      if (originalRatings.length === 0) return;
+      
+      const targetLang = i18n.language || 'vi';
+      const translated = await Promise.all(
+        originalRatings.map(async (rating) => {
+          if (!rating.content) return rating;
+          const translatedContent = await autoTranslate(rating.content, targetLang);
+          return { ...rating, content: translatedContent };
+        })
+      );
+      setSiteRatings(translated);
+    };
+
+    translateRatings();
+  }, [i18n.language, originalRatings]);
 
   return (
     <>

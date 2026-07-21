@@ -460,7 +460,7 @@ const ProductDetail: React.FC = () => {
           <div>
             <h4 className="font-semibold text-white text-lg">{getDisplayName(review)}</h4>
             <div className="mt-1">
-              {review.rating ? <StarRating rating={review.rating} /> : <span className="text-accent/50 italic text-sm">Chưa đánh giá sao</span>}
+              {review.rating ? <StarRating rating={review.rating} /> : <span className="text-accent/50 italic text-sm">{t("CHƯA CÓ ĐÁNH GIÁ SAO")}</span>}
             </div>
           </div>
         </div>
@@ -778,10 +778,6 @@ const ProductDetail: React.FC = () => {
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRating) {
-      error?.(t("Vui lòng chọn số sao!"));
-      return;
-    }
 
     try {
       setSubmitting(true);

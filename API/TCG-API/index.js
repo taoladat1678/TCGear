@@ -562,9 +562,15 @@ const removeTone = (str) =>
           from: `"TCGear" <${process.env.EMAIL_USER || "noreply@tcgear.com"}>`,
           to: newUser.user_email,
           subject: "Xác thực tài khoản TCGear",
-          html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
-            <div style="background-color: #1a1a1a; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
-              <h1 style="color: #e11d48; margin: 0;">TCGear</h1>
+          attachments: [{
+            filename: "logo_mail.jpg",
+            path: path.join(__dirname, "public", "img", "logo_mail.jpg"),
+            cid: "tcgear-logo"
+          }],
+          html: `<div style="background-color: #ef4444; padding: 20px;">
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #000; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
+              <img src="cid:tcgear-logo" alt="TCGear Logo" style="max-height: 80px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" />
             </div>
             <div style="padding: 30px;">
               <h2 style="color: #e11d48; margin-top: 0;">Chào ${newUser.user_fullname},</h2>
@@ -576,6 +582,7 @@ const removeTone = (str) =>
               <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;" />
               <p style="color: #444; font-size: 12px; margin: 0;">Mã thư gửi: ${Date.now()}-${Math.random().toString(36).substring(7)}</p>
             </div>
+          </div>
           </div>
           <!-- Anti-trimming spacer -->
           <div style="display:none; white-space:nowrap; font:15px courier; line-height:0;">
@@ -697,9 +704,15 @@ const removeTone = (str) =>
           from: `"TCGear Support" <${process.env.EMAIL_USER || "support@tcgear.com"}>`,
           to: user.user_email,
           subject: "Đặt Lại Mật Khẩu - TCGear",
-          html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
-            <div style="background-color: #1a1a1a; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
-              <h1 style="color: #e11d48; margin: 0;">TCGear</h1>
+          attachments: [{
+            filename: "logo_mail.jpg",
+            path: path.join(__dirname, "public", "img", "logo_mail.jpg"),
+            cid: "tcgear-logo"
+          }],
+          html: `<div style="background-color: #ef4444; padding: 20px;">
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #000; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
+              <img src="cid:tcgear-logo" alt="TCGear Logo" style="max-height: 80px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" />
             </div>
             <div style="padding: 30px;">
               <h2 style="color: #e11d48; margin-top: 0;">Chào ${user.user_fullname},</h2>
@@ -711,6 +724,7 @@ const removeTone = (str) =>
               <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;" />
               <p style="color: #444; font-size: 12px; margin: 0;">Mã thư gửi: ${Date.now()}-${Math.random().toString(36).substring(7)}</p>
             </div>
+          </div>
           </div>
           <!-- Anti-trimming spacer -->
           <div style="display:none; white-space:nowrap; font:15px courier; line-height:0;">
@@ -1188,7 +1202,7 @@ const removeTone = (str) =>
           userId = bodyUserId;
         }
 
-        if (!productId || !rating) {
+        if (!productId || rating === undefined || rating === null) {
           return res.status(400).json({ status: "error", message: "Thiếu dữ liệu bắt buộc" });
         }
 
@@ -1202,7 +1216,7 @@ const removeTone = (str) =>
 
         // Tính toán lại rating trung bình và count
         const [stats] = await db.query(
-          `SELECT AVG(rating) as avgRating, COUNT(rating) as totalCount FROM comments WHERE product_id = ?`,
+          `SELECT AVG(rating) as avgRating, COUNT(rating) as totalCount FROM comments WHERE product_id = ? AND rating > 0`,
           [productId]
         );
 
@@ -1719,9 +1733,15 @@ const removeTone = (str) =>
             from: `"TCGear Orders" <${process.env.EMAIL_USER || "orders@tcgear.com"}>`,
             to: recipient_email,
             subject: `Xác Nhận Đơn Hàng ${order_id} - TCGear`,
-            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
-              <div style="background-color: #1a1a1a; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
-                <h1 style="color: #e11d48; margin: 0;">TCGear</h1>
+            attachments: [{
+              filename: "logo_mail.jpg",
+              path: path.join(__dirname, "public", "img", "logo_mail.jpg"),
+              cid: "tcgear-logo"
+            }],
+            html: `<div style="background-color: #ef4444; padding: 20px;">
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
+              <div style="background-color: #000; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
+                <img src="cid:tcgear-logo" alt="TCGear Logo" style="max-height: 80px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" />
               </div>
               <div style="padding: 30px;">
                 <h2 style="color: #e11d48; margin-top: 0;">Cảm ơn bạn đã đặt hàng, ${recipient_name}!</h2>
@@ -1761,6 +1781,7 @@ const removeTone = (str) =>
                   <a href="${confirmLink}" style="background-color: #e11d48; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Xác Nhận Đơn Hàng</a>
                 </div>
               </div>
+            </div>
             </div>`
           };
 
@@ -2276,9 +2297,9 @@ const removeTone = (str) =>
               <head>
                 <meta charset="UTF-8">
               </head>
-              <body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+              <body style="margin: 0; padding: 0; background-color: #ef4444;">
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #000; color: #fff; border: 1px solid #e11d48; border-radius: 8px; overflow: hidden;">
-                  <div style="background-color: #1a1a1a; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
+                  <div style="background-color: #000; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
                     <img src="cid:tcgear-logo" alt="TCGear Logo" style="max-height: 80px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" />
                   </div>
                   <div style="padding: 30px;">
@@ -2312,6 +2333,96 @@ const removeTone = (str) =>
       } catch (err) {
         console.error("Lỗi POST /api/messages:", err);
         res.status(500).json({ status: "error", message: "Lỗi server khi gửi tin nhắn" });
+      }
+    });
+
+    // ======================= CREATE TABLE =======================
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS newletters (
+        id VARCHAR(20) PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        create_at DATETIME NOT NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    `);
+
+    // ======================= API NEWSLETTER =======================
+    app.post("/api/newsletter", async (req, res) => {
+      try {
+        const { email } = req.body;
+        if (!email) {
+          return res.status(400).json({ status: "error", message: "Vui lòng nhập địa chỉ email hợp lệ" });
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({ status: "error", message: "Định dạng email không hợp lệ" });
+        }
+
+        const [existing] = await db.query("SELECT * FROM newletters WHERE email = ?", [email]);
+        if (existing.length > 0) {
+          return res.status(400).json({ status: "error", message: "Email này đã được đăng ký nhận bản tin!" });
+        }
+
+        const id = `TCG-NLT-${randomUUID().split("-")[0]}`;
+        await db.query(
+          "INSERT INTO newletters (id, email, create_at) VALUES (?, ?, NOW())",
+          [id, email]
+        );
+
+        if (transporter) {
+          const mailOptions = {
+            from: '"TCGear Support" <no-reply@tcgear.com>',
+            to: email,
+            subject: "Chào mừng bạn đến với cộng đồng TCGear! 🎉",
+            attachments: [{
+              filename: "logo_mail.jpg",
+              path: path.join(__dirname, "public", "img", "logo_mail.jpg"),
+              cid: "tcgear-logo"
+            }],
+            html: `
+            <div style="background-color: #ef4444; padding: 20px;">
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #000; padding: 20px; text-align: center; border-bottom: 3px solid #e11d48;">
+                  <img src="cid:tcgear-logo" alt="TCGear Logo" style="max-height: 80px; width: auto; max-width: 100%; display: inline-block; vertical-align: middle;" />
+                </div>
+                <div style="padding: 30px; background-color: #fff; color: #333;">
+                  <h2 style="color: #000; font-size: 22px; margin-bottom: 20px;">Xin chào,</h2>
+                  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">Cảm ơn bạn đã đăng ký nhận bản tin từ <strong>TCGear</strong>! Chúng tôi rất vui mừng được chào đón bạn gia nhập cộng đồng của chúng tôi.</p>
+                  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 15px;">Từ nay, bạn sẽ là một trong những người đầu tiên nhận được thông tin về:</p>
+                  <ul style="font-size: 16px; line-height: 1.6; padding-left: 20px; margin-bottom: 25px;">
+                    <li>🔥 Các chương trình <strong>Khuyến mãi & Ưu đãi đặc biệt</strong></li>
+                    <li>🎁 <strong>Voucher giảm giá</strong> dành riêng cho thành viên</li>
+                    <li>⭐ <strong>Sản phẩm mới</strong> cực chất (Bàn phím, Chuột, Tai nghe, Áo đấu...)</li>
+                    <li>📰 <strong>Tin tức Esports</strong> nóng hổi từ đội tuyển T1</li>
+                  </ul>
+                  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">Để bắt đầu, hãy sử dụng mã giảm giá <strong style="color: #ef4444;">WELCOME10</strong> để được giảm 10% cho đơn hàng đầu tiên của bạn!</p>
+                  <div style="text-align: center;">
+                    <a href="http://localhost:5173/shop" style="background-color: #ef4444; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; display: inline-block;">Khám Phá Cửa Hàng Ngay</a>
+                  </div>
+                </div>
+                <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;">
+                  <p style="font-size: 14px; color: #6b7280; margin: 0;">&copy; 2026 TCGear. All rights reserved.</p>
+                  <p style="font-size: 12px; color: #9ca3af; margin-top: 5px;">Bạn nhận được email này vì đã đăng ký bản tin tại website TCGear.</p>
+                </div>
+              </div>
+            </div>
+            `
+          };
+
+          try {
+            const info = await transporter.sendMail(mailOptions);
+            if (!process.env.EMAIL_USER) {
+              console.log("Xem trước Newsletter Email tại đây: %s", nodemailer.getTestMessageUrl(info));
+            }
+          } catch (emailErr) {
+            console.error("Lỗi gửi email newsletter:", emailErr);
+          }
+        }
+
+        res.json({ status: "success", message: "Đăng ký nhận bản tin thành công!" });
+      } catch (err) {
+        console.error("Lỗi POST /api/newsletter:", err);
+        res.status(500).json({ status: "error", message: "Lỗi server khi đăng ký bản tin" });
       }
     });
 

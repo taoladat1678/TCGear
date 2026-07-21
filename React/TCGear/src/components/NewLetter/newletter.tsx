@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import './newletter.css';
 
 const autoTranslate = async (text: string): Promise<string> => {
@@ -23,6 +24,9 @@ const autoTranslate = async (text: string): Promise<string> => {
 
 const Newsletter: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [translatedTexts, setTranslatedTexts] = useState({
     title: 'THAM GIA CỘNG ĐỒNG TCGEAR',
     description: 'Đăng ký nhận bản tin để nhận ưu đãi độc quyền, thông tin sản phẩm mới và tin tức esports',
@@ -66,7 +70,31 @@ const Newsletter: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Xử lý gửi form newsletter ở đây
+    if (!email) return;
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('http://localhost:3000/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+
+      if (data.status === 'success') {
+        setEmail('');
+        navigate('/newsletter-success');
+      } else {
+        alert(data.message || 'Đăng ký thất bại');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Lỗi hệ thống, vui lòng thử lại sau.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,16 +110,20 @@ const Newsletter: React.FC = () => {
         <form className="newsletter-form flex flex-col sm:flex-row gap-4 max-w-md mx-auto" onSubmit={handleSubmit}>
           <input
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder={translatedTexts.placeholder}
             className="flex-1 px-4 py-3 rounded-md text-secondary focus:outline-none focus:ring-2 focus:ring-accent font-open-sans"
             aria-label={translatedTexts.ariaLabel}
             required
+            disabled={isLoading}
           />
           <button
             type="submit"
-            className="bg-secondary text-accent hover:bg-black px-6 py-3 rounded-md font-semibold transition font-orbitron"
+            disabled={isLoading}
+            className={`bg-secondary text-accent hover:bg-black px-6 py-3 rounded-md font-semibold transition font-orbitron ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {translatedTexts.buttonText}
+            {isLoading ? 'Đang xử lý...' : translatedTexts.buttonText}
           </button>
         </form>
       </div>

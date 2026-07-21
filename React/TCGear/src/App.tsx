@@ -7,6 +7,7 @@ import Header from './components/Header/header';
 import Footer from './components/Footer/footer';
 import Preloader from './components/Preloader/preloader';
 import Newsletter from './components/NewLetter/newletter';
+import NewsletterSuccess from './components/NewLetter/newsletter-success';
 import Home from './components/Home/home';
 import Shop from './components/Shop/shop';
 import Teams from './components/Teams/teams';
@@ -106,6 +107,7 @@ const App: React.FC = () => {
                           <Route path="/order-fail" element={<OrderFail />} />
                           <Route path="/checkout" element={<Checkout />} />
                           <Route path="/product-detail/:id" element={<ProductDetail />} />
+                          <Route path="/newsletter-success" element={<NewsletterSuccess />} />
                         </Routes>
                       </main>
                       <Newsletter />
