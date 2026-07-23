@@ -33,6 +33,7 @@ import OrderFail from './components/Order-notifications/order-fail/order-fail';
 import Checkout from './components/Checkout/checkout';
 import ProductDetail from './components/Detail/Product-Detail/product-detail';
 import VNPayReturn from './components/Checkout/vnpay-return';
+import Refund from './components/Refund/refund';
 
 // TẤT CẢ CÁC PROVIDER
 import { ToastProvider } from './context/ToastContext';
@@ -108,6 +109,7 @@ const App: React.FC = () => {
                           <Route path="/checkout" element={<Checkout />} />
                           <Route path="/product-detail/:id" element={<ProductDetail />} />
                           <Route path="/newsletter-success" element={<NewsletterSuccess />} />
+                          <Route path="/refund" element={<Refund />} />
                         </Routes>
                       </main>
                       <Newsletter />

@@ -268,6 +268,29 @@ const Header: React.FC = () => {
         <span className="counter" id="orders-counter">{ordersCount}</span>
       </Link>
 
+      <div className="group/refund flex flex-col w-full">
+        <a 
+          className="font-open-sans cursor-pointer !justify-between w-full"
+          onClick={(e) => { 
+            e.preventDefault();
+            e.currentTarget.nextElementSibling?.classList.toggle('hidden'); 
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <i data-feather="refresh-cw" className="h-5 w-5"></i> {t("Hoàn trả")}
+          </div>
+          <i data-feather="chevron-down" className="h-4 w-4"></i>
+        </a>
+        <div className="hidden flex-col w-full bg-black/20">
+          <Link to="/refund?type=canceled" className="font-open-sans text-sm whitespace-nowrap !pl-11" onClick={() => setAccountOpen(false)}>
+            {t("Đơn hàng đã hủy")}
+          </Link>
+          <Link to="/refund?type=returned" className="font-open-sans text-sm whitespace-nowrap !pl-11" onClick={() => setAccountOpen(false)}>
+            {t("Đơn hàng hoàn trả")}
+          </Link>
+        </div>
+      </div>
+
       <Link to="/vouchers" className="font-open-sans" onClick={() => setAccountOpen(false)}>
         <i data-feather="gift" className="h-5 w-5"></i> {t("Voucher")}
       </Link>

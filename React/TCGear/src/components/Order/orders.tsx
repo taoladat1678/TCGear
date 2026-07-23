@@ -6,6 +6,8 @@ import 'aos/dist/aos.css';
 import feather from 'feather-icons';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../context/ToastContext';
+import { useCart } from '../../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 AOS.init({
   duration: 800,
@@ -44,6 +46,8 @@ const getRatingPayload = (ratingValue: number, commentText: string) => {
 const Orders: React.FC = () => {
   const { t } = useTranslation();
   const { success, error } = useToast();
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   const [orders, setOrders] = useState<any[]>([]);
@@ -91,11 +95,16 @@ const Orders: React.FC = () => {
             'Hủy': 'cancelled',
             'Chờ xác nhận': 'pending',
             'Hoàn thành': 'completed',
-            'Hoàn trả': 'returned'
+            'Hoàn trả': 'returned',
+            'Yêu cầu hoàn trả': 'completed',
+            'Hoàn trả một phần': 'completed'
           };
 
           const originalStatusText = o.order_status || 'Chờ xác nhận';
           let mapStatusText = originalStatusText;
+          if (originalStatusText === 'Hoàn trả một phần') {
+             mapStatusText = 'Hoàn thành';
+          }
           let internalStatus = statusMap[mapStatusText] || 'processing';
           const isReceivedVal = o.is_received || 'Chưa nhận hàng';
 
@@ -104,9 +113,9 @@ const Orders: React.FC = () => {
             mapStatusText = 'Hoàn thành';
           }
 
-          const isProcessing = ['Chờ xử lý', 'Đang xử lý', 'Đang vận chuyển', 'Đang giao', 'Đã giao', 'Hoàn thành', 'Hoàn trả'].includes(originalStatusText);
-          const isShipped = ['Đang vận chuyển', 'Đang giao', 'Đã giao', 'Hoàn thành', 'Hoàn trả'].includes(originalStatusText);
-          const isDelivered = ['Đã giao', 'Hoàn thành', 'Hoàn trả'].includes(originalStatusText);
+          const isProcessing = ['Chờ xử lý', 'Đang xử lý', 'Đang vận chuyển', 'Đang giao', 'Đã giao', 'Hoàn thành', 'Hoàn trả', 'Yêu cầu hoàn trả', 'Hoàn trả một phần'].includes(originalStatusText);
+          const isShipped = ['Đang vận chuyển', 'Đang giao', 'Đã giao', 'Hoàn thành', 'Hoàn trả', 'Yêu cầu hoàn trả', 'Hoàn trả một phần'].includes(originalStatusText);
+          const isDelivered = ['Đã giao', 'Hoàn thành', 'Hoàn trả', 'Yêu cầu hoàn trả', 'Hoàn trả một phần'].includes(originalStatusText);
 
           const trackingSteps = [
             { step: 'Chờ xác nhận', date: date, completed: true },
@@ -118,10 +127,12 @@ const Orders: React.FC = () => {
           const validProducts = (o.products || []).filter((p: any) => p.quantity > 0);
           const groupedProducts: Record<string, any> = {};
           validProducts.forEach((p: any) => {
+            p.refunded_quantity = p.refunded_quantity || 0;
             const groupKey = p.name; // Gom nhóm theo tên sản phẩm
             if (groupedProducts[groupKey]) {
               groupedProducts[groupKey].quantity += p.quantity;
               groupedProducts[groupKey].price += p.price; // price here is actually total_amount from DB
+              groupedProducts[groupKey].refunded_quantity += p.refunded_quantity;
 
               if (!groupedProducts[groupKey].skus) {
                 groupedProducts[groupKey].skus = [groupedProducts[groupKey].sku];
@@ -138,6 +149,7 @@ const Orders: React.FC = () => {
               groupedProducts[groupKey].originalItems.push({ ...p });
             } else {
               groupedProducts[groupKey] = { ...p, skus: [p.sku], originalItems: [{ ...p }] };
+              groupedProducts[groupKey].refunded_quantity = p.refunded_quantity;
             }
           });
 
@@ -275,7 +287,7 @@ const Orders: React.FC = () => {
     setReturnModalOrder(order);
     const initialQuantities: any = {};
     order.products.forEach((p: any) => {
-      initialQuantities[p.sku] = 0; // Mặc định số lượng hoàn trả ban đầu là 0
+      initialQuantities[p.name] = 0; // Mặc định số lượng hoàn trả ban đầu là 0
     });
     setReturnQuantities(initialQuantities);
   };
@@ -305,7 +317,10 @@ const Orders: React.FC = () => {
       if (groupedProduct && groupedProduct.originalItems) {
         for (const p of groupedProduct.originalItems) {
           if (remainingQtyToReturn <= 0) break;
-          const qtyToTake = Math.min(p.quantity, remainingQtyToReturn);
+          const availableQty = p.quantity - (p.refunded_quantity || 0);
+          if (availableQty <= 0) continue;
+
+          const qtyToTake = Math.min(availableQty, remainingQtyToReturn);
 
           itemsToReturn.push({ variant_id: p.sku, return_quantity: qtyToTake });
           remainingQtyToReturn -= qtyToTake;
@@ -339,6 +354,40 @@ const Orders: React.FC = () => {
       console.error(err);
       error?.("Lỗi", "Lỗi kết nối máy chủ");
     }
+  };
+
+  const handleCancelOrder = async (orderId: string) => {
+    if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/orders/${orderId}/cancel`, {
+          method: 'PUT'
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          success?.("Thành công", "Hủy đơn hàng thành công");
+          fetchOrders();
+        } else {
+          error?.("Lỗi", data.message || "Không thể hủy đơn hàng");
+        }
+      } catch (err) {
+        error?.("Lỗi", "Lỗi kết nối máy chủ");
+      }
+    }
+  };
+
+  const handleBuyAgain = (order: any) => {
+    order.products.forEach((p: any) => {
+      addToCart({
+        id: p.sku || p.id,
+        name: p.name,
+        price: p.price / p.quantity,
+        image: p.image,
+        cate_id: 'buy_again',
+        color: p.color,
+        size: p.size
+      }, p.quantity);
+    });
+    navigate('/cart');
   };
 
   const counts = {
@@ -566,7 +615,12 @@ const Orders: React.FC = () => {
                                   <p className="text-accent/70 text-sm font-open-sans">
                                     {t("Số lượng")}: {product.quantity} | {t("Đơn giá")}: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(product.price / product.quantity)} | {t("Tổng giá trị")}: {product.priceString}
                                   </p>
-                                  <p className="text-accent/70 text-sm font-open-sans">
+                                  {(product.refunded_quantity > 0) && (
+                                    <p className="text-red-500 text-sm font-open-sans font-semibold mt-1">
+                                      {t("Đã hoàn trả")}: {product.refunded_quantity} | {t("Số lượng còn lại")}: {product.quantity - product.refunded_quantity}
+                                    </p>
+                                  )}
+                                  <p className="text-accent/70 text-sm font-open-sans mt-1">
                                     SKU: {product.sku}
                                   </p>
                                 </div>
@@ -592,30 +646,50 @@ const Orders: React.FC = () => {
                             ))}
                           </div>
                         </div>
-                        {(order.statusText === 'Đã giao' || order.statusText === 'Hoàn thành') && (
-                          <div className="md:col-span-2 flex justify-end mt-4 border-t border-primary/20 pt-4 gap-4">
-                            {order.statusText === 'Hoàn thành' && (
-                              <button
-                                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded text-sm transition font-open-sans"
-                                onClick={() => openReturnModal(order)}
-                              >
-                                {t("Hoàn trả sản phẩm")}
-                              </button>
-                            )}
-                            {order.isReceived === 'Đã nhận hàng' ? (
-                              <button className="bg-gray-600 text-white px-6 py-2 rounded text-sm transition font-open-sans cursor-not-allowed" disabled>
-                                {t("Đã nhận hàng")}
-                              </button>
-                            ) : (
-                              <button
-                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm transition font-open-sans"
-                                onClick={() => handleConfirmReceived(order.id)}
-                              >
-                                {t("Đã nhận được hàng")}
-                              </button>
-                            )}
-                          </div>
-                        )}
+                        {/* Action Buttons */}
+                        <div className="md:col-span-2 flex justify-end mt-4 border-t border-primary/20 pt-4 gap-4">
+                          {['Chờ xác nhận', 'Chờ xử lý', 'Đang vận chuyển'].includes(order.statusText) && (
+                            <button
+                              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded text-sm transition font-open-sans"
+                              onClick={() => handleCancelOrder(order.id)}
+                            >
+                              {t("Hủy đơn hàng")}
+                            </button>
+                          )}
+                          {order.statusText === 'Hủy' && (
+                            <button
+                              className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded text-sm transition font-open-sans"
+                              onClick={() => handleBuyAgain(order)}
+                            >
+                              {t("Mua lại")}
+                            </button>
+                          )}
+                          {(order.statusText === 'Đã giao' || order.statusText === 'Hoàn thành') && (
+                            <>
+                              {order.statusText === 'Hoàn thành' && (
+                                <button
+                                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded text-sm transition font-open-sans"
+                                  onClick={() => openReturnModal(order)}
+                                >
+                                  {t("Hoàn trả sản phẩm")}
+                                </button>
+                              )}
+                              {order.isReceived === 'Đã nhận hàng' ? (
+                                <button className="bg-gray-600 text-white px-6 py-2 rounded text-sm transition font-open-sans cursor-not-allowed" disabled>
+                                  {t("Đã nhận hàng")}
+                                </button>
+                              ) : (
+                                <button
+                                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm transition font-open-sans"
+                                  onClick={() => handleConfirmReceived(order.id)}
+                                >
+                                  {t("Đã nhận được hàng")}
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -706,41 +780,28 @@ const Orders: React.FC = () => {
               * Vui lòng chọn số lượng sản phẩm bạn muốn hoàn trả. Số tiền tương ứng sẽ được trừ đi từ tổng tích lũy.
             </p>
 
-            <div className="space-y-4 mb-8">
-              {returnModalOrder.products.map((p: any) => {
-                const unitPrice = p.price / p.quantity;
-                const unitPriceString = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(unitPrice);
+            <div className="max-h-60 overflow-y-auto mb-6 pr-2 space-y-4">
+              {returnModalOrder.products.filter((p: any) => p.quantity - (p.refunded_quantity || 0) > 0).map((p: any, index: number) => {
+                const maxReturn = p.quantity - (p.refunded_quantity || 0);
                 return (
-                  <div key={p.name} className="flex items-center gap-4 bg-secondary/50 p-4 rounded-lg border border-primary/10">
-                    <input
-                      type="checkbox"
-                      checked={(returnQuantities[p.name] || 0) > 0}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          handleQuantityChange(p.name, p.quantity, p.quantity);
-                        } else {
-                          handleQuantityChange(p.name, 0, p.quantity);
-                        }
-                      }}
-                      className="w-5 h-5 cursor-pointer accent-red-500 shrink-0"
-                    />
-                    <img src={p.image} alt={p.name} className="w-16 h-16 object-cover rounded-md" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold font-open-sans line-clamp-1">{p.name}</h3>
-                      <p className="text-sm text-accent/60">Đã mua: {p.quantity} x {unitPriceString}</p>
+                  <div key={index} className="flex justify-between items-center border border-primary/20 p-3 rounded">
+                    <div className="flex gap-3 items-center">
+                      <img src={p.image} alt={p.name} className="w-12 h-12 object-cover rounded" />
+                      <div>
+                        <p className="font-medium text-sm max-w-[200px] truncate">{p.name}</p>
+                        <p className="text-xs text-accent/70">Tối đa có thể trả: {maxReturn}</p>
+                      </div>
                     </div>
-
-                    {/* Cụm tăng giảm số lượng */}
-                    <div className="flex items-center border border-primary/30 rounded-lg bg-black/50">
+                    <div className="flex items-center border border-primary/30 rounded overflow-hidden">
                       <button
-                        onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) - 1, p.quantity)}
+                        onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) - 1, maxReturn)}
                         className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
                       >−</button>
                       <span className="w-12 text-center font-bold font-open-sans text-primary">
                         {returnQuantities[p.name] || 0}
                       </span>
                       <button
-                        onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) + 1, p.quantity)}
+                        onClick={() => handleQuantityChange(p.name, (returnQuantities[p.name] || 0) + 1, maxReturn)}
                         className="w-10 h-10 hover:bg-primary/20 transition text-lg flex items-center justify-center"
                       >+</button>
                     </div>

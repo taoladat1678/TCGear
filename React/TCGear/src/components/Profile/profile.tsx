@@ -200,7 +200,8 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
+    if (!token || token === 'null' || token === 'undefined') {
+      localStorage.removeItem('token'); // Đảm bảo xóa token rác nếu có
       setIsLoggedIn(false);
       setLoading(false);
       return;
@@ -216,6 +217,14 @@ const Profile: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store'
       });
+      
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        setLoading(false);
+        return;
+      }
+      
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       if (data.status === 'success') {

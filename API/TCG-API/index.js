@@ -1197,7 +1197,7 @@ const removeTone = (str) =>
         }
 
         const { productId, rating, commentText, guestName, userId: bodyUserId } = req.body;
-        
+
         if (!userId && bodyUserId) {
           userId = bodyUserId;
         }
@@ -1685,10 +1685,15 @@ const removeTone = (str) =>
             }
           }
         }
+        // 5. Lưu thông báo vào lịch sử hoạt động (Activities)
+        await db.query(
+          `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'ORDER', ?, ?)`,
+          [user_id, order_id, 'Đặt đơn hàng thành công']
+        );
 
         await db.commit();
 
-        // 5. Gửi email xác nhận đơn hàng
+        // 6. Gửi email xác nhận đơn hàng
         if (recipient_email) {
           const confirmLink = `http://localhost:5173/order-confirm?orderId=${order_id}`;
 
@@ -1835,7 +1840,9 @@ const removeTone = (str) =>
     // ======================= VNPAY CREATE URL API =======================
     app.post("/api/payment/vnpay_create_url", (req, res) => {
       const { total_amount } = req.body;
-      if (!total_amount) return res.status(400).json({ status: "error", message: "Thiếu total_amount" });
+      if (total_amount === undefined || total_amount === null || isNaN(total_amount) || total_amount < 10000) {
+        return res.status(400).json({ status: "error", message: "Số tiền thanh toán qua VNPAY phải tối thiểu 10.000 VND." });
+      }
 
       let ipAddr = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       let tmnCode = process.env.VNP_TMN_CODE;
@@ -1912,16 +1919,23 @@ const removeTone = (str) =>
         // Bắt đầu Transaction để đảm bảo an toàn dữ liệu (nếu trừ kho lỗi thì sẽ hoàn tác việc cập nhật trạng thái)
         await db.beginTransaction();
 
-        // 1. Cập nhật trạng thái nhận hàng
-        const [result] = await db.query(
-          `UPDATE orders SET is_received = 'Đã nhận hàng' WHERE order_id = ?`,
+        // 0. Lấy thông tin user_id từ đơn hàng
+        const [orderRows] = await db.query(
+          `SELECT user_id FROM orders WHERE order_id = ?`,
           [orderId]
         );
 
-        if (result.affectedRows === 0) {
+        if (orderRows.length === 0) {
           await db.rollback(); // Hoàn tác nếu không tìm thấy đơn
           return res.status(404).json({ status: "error", message: "Không tìm thấy đơn hàng" });
         }
+        const userId = orderRows[0].user_id;
+
+        // 1. Cập nhật trạng thái nhận hàng và các trạng thái đơn hàng để đảm bảo đủ điều kiện cộng điểm Eco
+        const [result] = await db.query(
+          `UPDATE orders SET is_received = 'Đã nhận hàng', order_status = 'Hoàn thành', payment_status = 'Đã thanh toán', shipping_status = 'Đã giao' WHERE order_id = ?`,
+          [orderId]
+        );
 
         // 2. Lấy danh sách sản phẩm và số lượng mà khách đã mua trong đơn hàng này
         const [orderDetails] = await db.query(
@@ -1941,7 +1955,13 @@ const removeTone = (str) =>
 
         // Xác nhận lưu các thay đổi vào Database
         await db.commit();
-        res.json({ status: "success", message: "Đã xác nhận nhận hàng và trừ số lượng trong kho" });
+
+        // 4. Đồng bộ lại thông tin Eco cho User
+        if (userId) {
+          await syncUserEcoInfo(userId);
+        }
+
+        res.json({ status: "success", message: "Đã xác nhận nhận hàng, trừ kho và đồng bộ Eco Info" });
 
       } catch (err) {
         await db.rollback(); // Nếu có bất kỳ lỗi nào (kể cả lỗi SQL), quay ngược lại trạng thái ban đầu
@@ -1955,7 +1975,7 @@ const removeTone = (str) =>
     app.post("/api/orders/:orderId/return", async (req, res) => {
       try {
         const { orderId } = req.params;
-        const { returnItems } = req.body; // Mảng: [{ variant_id, return_quantity }]
+        const { returnItems, refund_reason, proof_images } = req.body; // Mảng: [{ variant_id, return_quantity }]
 
         if (!returnItems || returnItems.length === 0) {
           return res.status(400).json({ status: "error", message: "Vui lòng chọn sản phẩm" });
@@ -1977,6 +1997,21 @@ const removeTone = (str) =>
 
         const [orderDetails] = await db.query(`SELECT * FROM order_details WHERE order_id = ?`, [orderId]);
 
+        // 1. Tạo ID cho phiếu hoàn trả
+        const refundId = `RFD-${Date.now()}`;
+
+        // 2. Insert vào bảng refund_requests và Cập nhật trạng thái đơn hàng gốc
+        await db.query(
+          `INSERT INTO refund_requests (refund_id, order_id, user_id, refund_reason, proof_images, status, created_at, updated_at) 
+           VALUES (?, ?, ?, ?, ?, 'Chờ xử lý', NOW(), NOW())`,
+          [refundId, orderId, order.user_id, refund_reason || null, proof_images || null]
+        );
+        await db.query(
+          `UPDATE orders SET order_status = 'Yêu cầu hoàn trả', payment_status = 'Chờ hoàn trả' WHERE order_id = ?`,
+          [orderId]
+        );
+
+        // 3. Insert chi tiết các món hàng muốn trả vào refund_items
         for (const returnItem of returnItems) {
           const detail = orderDetails.find(d => d.variant_id === returnItem.variant_id);
 
@@ -1987,44 +2022,25 @@ const removeTone = (str) =>
               const unitPrice = detail.total_amount / detail.quantity;
               const refundAmount = unitPrice * returnQty;
 
-              // 1. Cộng lại kho
-              await db.query(`UPDATE variants SET stock = stock + ? WHERE variant_id = ?`, [returnQty, detail.variant_id]);
-
-              // 2. Trừ quantity và total_amount trong đơn hàng
-              await db.query(`UPDATE order_details SET quantity = quantity - ?, total_amount = total_amount - ? WHERE detail_id = ?`,
-                [returnQty, refundAmount, detail.detail_id]);
-
-              // 🔥 THÊM MỚI: Trừ lượt mua trong bảng products (Dùng GREATEST để tránh bị âm)
-              await db.query(`
-                UPDATE products p
-                JOIN variants v ON p.product_id = v.product_id
-                SET p.product_buying = GREATEST(0, p.product_buying - ?)
-                WHERE v.variant_id = ?
-              `, [returnQty, detail.variant_id]);
+              await db.query(
+                `INSERT INTO refund_items (refund_id, variant_id, quantity, refund_amount) VALUES (?, ?, ?, ?)`,
+                [refundId, detail.variant_id, returnQty, refundAmount]
+              );
             }
           }
         }
 
-        // 3. Kiểm tra xem còn sản phẩm nào không
-        const [updatedDetails] = await db.query(`SELECT SUM(quantity) as totalQty FROM order_details WHERE order_id = ?`, [orderId]);
-        if (updatedDetails[0].totalQty <= 0) {
-          await db.query(`UPDATE orders SET order_status = 'Hoàn trả', shipping_status = 'Hoàn trả', is_received = 'Đã hoàn trả' WHERE order_id = ?`, [orderId]);
-        }
-
-        // 4. Đồng bộ Eco Info
-        const sqlSync = `
-      UPDATE user_eco_infos
-      SET 
-        eco_orders_total = (SELECT COUNT(DISTINCT o.order_id) FROM orders o WHERE o.user_id = ? AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Đã giao')),
-        eco_total = (SELECT COALESCE(SUM(od.total_amount), 0) FROM orders o JOIN order_details od ON o.order_id = od.order_id WHERE o.user_id = ? AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Đã giao'))
-      WHERE user_id = ?;
-    `;
-        await db.query(sqlSync, [order.user_id, order.user_id, order.user_id]);
+        // 4. Lưu thông báo vào user_activities
+        await db.query(
+          `INSERT INTO user_activities (user_id, type, ref_id, description) VALUES (?, 'REFUND', ?, ?)`,
+          [order.user_id, orderId, 'Yêu cầu hoàn trả đã được gửi thành công']
+        );
 
         await db.commit();
-        res.json({ status: "success", message: "Hoàn trả thành công" });
+        res.json({ status: "success", message: "Yêu cầu hoàn trả đã được ghi nhận", data: { refund_id: refundId } });
       } catch (err) {
         await db.rollback();
+        console.error("Lỗi hoàn trả:", err);
         res.status(500).json({ status: "error", message: "Lỗi server" });
       }
     });
@@ -2044,7 +2060,13 @@ const removeTone = (str) =>
                p.product_name as name, p.product_image as image,
                COALESCE(v.variant_id, p.product_id) as sku,
                s.size_name as size,
-               c.color_name as color
+               c.color_name as color,
+               (
+                 SELECT COALESCE(SUM(ri.quantity), 0)
+                 FROM refund_items ri
+                 JOIN refund_requests rr ON ri.refund_id = rr.refund_id
+                 WHERE rr.order_id = od.order_id AND ri.variant_id = od.variant_id AND rr.status IN ('Chờ xử lý', 'Đã hoàn trả')
+               ) as refunded_quantity
              FROM order_details od
              LEFT JOIN variants v ON od.variant_id = v.variant_id
              JOIN products p ON (v.product_id = p.product_id OR od.variant_id = p.product_id)
@@ -2057,6 +2079,7 @@ const removeTone = (str) =>
           order.products = products.map(p => ({
             name: p.name,
             quantity: p.quantity,
+            refunded_quantity: Number(p.refunded_quantity) || 0,
             price: p.total_amount,
             sku: p.sku,
             image: p.image,
@@ -2068,6 +2091,164 @@ const removeTone = (str) =>
       } catch (err) {
         console.error("Lỗi GET /api/orders/user/:userId:", err);
         res.status(500).json({ status: "error", message: "Lỗi lấy danh sách đơn hàng" });
+      }
+    });
+
+    // ======================= CANCELED & REFUND API =======================
+    app.put("/api/orders/:orderId/cancel", async (req, res) => {
+      try {
+        const { orderId } = req.params;
+        const [result] = await db.query(
+          `UPDATE orders SET order_status = 'Hủy', payment_status = 'Chờ hoàn trả', shipping_status = 'Tạm ngưng vận chuyển' WHERE order_id = ?`,
+          [orderId]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ status: "error", message: "Không tìm thấy đơn hàng" });
+        }
+        res.json({ status: "success", message: "Hủy đơn hàng thành công" });
+      } catch (err) {
+        console.error("Lỗi PUT /api/orders/:orderId/cancel:", err);
+        res.status(500).json({ status: "error", message: "Lỗi server khi hủy đơn hàng" });
+      }
+    });
+
+    app.get("/api/admin/refunds/:refundId/approve", async (req, res) => {
+      try {
+        const { refundId } = req.params;
+
+        await db.beginTransaction();
+
+        const [refunds] = await db.query(`SELECT * FROM refund_requests WHERE refund_id = ?`, [refundId]);
+        if (refunds.length === 0) {
+          await db.rollback();
+          return res.status(404).send("<h1 style='color:red;'>Không tìm thấy yêu cầu hoàn trả</h1>");
+        }
+
+        const refund = refunds[0];
+        if (refund.status === 'Đã hoàn trả') {
+          await db.rollback();
+          return res.status(400).send("<h1 style='color:orange;'>Yêu cầu này đã được duyệt trước đó!</h1>");
+        }
+
+        const [refundItems] = await db.query(`SELECT * FROM refund_items WHERE refund_id = ?`, [refundId]);
+        const [orderDetails] = await db.query(`SELECT * FROM order_details WHERE order_id = ?`, [refund.order_id]);
+
+        let totalOrderQty = 0;
+        orderDetails.forEach(item => totalOrderQty += item.quantity);
+
+        // 1. Cập nhật trạng thái phiếu hoàn trả
+        await db.query(`UPDATE refund_requests SET status = 'Đã hoàn trả', updated_at = NOW() WHERE refund_id = ?`, [refundId]);
+
+        // Tính TỔNG số lượng đã hoàn trả của tất cả các phiếu đã duyệt thuộc đơn hàng này
+        const [allRefunds] = await db.query(`
+          SELECT COALESCE(SUM(ri.quantity), 0) as totalRefundQty
+          FROM refund_items ri
+          JOIN refund_requests rr ON ri.refund_id = rr.refund_id
+          WHERE rr.order_id = ? AND rr.status = 'Đã hoàn trả'
+        `, [refund.order_id]);
+        
+        let accumulativeRefundQty = Number(allRefunds[0].totalRefundQty);
+
+        // 2. Cộng lại số lượng sản phẩm vào kho
+        for (const item of refundItems) {
+          await db.query(`UPDATE variants SET stock = stock + ? WHERE variant_id = ?`, [item.quantity, item.variant_id]);
+        }
+
+        // 3. Phân biệt Trả hết hay Trả 1 phần để cập nhật đơn hàng
+        let isFullRefund = accumulativeRefundQty >= totalOrderQty;
+        if (isFullRefund) {
+          await db.query(`UPDATE orders SET order_status = 'Hoàn trả', payment_status = 'Đã hoàn trả' WHERE order_id = ?`, [refund.order_id]);
+        } else {
+          await db.query(`UPDATE orders SET order_status = 'Hoàn trả một phần', payment_status = 'Đã hoàn trả một phần' WHERE order_id = ?`, [refund.order_id]);
+        }
+
+        // 4. Cập nhật lại Ví Eco Info
+        await syncUserEcoInfo(refund.user_id);
+
+        await db.commit();
+
+        res.send(`
+          <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+            <h1 style="color: green;">Duyệt hoàn trả thành công!</h1>
+            <p>Trạng thái: <strong>${isFullRefund ? 'Hoàn trả toàn bộ' : 'Hoàn trả một phần'}</strong></p>
+            <p>Kho hàng đã được cộng lại và điểm Eco User Info đã được tự động tính toán chính xác.</p>
+          </div>
+        `);
+      } catch (err) {
+        await db.rollback();
+        console.error("Lỗi duyệt hoàn trả:", err);
+        res.status(500).send("<h1 style='color:red;'>Lỗi Server</h1>");
+      }
+    });
+
+    app.get("/api/refund/pending/:userId", async (req, res) => {
+      try {
+        const { userId } = req.params;
+        const { type } = req.query;
+
+        let statusCondition = "";
+        if (type === 'canceled') {
+          statusCondition = "AND o.order_status = 'Hủy' AND o.payment_method != 'Thanh Toán Khi Nhận Hàng'";
+        } else if (type === 'returned') {
+          statusCondition = "AND o.order_status IN ('Hoàn trả', 'Yêu cầu hoàn trả')";
+        }
+
+        const [orders] = await db.query(
+          `SELECT o.*, 
+            CASE 
+              WHEN o.order_status = 'Hủy' THEN 
+                (SELECT COALESCE(SUM(od.total_amount), 0) FROM order_details od WHERE od.order_id = o.order_id)
+              ELSE 
+                (SELECT COALESCE(SUM(ri.refund_amount), 0) 
+                 FROM refund_items ri 
+                 JOIN refund_requests rr ON ri.refund_id = rr.refund_id 
+                 WHERE rr.order_id = o.order_id)
+            END as total_amount
+           FROM orders o 
+           WHERE o.user_id = ? AND o.payment_status = 'Chờ hoàn trả' ${statusCondition}
+           ORDER BY o.order_date DESC, o.order_time DESC`,
+          [userId]
+        );
+        res.json({ status: "success", data: orders });
+      } catch (err) {
+        console.error("Lỗi GET /api/refund/pending:", err);
+        res.status(500).json({ status: "error", message: "Lỗi lấy danh sách hoàn trả" });
+      }
+    });
+
+    app.get("/api/refund/completed/:userId", async (req, res) => {
+      try {
+        const { userId } = req.params;
+        const { type } = req.query;
+
+        let statusCondition = "";
+        if (type === 'canceled') {
+          statusCondition = "AND o.order_status = 'Hủy' AND o.payment_method != 'Thanh Toán Khi Nhận Hàng'";
+        } else if (type === 'returned') {
+          statusCondition = "AND o.order_status IN ('Hoàn trả', 'Yêu cầu hoàn trả')";
+        }
+
+        const [orders] = await db.query(
+          `SELECT o.*, 
+            CASE 
+              WHEN o.order_status = 'Hủy' THEN 
+                (SELECT COALESCE(SUM(od.total_amount), 0) FROM order_details od WHERE od.order_id = o.order_id)
+              ELSE 
+                (SELECT COALESCE(SUM(ri.refund_amount), 0) 
+                 FROM refund_items ri 
+                 JOIN refund_requests rr ON ri.refund_id = rr.refund_id 
+                 WHERE rr.order_id = o.order_id)
+            END as total_amount
+           FROM orders o 
+           WHERE o.user_id = ? AND o.payment_status = 'Đã hoàn trả' ${statusCondition}
+           ORDER BY o.order_date DESC, o.order_time DESC`,
+          [userId]
+        );
+        res.json({ status: "success", data: orders });
+      } catch (err) {
+        console.error("Lỗi GET /api/refund/completed:", err);
+        res.status(500).json({ status: "error", message: "Lỗi lấy danh sách đã hoàn trả" });
       }
     });
 
@@ -2092,25 +2273,36 @@ const removeTone = (str) =>
               SELECT COUNT(DISTINCT o.order_id)
               FROM orders o
               WHERE o.user_id = ?
-                AND o.payment_status IN ('Đã thanh toán', 'Đã thanh toán')
-                AND o.order_status IN ('Đã giao', 'Đã giao', 'Hoàn thành')
-                AND o.shipping_status IN ('Đã giao', 'Đã giao')
+                AND o.payment_status IN ('Đã thanh toán', 'Đã hoàn trả một phần')
+                AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Hoàn trả một phần')
+                AND o.shipping_status IN ('Đã giao')
                 AND o.is_received = 'Đã nhận hàng'
             ),
             eco_total = (
-              SELECT COALESCE(SUM(od.total_amount), 0)
-              FROM orders o
-              JOIN order_details od ON o.order_id = od.order_id
-              WHERE o.user_id = ?
-                AND o.payment_status IN ('Đã thanh toán', 'Đã thanh toán')
-                AND o.order_status IN ('Đã giao', 'Đã giao', 'Hoàn thành')
-                AND o.shipping_status IN ('Đã giao', 'Đã giao')
-                AND o.is_received = 'Đã nhận hàng'
+              (
+                SELECT COALESCE(SUM(od.total_amount), 0)
+                FROM orders o
+                JOIN order_details od ON o.order_id = od.order_id
+                WHERE o.user_id = ?
+                  AND o.payment_status IN ('Đã thanh toán', 'Đã hoàn trả một phần')
+                  AND o.order_status IN ('Đã giao', 'Hoàn thành', 'Hoàn trả một phần')
+                  AND o.shipping_status IN ('Đã giao')
+                  AND o.is_received = 'Đã nhận hàng'
+              )
+              - 
+              (
+                SELECT COALESCE(SUM(ri.refund_amount), 0)
+                FROM refund_requests rr
+                JOIN refund_items ri ON rr.refund_id = ri.refund_id
+                JOIN orders o ON rr.order_id = o.order_id
+                WHERE o.user_id = ? AND rr.status = 'Đã hoàn trả'
+                  AND o.order_status = 'Hoàn trả một phần'
+              )
             )
           WHERE user_id = ?;
         `;
 
-        await db.query(sql, [userId, userId, userId]);
+        await db.query(sql, [userId, userId, userId, userId]);
       } catch (error) {
         console.error("Lỗi khi đồng bộ user_eco_infos:", error);
       }
@@ -2352,7 +2544,7 @@ const removeTone = (str) =>
         if (!email) {
           return res.status(400).json({ status: "error", message: "Vui lòng nhập địa chỉ email hợp lệ" });
         }
-        
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
           return res.status(400).json({ status: "error", message: "Định dạng email không hợp lệ" });
